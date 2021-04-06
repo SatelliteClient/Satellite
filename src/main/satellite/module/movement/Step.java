@@ -11,17 +11,20 @@ public class Test extends Module {
     public Test () {
         super("Test", Keyboard.KEY_NUMPAD0, Category.OTHER);
     }
-
+   
     @Override
-    public void onUpdate() {
-
-    	PlayerUtil util	 = new PlayerUtil(mc.player);
-
-    	if(mc.player.isCollidedHorizontally == true) {
-
-    		util.vClip(2.9);
-    	}
-        super.onUpdate();
+    public void onEvent(Event e) {
+        if(e instanceof EventUpdate) {
+            if(e.isPre()) {
+                
+    	        PlayerUtil util	 = new PlayerUtil(mc.player);
+    	        if(mc.player.isCollidedHorizontally == true) {
+    		        util.vClip(2.9);
+                    
+                }
+            }
+        }
+        super.onEvent(e);
     }
 
     @Override
