@@ -17,6 +17,8 @@ public class Test extends Module {
         if(e instanceof EventUpdate) {
             if(e.isPre()) {
                 
+                mc.player.stepHeight = 2.9F
+                    
     	        PlayerUtil util	 = new PlayerUtil(mc.player);
     	        if(mc.player.isCollidedHorizontally == true) {
     		        util.vClip(2.9);
@@ -25,12 +27,6 @@ public class Test extends Module {
             }
         }
         super.onEvent(e);
-    }
-
-    @Override
-    public void onEnable() {
-       mc.player.stepHeight = 2.9F;
-       super.onEnable();
     }
 
     @Override
