@@ -17,7 +17,7 @@ public class Yaw extends Module{
   public void onEvent(Event e) {
 		if(e instanceof EventUpdate) {
 			if(e.isPre()) {{
-        mc.player.rotationYaw = yaw;
+				mc.player.rotationYaw = (float) ( (Math.floor( ( mc.player.rotationYaw + 22.5) / 45 ) * 45));
 			}
 		}
 		super.onEvent(e);
