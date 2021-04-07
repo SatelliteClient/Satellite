@@ -1,15 +1,16 @@
-package com.satellite.module.other;
+package satellite.module.movement;
 
 import org.lwjgl.input.Keyboard;
 
-import satellite.module.Category;
+import satellite.event.Event;
+import satellite.event.listeners.EventUpdate;
 import satellite.module.Module;
-import satellite.module.util.PlayerUtil;
+import satellite.utils.PlayerUtil;
 
-public class Test extends Module {
+public class Step extends Module {
 
-    public Test () {
-        super("Test", Keyboard.KEY_NUMPAD0, Category.OTHER);
+    public Step () {
+        super("Step", Keyboard.KEY_NUMPAD0, Category.MOVEMENT);
     }
    
     @Override
@@ -17,7 +18,7 @@ public class Test extends Module {
         if(e instanceof EventUpdate) {
             if(e.isPre()) {
                 
-                mc.player.stepHeight = 2.9F
+                mc.player.stepHeight = 2.9F;
                     
     	        PlayerUtil util	 = new PlayerUtil(mc.player);
     	        if(mc.player.isCollidedHorizontally == true) {
