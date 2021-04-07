@@ -12,6 +12,7 @@ import satellite.event.Event;
 import satellite.event.listeners.EventHandleTeleport;
 import satellite.event.listeners.EventMotion;
 import satellite.event.listeners.EventRecievePacket;
+import satellite.event.listeners.EventSendingPacket;
 import satellite.event.listeners.EventUpdate;
 import satellite.module.Module;
 import satellite.utils.PlayerUtil;
@@ -74,6 +75,7 @@ public class PacketFly extends Module {
 				Player.freeze();
 				
 				CansellingTeleport++;
+				CansellingTeleport++;
 				clearLagTeleportId++;
 			}
 		}
@@ -92,6 +94,18 @@ public class PacketFly extends Module {
 			}
 		}
 		
+		if(e instanceof EventSendingPacket) {
+			EventSendingPacket event = ((EventSendingPacket)e);
+			Packet packet = event.getPacket();
+			if(packet instanceof CPacketPlayer.Rotation)
+				event.setCansellSending(true);
+
+			if(packet instanceof CPacketPlayer.PositionRotation) {
+				CPacketPlayer.PositionRotation pos = ((CPacketPlayer.PositionRotation) packet);
+				mc.getConnection().sendPacket(new CPacketPlayer.Position(pos.getX(mc.player.posX), pos.getY(mc.player.posY), pos.getZ(mc.player.posZ), false));
+			}
+		}
+		
 		if(e instanceof EventHandleTeleport) {
 			EventHandleTeleport event = ((EventHandleTeleport)e);
 
@@ -104,8 +118,8 @@ public class PacketFly extends Module {
 				event.setCancellTeleporting(true);
 				//CansellingTeleport--;
 				//speed=0.15;
-				speed+=0.1;
-				speed*=0.5;
+				speed=0.1;
+				System.out.print(speed+"\n");
 			}else
 			{
 				speed=0.00;
