@@ -8,6 +8,7 @@ import satellite.event.Event;
 import satellite.event.listeners.EventKey;
 import satellite.module.Module;
 import satellite.module.movement.*;
+import satellite.module.player.InvMove;
 import satellite.module.player.Velocity;
 import satellite.module.render.*;
 import satellite.ui.HUD;
@@ -25,6 +26,7 @@ public class Client {
 		modules.add(new PacketFly());
 		modules.add(new FullBright());
 		modules.add(new Velocity());
+		modules.add(new InvMove());
 	}
 	
 	public static void keyPress(int key) {
