@@ -40,6 +40,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import satellite.Client;
 import satellite.event.EventType;
 import satellite.event.listeners.EventRecievePacket;
+import satellite.event.listeners.EventSendingPacket;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
@@ -159,7 +160,7 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
         {
             try
             {
-                ((Packet<INetHandler>)p_channelRead0_2_).processPacket(this.packetListener);
+                ((Packet<INetHandler>)e.getPacket()).processPacket(this.packetListener);
             }
             catch (ThreadQuickExitException var4)
             {
@@ -181,10 +182,15 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
 
     public void sendPacket(Packet<?> packetIn)
     {
+    	EventSendingPacket e = new EventSendingPacket(packetIn);
+    	
+    	if(e.isCansellSending())
+    		return;
+    	
         if (this.isChannelOpen())
         {
             this.flushOutboundQueue();
-            this.dispatchPacket(packetIn, (GenericFutureListener[])null);
+            this.dispatchPacket(e.getPacket(), (GenericFutureListener[])null);
         }
         else
         {
@@ -192,7 +198,7 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
 
             try
             {
-                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(packetIn, new GenericFutureListener[0]));
+                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(e.getPacket(), new GenericFutureListener[0]));
             }
             finally
             {
