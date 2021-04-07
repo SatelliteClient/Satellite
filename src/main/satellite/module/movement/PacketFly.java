@@ -19,7 +19,7 @@ import satellite.utils.PlayerUtil;
 public class PacketFly extends Module {
 
 	public PacketFly() {
-		super("PacketFly", Keyboard.KEY_NONE, Category.MOVEMENT);
+		super("PacketFly", Keyboard.KEY_G, Category.MOVEMENT);
 	}
 	
 	@Override
@@ -46,7 +46,6 @@ public class PacketFly extends Module {
 				
 				CansellingTeleport=0;
 				
-				System.out.print(clearLagTeleportId - teleportId+"\n");
 				if(clearLagTeleportId<=teleportId)
 				{
 					clearLagTeleportId=teleportId+1;
@@ -62,7 +61,7 @@ public class PacketFly extends Module {
 					Player.Move();
 					Player.freeze();
 				}
-				if(mc.player.ticksExisted%8==0 && !isMoving) {
+				if(mc.player.ticksExisted%5==0 && !isMoving) {
 					mc.player.motionY=-0.04;
 					mc.player.onGround=true;
 					Player.Move();
@@ -85,6 +84,14 @@ public class PacketFly extends Module {
 			event.setPitch(0);
 		}
 		
+		if(e instanceof EventRecievePacket) {
+			EventRecievePacket event = ((EventRecievePacket)e);
+			Packet packet = event.getPacket();
+			if(packet instanceof SPacketPlayerPosLook) {
+				//clearLagTeleportId=((SPacketPlayerPosLook) packet).getTeleportId();
+			}
+		}
+		
 		if(e instanceof EventHandleTeleport) {
 			EventHandleTeleport event = ((EventHandleTeleport)e);
 
@@ -92,13 +99,16 @@ public class PacketFly extends Module {
 			event.setPitch(mc.player.cameraPitch);
 			
 			teleportId=(int) event.getTeleportId();
+			
 			if(CansellingTeleport>0&&mc.player.getDistance(event.getX(), event.getY(), event.getZ()) < 1) {
 				event.setCancellTeleporting(true);
-				CansellingTeleport--;
-				speed=0.15;
+				//CansellingTeleport--;
+				//speed=0.15;
+				speed+=0.1;
+				speed*=0.5;
 			}else
 			{
-				speed=0.02;
+				speed=0.00;
 			}
 		}
 		super.onEvent(e);
