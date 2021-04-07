@@ -1,7 +1,13 @@
 package satellite.module;
 
+import net.minecraft.client.Minecraft;
+import satellite.event.Event;
+import satellite.utils.PlayerUtil;
+
 public class Module {
 
+	protected Minecraft mc = Minecraft.getMinecraft();
+	
 	public Category category;
 	public int keyCode;
 	public String name;
@@ -58,7 +64,7 @@ public class Module {
 	public void init() {}
 	public void onEnable() {}
 	public void onDisable() {}
-	public void onEvent() {}
+	public void onEvent(Event e) {}
 	
 	public enum Category {
 		COMBAT("Combat"),
