@@ -47,36 +47,38 @@ public class PacketFly extends Module {
 				
 				CansellingTeleport=0;
 				
-				if(clearLagTeleportId<=teleportId)
-				{
-					clearLagTeleportId=teleportId+1;
-				}
-				
-				Player.vClip2(999);
-				mc.getConnection().sendPacket(new CPacketConfirmTeleport(clearLagTeleportId));
-				
-				boolean isMoving = mc.player.lastTickPosX != mc.player.posX || mc.player.lastTickPosZ != mc.player.posZ;
-				if(mc.player.ticksExisted%3==0 && isMoving) {
-					mc.player.motionY=-0.04;
-					mc.player.onGround=true;
-					Player.Move();
-					Player.freeze();
-				}
-				if(mc.player.ticksExisted%5==0 && !isMoving) {
-					mc.player.motionY=-0.04;
-					mc.player.onGround=true;
-					Player.Move();
-					Player.freeze();
-				}
+				for(int i = 0; i < 1; i++) {
+					if(clearLagTeleportId<=teleportId)
+					{
+						clearLagTeleportId=teleportId+1;
+					}
 					
-				
-				Player.Strafe(speed);
-				Player.Move();
-				Player.freeze();
-				
-				CansellingTeleport++;
-				CansellingTeleport++;
-				clearLagTeleportId++;
+					Player.vClip2(999, false);
+					mc.getConnection().sendPacket(new CPacketConfirmTeleport(clearLagTeleportId));
+					
+					boolean isMoving = mc.player.lastTickPosX != mc.player.posX || mc.player.lastTickPosZ != mc.player.posZ;
+					if(mc.player.ticksExisted%3==0 && isMoving) {
+						mc.player.motionY=-0.04;
+						mc.player.onGround=true;
+						Player.Move();
+						Player.freeze();
+					}
+					if(mc.player.ticksExisted%5==0 && !isMoving) {
+						mc.player.motionY=-0.04;
+						mc.player.onGround=true;
+						Player.Move();
+						Player.freeze();
+					}
+						
+					
+					Player.Strafe(speed);
+					Player.Move();
+					Player.freeze();
+					
+					CansellingTeleport++;
+					CansellingTeleport++;
+					clearLagTeleportId++;	
+				}
 			}
 		}
 		
@@ -90,7 +92,6 @@ public class PacketFly extends Module {
 			EventRecievePacket event = ((EventRecievePacket)e);
 			Packet packet = event.getPacket();
 			if(packet instanceof SPacketPlayerPosLook) {
-				//clearLagTeleportId=((SPacketPlayerPosLook) packet).getTeleportId();
 			}
 		}
 		
@@ -119,7 +120,6 @@ public class PacketFly extends Module {
 				//CansellingTeleport--;
 				//speed=0.15;
 				speed=0.1;
-				System.out.print(speed+"\n");
 			}else
 			{
 				speed=0.00;

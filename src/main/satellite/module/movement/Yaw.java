@@ -3,6 +3,7 @@ package satellite.module.movement;
 import org.lwjgl.input.Keyboard;
 
 import satellite.event.Event;
+import satellite.event.listeners.EventPlayerInput;
 import satellite.event.listeners.EventUpdate;
 import satellite.module.Module;
 
@@ -16,10 +17,8 @@ public class Yaw extends Module	{
 	
 	@Override
 	public void onEvent(Event e) {
-		if(e instanceof EventUpdate) {
-			if(e.isPre()) {
-				mc.player.rotationYaw = (float) ( (Math.floor( ( mc.player.rotationYaw + 22.5) / 45 ) * 45));
-			}
+		if(e instanceof EventPlayerInput) {
+			mc.player.rotationYaw = (float) ( (Math.floor( ( mc.player.rotationYaw + 22.5) / 45 ) * 45));
 			super.onEvent(e);
 		}
 	}
