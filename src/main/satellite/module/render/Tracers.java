@@ -31,9 +31,10 @@ public class Tracers extends Module {
 			
 			//EntityPlayerSP thePlayer = mc.player;
 			
-			for (Entity entity : mc.world.loadedEntityList) {
+			//test ima burokku wo fill sitanowo render sitai
+			/*for (Entity entity : mc.world.loadedEntityList) {
 				RenderUtil.drawBlockBox(new BlockPos(entity.posX, entity.posY, entity.posZ), new Color(255, 255, 255), false);
-			}
+			}*/
 			
 			
 			GL11.glPushMatrix();
@@ -52,7 +53,7 @@ public class Tracers extends Module {
 					continue;
 				boolean bool = false;
 				Color color = new Color(255, 255, 255);
-				//drawTraces(entity, color);
+				drawTraces(entity, color);
 			}
 			GL11.glEnd();
 			GL11.glEnable(3553);
@@ -81,8 +82,8 @@ public class Tracers extends Module {
       
       RenderUtil.glColor(color);
 	  GL11.glVertex3d(eyeVector.getXCoord(), thePlayer.getEyeHeight() + eyeVector.getYCoord(), eyeVector.getZCoord());
-      //GL11.glVertex3d(x, y, z);
-      //GL11.glVertex3d(x, y, z);
+      GL11.glVertex3d(x, y, z);
+      GL11.glVertex3d(x, y, z);
       GL11.glVertex3d(x, y + entity.getEyeHeight(), z);
       return;
   }
