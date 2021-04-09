@@ -8,8 +8,7 @@ import satellite.event.Event;
 import satellite.event.listeners.EventKey;
 import satellite.module.Module;
 import satellite.module.movement.*;
-import satellite.module.player.InvMove;
-import satellite.module.player.Velocity;
+import satellite.module.player.*;
 import satellite.module.render.*;
 import satellite.ui.HUD;
 
@@ -24,7 +23,7 @@ public class Client {
 		modules.add(new Step());
 		modules.add(new Yaw());
 		modules.add(new PacketFly());
-		modules.add(new FullBright());
+		modules.add(new Fullbright());
 		modules.add(new Velocity());
 		modules.add(new InvMove());
 	}
