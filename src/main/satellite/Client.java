@@ -26,6 +26,8 @@ public class Client {
 		modules.add(new Fullbright());
 		modules.add(new Velocity());
 		modules.add(new InvMove());
+		modules.add(new Tracers());
+		modules.add(new LongJump());
 	}
 	
 	public static void keyPress(int key) {
