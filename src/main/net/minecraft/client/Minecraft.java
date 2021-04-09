@@ -256,7 +256,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
 
     /** True if the player is connected to a realms server */
     private boolean connectedToRealms;
-    private final Timer timer = new Timer(20.0F);
+    public Timer timer = new Timer(20.0F);
 
     /** Instance of PlayerUsageSnooper. */
     private final Snooper usageSnooper = new Snooper("client", this, MinecraftServer.getCurrentTimeMillis());
@@ -1185,7 +1185,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
         long i1 = System.nanoTime() - l;
         this.checkGLError("Pre render");
         this.mcProfiler.endStartSection("sound");
-        this.mcSoundHandler.setListener(this.player, this.timer.field_194147_b);
+        this.mcSoundHandler.setListener(this.player, this.timer.partialTicks);
         this.mcProfiler.endSection();
         this.mcProfiler.startSection("render");
         GlStateManager.pushMatrix();
@@ -1198,7 +1198,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
         if (!this.skipRenderWorld)
         {
             this.mcProfiler.endStartSection("gameRenderer");
-            this.entityRenderer.updateCameraAndRender(this.isGamePaused ? this.field_193996_ah : this.timer.field_194147_b, i);
+            this.entityRenderer.updateCameraAndRender(this.isGamePaused ? this.field_193996_ah : this.timer.partialTicks, i);
             this.mcProfiler.endStartSection("toasts");
             this.field_193034_aS.func_191783_a(new ScaledResolution(this));
             this.mcProfiler.endSection();
@@ -1228,7 +1228,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
         this.framebufferMc.framebufferRender(this.displayWidth, this.displayHeight);
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();
-        this.entityRenderer.renderStreamIndicator(this.timer.field_194147_b);
+        this.entityRenderer.renderStreamIndicator(this.timer.partialTicks);
         GlStateManager.popMatrix();
         this.mcProfiler.startSection("root");
         this.updateDisplay();
@@ -1241,11 +1241,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
         {
             if (this.isGamePaused)
             {
-                this.field_193996_ah = this.timer.field_194147_b;
+                this.field_193996_ah = this.timer.partialTicks;
             }
             else
             {
-                this.timer.field_194147_b = this.field_193996_ah;
+                this.timer.partialTicks = this.field_193996_ah;
             }
 
             this.isGamePaused = flag;
@@ -3525,7 +3525,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
 
     public float getRenderPartialTicks()
     {
-        return this.timer.field_194147_b;
+        return this.timer.partialTicks;
     }
 
     public float func_193989_ak()
