@@ -22,8 +22,8 @@ public class PlayerUtil {
 		mc.player.setPosition(mc.player.posX, mc.player.posY + d, mc.player.posZ);
 	}
 
-	public void vClip2(double d) {
-		mc.getConnection().sendPacket(new CPacketPlayer.Position(mc.player.posX, mc.player.posY+d, mc.player.posZ, false));
+	public void vClip2(double d, boolean onGround) {
+		mc.getConnection().sendPacket(new CPacketPlayer.Position(mc.player.posX, mc.player.posY+d, mc.player.posZ, onGround));
 	}
 	
 	public int InputY() {
