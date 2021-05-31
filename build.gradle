@@ -1,0 +1,129 @@
+buildscript {
+    repositories {
+        jcenter()
+
+        maven {
+            name = 'forge'
+            url = 'https://files.minecraftforge.net/maven'
+        }
+
+        maven {
+            name = 'SpongePowered'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
+        }
+    }
+
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+version = project.version
+group = 'com.github'
+
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    maven {
+        name = 'spongepowered-repo'
+        url = 'https://repo.spongepowered.org/repository/maven-public/'
+    }
+    maven {
+        name = "jitpack.io"
+        url = "https://jitpack.io"
+    }
+    mavenCentral()
+    jcenter()
+}
+
+minecraft {
+    mappings channel: 'stable', version: '39-1.12'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'fml.coreMods.load', 'com.github.satellite.mixin.MixinLoaderForge'
+            property 'mixin.env.disableRefMap', 'true'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
+    }
+}
+
+configurations {
+    jarLibs
+
+    all {
+        resolutionStrategy {
+            force 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+
+    jarLibs('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+        exclude module: 'commons-io'
+        exclude module: 'gson'
+        exclude module: 'guava'
+        exclude module: 'launchwrapper'
+        exclude module: 'log4j-core'
+    }
+
+    annotationProcessor('org.spongepowered:mixin:0.8.2:processor') {
+        exclude module: 'gson'
+    }
+
+    jarLibs('org.reflections:reflections:0.9.12') {
+        exclude module: 'gson'
+        exclude module: 'guava'
+    }
+
+    compileOnly 'org.jetbrains:annotations:20.1.0'
+    implementation configurations.jarLibs
+}
+
+mixin {
+    defaultObfuscationEnv 'searge'
+    add sourceSets.main, 'mixins.satellite.refmap.json'
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    exclude '**/rawimagefiles'
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version
+    }
+}
+
+jar {
+    manifest.attributes(
+            'Manifest-Version': 1.0,
+            'MixinConfigs': 'mixins.satellite.json',
+            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+            'TweakOrder': 0,
+            'FMLCorePluginContainsFMLMod': 'true',
+            'FMLCorePlugin': 'com.github.satellite.mixin.MixinLoaderForge',
+            'ForceLoadAsMod': 'true'
+    )
+
+    from {
+        configurations.jarLibs.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
