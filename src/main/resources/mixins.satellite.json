@@ -1,0 +1,18 @@
+{
+  "verbose": false,
+  "compatibilityLevel": "JAVA_8",
+  "package": "com.github.satellite.mixin.client",
+  "refmap": "mixins.satellite.refmap.json",
+  "mixins": [
+    "IMixinMapData",
+    "MixinEntityPlayerSP",
+    "MixinGuiIngame",
+    "MixinMinecraft",
+    "MixinNetworkManager",
+    "MixinMovementInputFromOptions",
+    "MixinEntityRenderer",
+    "MixinNetHandlerPlayClient",
+    "MixinGuiMainMenu",
+    "AccessorMinecraft"
+  ]
+}
