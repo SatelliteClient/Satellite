@@ -47,9 +47,6 @@ public class Phase extends Module {
 		{
 			if(e instanceof EventUpdate) {
 				if(mc.player.collidedVertically) {
-					if(tickTimer==1) {
-						PlayerUtils.vClip2(999, true);
-					}
 					double speed = 1;
 					double late = 60;
 					int tick = 50;
@@ -57,7 +54,13 @@ public class Phase extends Module {
 					late = 1 / late;
 					late = 1 - late;
 					PlayerUtils.Strafe(speed - speed*Math.pow(late, tickTimer%tick));
-					mc.player.setPosition(mc.player.posX += mc.player.motionX, mc.player.posY, mc.player.posZ += mc.player.motionZ);
+
+					if (tick - (tickTimer%tick) < 20) {
+						PlayerUtils.Strafe(1.98f);
+						mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
+					}
+
+					mc.player.setPosition(mc.player.posX + mc.player.motionX, mc.player.posY, mc.player.posZ + mc.player.motionZ);
 					PlayerUtils.vClip2(0, true);
 					tickTimer++;
 				}

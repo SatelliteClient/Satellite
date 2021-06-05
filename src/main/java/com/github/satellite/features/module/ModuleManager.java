@@ -62,6 +62,7 @@ public class ModuleManager {
 		modules.add(new ClickTP());
 		modules.add(new AntiChunkBan());
 		modules.add(new AntiCrystal());
+		modules.add(new HighJump());
 		modules.add(new Debug());
 	}
 	

@@ -86,6 +86,7 @@ public class Scaffold extends Module {
 			if(!poss.isEmpty()) {
 				event.setYaw((float) poss.get(0).rotx);
 				event.setPitch((float) poss.get(0).roty);
+				event.cancel();
 			}
 		}
 		if(e instanceof EventPlayerInput) {

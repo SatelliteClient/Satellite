@@ -5,7 +5,11 @@ public class Event<T> {
 	public boolean cancelled;
 	public EventType type;
 	public EventDirection direction;
-	
+
+	public void cancel() {
+		this.cancelled = true;
+	}
+
 	public boolean isCancelled() {
 		return cancelled;
 	}

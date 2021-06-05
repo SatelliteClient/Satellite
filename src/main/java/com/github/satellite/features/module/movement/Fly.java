@@ -78,8 +78,6 @@ public class Fly extends Module {
                 lastTickSpeed = mc.player.isPotionActive(Potion.getPotionById(1)) ? 1.34D : 1.261D ;
 				break;
 			case "Funcraft":
-				lastTickSpeed = mc.player.onGround ? .5D : PlayerUtils.getSpeed();
-				break;
 			case "Normal":
 				lastTickSpeed = mc.player.onGround ? .5D : PlayerUtils.getSpeed();
 				break;
@@ -88,7 +86,7 @@ public class Fly extends Module {
 				if(!mc.player.onGround)
 					break;
 				mc.player.jump();
-				mc.player.posY += 0.41999998688697815D;
+				PlayerUtils.vClip(.41999998688697815D);
 			}
 		}
 		super.onEnable();
@@ -115,10 +113,12 @@ public class Fly extends Module {
 		case "Vanilla":
 		{
 			if(e instanceof EventMotion) {
-				mc.player.motionY= PlayerUtils.InputY()*(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
-				PlayerUtils.Strafe(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
-				PlayerUtils.Move();
-				PlayerUtils.freeze();
+				if (e.isPre()) {
+					mc.player.motionY= PlayerUtils.InputY()*(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
+					PlayerUtils.Strafe(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
+					PlayerUtils.move();
+					PlayerUtils.freeze();
+				}
 			}
 			if(e instanceof EventRenderGUI) {
 				String speed = String.valueOf(Math.sqrt(Math.pow(mc.player.posX - mc.player.prevPosX, 2) + Math.pow(mc.player.posZ - mc.player.prevPosZ, 2)) * 10);
@@ -156,9 +156,9 @@ public class Fly extends Module {
 							y1 -= y;
 							int i=0;
 							for(i=0; i<5; i++) {
-								PlayerUtils.Move();
+								PlayerUtils.move();
 								PlayerUtils.vClip2(y1, false);
-								PlayerUtils.Move();
+								PlayerUtils.move();
 								PlayerUtils.vClip2(0, false);
 								ClientUtils.setTimer(1F / (i*2));
 							}
@@ -212,9 +212,9 @@ public class Fly extends Module {
 			}
 			
 			if(e instanceof EventMotion) {
-				EventMotion event = (EventMotion)e;
-				PlayerUtils.vClip(mc.player.ticksExisted%2==0?1E-5:0);
-				tickTimer++;
+				if (e.isPre()) {
+					PlayerUtils.vClip(mc.player.ticksExisted%2==0?-1E-5:1E-5);
+				}
 			}
 			if(e instanceof EventPacket) {
 				EventPacket event = (EventPacket)e;
@@ -253,7 +253,7 @@ public class Fly extends Module {
 					PlayerUtils.Strafe(speed);
 					for(int i1=0; i1<4; i1++) {
 						PlayerUtils.vClip(PlayerUtils.InputY()*speed);
-						PlayerUtils.Move();
+						PlayerUtils.move();
 						CansellingTeleport++;
 					}
 

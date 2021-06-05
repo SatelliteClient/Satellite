@@ -32,9 +32,8 @@ public class MixinNetHandlerPlayClient {
         EventHandleTeleport e = new EventHandleTeleport(packetIn);
         e.setDirection(EventDirection.INCOMING);
         Satellite.onEvent(e);
-        System.out.print(e.getTeleportId()+"\n");
 
-        if (e.isCancellTeleporting()) {
+        if (e.isCancellTeleporting() || e.isCancelled()) {
             ci.cancel();
             EntityPlayer entityplayer = this.client.player;
             double d0 = packetIn.getX();

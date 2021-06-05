@@ -2,8 +2,10 @@ package com.github.satellite.features.module.misc;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventPacket;
+import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
+import com.github.satellite.utils.PlayerUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketBlockAction;
@@ -23,30 +25,34 @@ public class Debug extends Module {
 
     @Override
     public void init() {
-        mode = new ModeSetting("Mode", "Riden", new String[] {"Riden"});
+        mode = new ModeSetting("Mode", "Riden", new String[] {"Riden", "Speed"});
         addSetting(mode);
         super.init();
     }
 
     @Override
     public void onEvent(Event<?> e) {
-        if(e instanceof EventPacket) {
-            EventPacket event = (EventPacket)e;
-            Packet p = event.getPacket();
-            if(event.isIncoming()) {
-                switch (mode.getMode()) {
-                    case "Riden":
+        switch (mode.getMode()) {
+            case "Riden":
+                if (e instanceof EventPacket) {
+                    EventPacket event = (EventPacket)e;
+                    Packet p = event.getPacket();
+                    if(event.isIncoming()) {
                         if(mc.player.getRidingEntity() != null) {
                             mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(mc.player.getRidingEntity().toString()));
                             mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(String.valueOf(mc.player.getRidingEntity().getEntityId())));
                         }
-                        break;
-
-
-                    default:
-                        break;
+                    }
                 }
-            }
+                break;
+            case "Speed":
+                if (e instanceof EventUpdate) {
+                    mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(String.valueOf(PlayerUtils.getSpeed())));
+                }
+                break;
+
+            default:
+                break;
         }
         super.onEvent(e);
     }

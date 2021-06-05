@@ -28,7 +28,7 @@ public class KillAura extends Module {
 		super.init();
 	}
 	
-	ArrayList<Entity> targets;
+	ArrayList<Entity> targets = new ArrayList<Entity>();
 	
 	float yaw = 0, pitch = 0;
 
@@ -93,6 +93,8 @@ public class KillAura extends Module {
         			event.yaw = 180-(float)x;
         			event.pitch = (float) y;
     			}
+
+				event.cancel();
         	}
         }
         

@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Connection extends Thread{
+public class Connection extends Thread {
 
 	PrintWriter pr;
 	InputStreamReader in;

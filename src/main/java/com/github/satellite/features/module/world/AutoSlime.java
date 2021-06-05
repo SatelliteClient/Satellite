@@ -59,7 +59,7 @@ public class AutoSlime extends Module {
 
 				if(!mc.player.isSneaking())
 					mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
-				for(int i=0; i < (mc.player.ticksExisted%3==0?4:0); i++) {
+				for(int i=0; i < 1; i++) {//(mc.player.ticksExisted%3==0?4:0)
 					placeablePos = new CopyOnWriteArrayList<BlockUtils>();
 					
 					int s = mc.player.inventory.currentItem;
@@ -121,12 +121,14 @@ public class AutoSlime extends Module {
 	public void scanPos(BlockPos pos, double dist) {
 		int i = 0;
 		
-		double[] vec = new double[] {pos.getX(), pos.getZ()};
+		double[] vec = new double[] {160 + pos.getX(), 160 - pos.getZ()};
 		
 		double d = MathUtils.getDistanceSq(vec);
 		//if(pos.getY()==18) {i++;}
 		//if(d > 999) {i++;}
 		//if(d > 1002) {i--;}
+		if(d > 40) {i++;}
+		if(d > 41) {i--;}
 		//if(d > 50) {i++;}
 		//if(d > 51) {i--;}
 		//if(pos.getY() > mc.player.posY-1) {i=0;}
@@ -135,7 +137,7 @@ public class AutoSlime extends Module {
 		//if(pos.getY()==6) {i=1;}
 		//if(pos.getY() == 65) {i=1;}
 		//if(pos.getY() == 119) {i++;}
-		if(pos.getY() == mc.player.posY-1) {i=1;}
+		//if(pos.getY() == mc.player.posY-1) {i=1;}
 		//if(pos.getY() == (int)mc.player.posY) {i=1;}
 		//if(pos.getY() < mc.player.posY) {i=1;}
 		//if(mc.world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockEmptyDrops)i++;

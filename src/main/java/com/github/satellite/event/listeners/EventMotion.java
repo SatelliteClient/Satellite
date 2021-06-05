@@ -1,6 +1,8 @@
 package com.github.satellite.event.listeners;
 
 import com.github.satellite.event.Event;
+import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
 
 public class EventMotion extends Event<EventMotion> {
 

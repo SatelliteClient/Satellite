@@ -13,6 +13,9 @@
     "MixinEntityRenderer",
     "MixinNetHandlerPlayClient",
     "MixinGuiMainMenu",
-    "AccessorMinecraft"
+    "AccessorMinecraft",
+    "AccessorTimer",
+    "AccessorEntity",
+    "AccessorEntityPlayer"
   ]
 }

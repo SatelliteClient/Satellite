@@ -3,6 +3,7 @@ package com.github.satellite.network;
 import com.github.satellite.network.packet.NetWorkManager;
 import com.github.satellite.network.packet.packets.CPSetPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -25,7 +26,6 @@ public class SatelliteNetClient {
 	public void sendLoginPacket() {
 		//this.netWorkManager.sendPacket(new CP);
 	}
-
 	public void sendPlayerInfo(EntityPlayerSP player) {
 		this.netWorkManager.sendPacket(new CPSetPlayer(player.getEntityId(), (int)player.posX, (int)player.posY, (int)player.posZ, player.getName()));
 	}

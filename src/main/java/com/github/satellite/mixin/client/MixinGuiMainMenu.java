@@ -13,7 +13,7 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Inject(method = "initGui", at = @At("RETURN"))
     private void GuiMainMenu(CallbackInfo callbackInfo) {
-        this.buttonList.add(new GuiButton(500, this.width / 2 + 102, this.height / 4 + 48 + 24 * 2, 98, 20, "login"));
+        this.buttonList.add(new GuiButton(500, this.width / 2 + 104, this.height / 4 + 48 + 24 * 2, 98, 20, "login"));
     }
 
     @Inject(method = "actionPerformed", at = @At("HEAD"))

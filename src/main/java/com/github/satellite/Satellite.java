@@ -1,8 +1,9 @@
 package com.github.satellite;
 
+import com.github.satellite.command.CommandManager;
+import com.github.satellite.event.listeners.EventChat;
 import com.github.satellite.network.SatelliteNetClient;
 import com.github.satellite.event.Event;
-import com.github.satellite.features.module.Module;
 import com.github.satellite.features.module.ModuleManager;
 import com.github.satellite.ui.HUD;
 import com.github.satellite.ui.clickGUI.GuiClickGUI;
@@ -28,6 +29,7 @@ public class Satellite
 	public static SatelliteNetClient SatelliteNet;
 	public static boolean isConnected;
 	public static ThemeManager themeManager = new ThemeManager();
+	public static CommandManager commandManager = new CommandManager();
 	public static Minecraft mc = Minecraft.getMinecraft();
 
     @EventHandler
@@ -43,6 +45,7 @@ public class Satellite
 			isConnected=false;
 		}
 
+		commandManager.init();
 		ModuleManager.registerModules();
 		GuiClickGUI.loadModules();
 	}
@@ -77,8 +80,14 @@ public class Satellite
 	public void chatEvent(ClientChatEvent event) {
 		String message = event.getMessage();
 
-		if (message.startsWith(".")) {
+		if (commandManager.handleCommand(message)) {
 			event.setCanceled(true);
 		}
+
+		if(message.startsWith(commandManager.prefix)) {
+			event.setCanceled(true);
+		}
+
+		onEvent(new EventChat(message));
 	}
 }

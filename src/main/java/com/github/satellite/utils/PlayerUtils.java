@@ -48,7 +48,7 @@ public class PlayerUtils {
 		mc.player.motionZ=Math.cos(r)*getSpeed();
 	}
 	
-	public static void Move() {
+	public static void move() {
 		mc.player.move(MoverType.SELF, mc.player.motionX, mc.player.motionY, mc.player.motionZ);
 	}
 	
