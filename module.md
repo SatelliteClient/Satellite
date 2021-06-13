@@ -1,4 +1,4 @@
-[README](README.md)
+[README](https://github.com/SatelliteClient/Satellite)
 - Combat
   - AntiCrystal
   - Criticals
