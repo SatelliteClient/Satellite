@@ -1,7 +1,7 @@
 package com.github.satellite.utils.render.easing;
 
-public class EaseValue {
+public abstract class EaseValue {
 
-	public void updateEase() {}
-	
+	public abstract void updateEase();
+
 }

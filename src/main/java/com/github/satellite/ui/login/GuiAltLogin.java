@@ -35,8 +35,6 @@ public final class GuiAltLogin extends GuiScreen {
             			String username=this.multi.getText().split(":")[0];
             			String password=this.multi.getText().split(":")[1];
             			
-            			System.out.print(username+", "+password+"\n");
-            			
             			this.thread = new AltLoginThread(username, password, false);
             		}catch (Exception e) {
             			this.thread = new AltLoginThread("", "", false);

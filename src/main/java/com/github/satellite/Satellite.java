@@ -36,7 +36,6 @@ public class Satellite
     public void init(FMLInitializationEvent event)
     {
 		MinecraftForge.EVENT_BUS.register(this);
-
 		try {
 			SatelliteNet = new SatelliteNetClient();
 			SatelliteNet.sendLoginPacket();

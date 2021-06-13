@@ -15,6 +15,7 @@ import com.github.satellite.utils.render.AnimationUtil.Mode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ public class GuiClickGUI extends GuiScreen {
 	public static List<Panel> menuElements = new ArrayList<Panel>();
 	
 	public GuiClickGUI(int screen) {
-
 		GuiClickGUI.gui.panels = new CopyOnWriteArrayList<>();
 		
 		String[] els = new String[] {"ClickGUI", "Map", "Satellite Settings", "Player", "Team", "Waypoints"};
@@ -141,7 +141,7 @@ public class GuiClickGUI extends GuiScreen {
 		}*/
 		gui.draw(mouseX, mouseY, partialTicks);
 	}
-	
+
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		for(Category p : panels) {

@@ -100,10 +100,9 @@ public class BlockUtils {
 		
 		EnumActionResult enumactionresult = mc.playerController.processRightClickBlock(mc.player, mc.world, new BlockPos(pos.getX() - f.getDirectionVec().getX(), pos.getY() - f.getDirectionVec().getY(), pos.getZ() - f.getDirectionVec().getZ()), f, vec, EnumHand.MAIN_HAND);
 
-        if (enumactionresult == EnumActionResult.SUCCESS)
+        if (enumactionresult == EnumActionResult.SUCCESS && swing)
         {
             mc.player.swingArm(EnumHand.MAIN_HAND);
-            return;
         }
 	}
 	

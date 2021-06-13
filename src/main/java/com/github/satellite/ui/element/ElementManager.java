@@ -38,7 +38,9 @@ public class ElementManager {
 		}
 		Collections.reverse(panels);
 	}
-	
+
+	public int RENDER_PHASE = 0;
+
 	public void draw(int mouseX, int mouseY, float partialTicks) {
 		for(Panel p : panels) {
 			for(EaseValue value : p.values) {
@@ -66,5 +68,10 @@ public class ElementManager {
 	
 	public void addPanel(Panel...panels) {
 		this.panels.addAll(Arrays.asList(panels));
+	}
+
+	enum RENDER_PHASE {
+		PRE,
+		
 	}
 }

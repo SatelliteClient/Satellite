@@ -40,7 +40,7 @@ public class Panel {
 	}
 
 	public Panel(ElementManager elementManager, double x, double y, double w, double h, boolean isCollidable) {
-		this(elementManager, new Value(x, null), new Value(y, null), new Value(w, null), new Value(h, null), isCollidable);
+		this(elementManager, new Value((float) x, null), new Value((float)y, null), new Value((float)w, null), new Value((float)h, null), isCollidable);
 	}
 
 	public void up() {
@@ -108,7 +108,7 @@ public class Panel {
 	}
 
 	public void setHeight(double height) {
-		this.height.value = height;
+		this.height.value = (float) height;
 	}
 
 	public long getOnHover() {

@@ -8,14 +8,26 @@ import javax.annotation.Nullable;
 
 public class Value extends EaseValue {
 
-	public double value;
-	public double lastValue;
-	public double easeTo;
-	public double duration;
+	public float value;
+	public float lastValue;
+	public float easeTo;
+	public float duration;
 	public TimeHelper timeHelper;
 	public Mode easeMode;
-	
+
 	public Value(double value, @Nullable Mode easeMode) {
+		this.value = (float) value;
+		this.timeHelper = new TimeHelper();
+		this.lastValue = (float) value;
+		this.easeTo = (float) value;
+		this.duration = 1;
+		this.easeMode = easeMode;
+		if(easeMode == null) {
+			this.easeMode = Mode.NONE;
+		}
+	}
+
+	public Value(float value, @Nullable Mode easeMode) {
 		this.value = value;
 		this.timeHelper = new TimeHelper();
 		this.lastValue = value;
@@ -27,24 +39,24 @@ public class Value extends EaseValue {
 		}
 	}
 	
-	public double getValue() {
+	public float getValue() {
 		return value;
 	}
 	
-	public void setValue(double value) {
+	public void setValue(float value) {
 		this.value = value;
 	}
 	
 	@Override
 	public void updateEase() {
-		double time = timeHelper.getCurrentMS() - timeHelper.getLastMS();
+		long time = timeHelper.getCurrentMS() - timeHelper.getLastMS();
 		this.value = lastValue + AnimationUtil.easing(easeMode, time / duration, easeTo - lastValue);
-		if(Math.abs(value - easeTo) < 1) {
+		if(Math.abs(value - easeTo) < 1/duration) {
 			this.value = easeTo;
 		}
 	}
 	
-	public void easeTo(double value, double duration, boolean reset) {
+	public void easeTo(float value, float duration, boolean reset) {
 		if(this.easeTo != value) {
 			timeHelper.reset();
 			this.lastValue = this.value;
@@ -60,32 +72,32 @@ public class Value extends EaseValue {
 		
 		public Value value;
 		
-		private num(double value) {
+		private num(float value) {
 			this.value = new Value(value, null);
 		}
 	}
 
-	public double getLastValue() {
+	public float getLastValue() {
 		return lastValue;
 	}
 
-	public void setLastValue(double lastValue) {
+	public void setLastValue(float lastValue) {
 		this.lastValue = lastValue;
 	}
 
-	public double getEaseTo() {
+	public float getEaseTo() {
 		return easeTo;
 	}
 
-	public void setEaseTo(double easeTo) {
+	public void setEaseTo(float easeTo) {
 		this.easeTo = easeTo;
 	}
 
-	public double getDuration() {
+	public float getDuration() {
 		return duration;
 	}
 
-	public void setDuration(double duration) {
+	public void setDuration(float duration) {
 		this.duration = duration;
 	}
 

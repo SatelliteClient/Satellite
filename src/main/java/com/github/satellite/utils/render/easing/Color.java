@@ -8,26 +8,26 @@ import javax.annotation.Nullable;
 
 public class Color extends EaseValue {
 
-	public double red;
-	public double green;
-	public double blue;
-	public double alpha;
+	public float red;
+	public float green;
+	public float blue;
+	public float alpha;
 	
-	public double lastRed;
-	public double lastGreen;
-	public double lastBlue;
-	public double lastAlpha;
+	public float lastRed;
+	public float lastGreen;
+	public float lastBlue;
+	public float lastAlpha;
 	
-	public double easeToRed;
-	public double easeToGreen;
-	public double easeToBlue;
-	public double easeToAlpha;
+	public float easeToRed;
+	public float easeToGreen;
+	public float easeToBlue;
+	public float easeToAlpha;
 	
-	public double duration;
+	public float duration;
 	public TimeHelper timeHelper;
 	public Mode easeMode;
 	
-	public Color(double red, double green, double blue, double alpha, @Nullable Mode easeMode) {
+	public Color(float red, float green, float blue, float alpha, @Nullable Mode easeMode) {
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
@@ -57,14 +57,14 @@ public class Color extends EaseValue {
 
 	@Override
 	public void updateEase() {
-		double time = timeHelper.getCurrentMS() - timeHelper.getLastMS();
+		float time = timeHelper.getCurrentMS() - timeHelper.getLastMS();
 		this.red = lastRed + AnimationUtil.easing(easeMode, time / duration, easeToRed - lastRed);
 		this.green = lastGreen + AnimationUtil.easing(easeMode, time / duration, easeToGreen - lastGreen);
 		this.blue = lastBlue + AnimationUtil.easing(easeMode, time / duration, easeToBlue - lastBlue);
 		this.alpha = lastAlpha + AnimationUtil.easing(easeMode, time / duration, easeToAlpha - lastAlpha);
 	}
 	
-	public void easeTo(double red, double green, double blue, double alpha, double duration, boolean reset) {
+	public void easeTo(float red, float green, float blue, float alpha, float duration, boolean reset) {
 		if(!(this.easeToRed == red && this.easeToGreen == green && this.easeToBlue == blue && this.easeToAlpha == alpha)) {
 			timeHelper.reset();
 			this.lastRed = this.red;
@@ -83,107 +83,107 @@ public class Color extends EaseValue {
 		return new java.awt.Color((int)red, (int)green, (int)blue, (int)alpha);
 	}
 
-	public double getRed() {
+	public float getRed() {
 		return red;
 	}
 
-	public void setRed(double red) {
+	public void setRed(float red) {
 		this.red = red;
 	}
 
-	public double getGreen() {
+	public float getGreen() {
 		return green;
 	}
 
-	public void setGreen(double green) {
+	public void setGreen(float green) {
 		this.green = green;
 	}
 
-	public double getBlue() {
+	public float getBlue() {
 		return blue;
 	}
 
-	public void setBlue(double blue) {
+	public void setBlue(float blue) {
 		this.blue = blue;
 	}
 
-	public double getAlpha() {
+	public float getAlpha() {
 		return alpha;
 	}
 
-	public void setAlpha(double alpha) {
+	public void setAlpha(float alpha) {
 		this.alpha = alpha;
 	}
 
-	public double getLastRed() {
+	public float getLastRed() {
 		return lastRed;
 	}
 
-	public void setLastRed(double lastRed) {
+	public void setLastRed(float lastRed) {
 		this.lastRed = lastRed;
 	}
 
-	public double getLastGreen() {
+	public float getLastGreen() {
 		return lastGreen;
 	}
 
-	public void setLastGreen(double lastGreen) {
+	public void setLastGreen(float lastGreen) {
 		this.lastGreen = lastGreen;
 	}
 
-	public double getLastBlue() {
+	public float getLastBlue() {
 		return lastBlue;
 	}
 
-	public void setLastBlue(double lastBlue) {
+	public void setLastBlue(float lastBlue) {
 		this.lastBlue = lastBlue;
 	}
 
-	public double getLastAlpha() {
+	public float getLastAlpha() {
 		return lastAlpha;
 	}
 
-	public void setLastAlpha(double lastAlpha) {
+	public void setLastAlpha(float lastAlpha) {
 		this.lastAlpha = lastAlpha;
 	}
 
-	public double getEaseToRed() {
+	public float getEaseToRed() {
 		return easeToRed;
 	}
 
-	public void setEaseToRed(double easeToRed) {
+	public void setEaseToRed(float easeToRed) {
 		this.easeToRed = easeToRed;
 	}
 
-	public double getEaseToGreen() {
+	public float getEaseToGreen() {
 		return easeToGreen;
 	}
 
-	public void setEaseToGreen(double easeToGreen) {
+	public void setEaseToGreen(float easeToGreen) {
 		this.easeToGreen = easeToGreen;
 	}
 
-	public double getEaseToBlue() {
+	public float getEaseToBlue() {
 		return easeToBlue;
 	}
 
-	public void setEaseToBlue(double easeToBlue) {
+	public void setEaseToBlue(float easeToBlue) {
 		this.easeToBlue = easeToBlue;
 	}
 
-	public double getEaseToAlpha() {
+	public float getEaseToAlpha() {
 		return easeToAlpha;
 	}
 
-	public void setEaseToAlpha(double easeToAlpha) {
+	public void setEaseToAlpha(float easeToAlpha) {
 		this.easeToAlpha = easeToAlpha;
 	}
 
-	public double getDuration() {
+	public float getDuration() {
 		return duration;
 	}
 
-	public void setDuration(double duration) {
+	public void setDuration(float duration) {
 		this.duration = duration;
 	}
 

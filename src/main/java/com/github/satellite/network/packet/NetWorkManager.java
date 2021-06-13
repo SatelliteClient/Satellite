@@ -2,10 +2,7 @@ package com.github.satellite.network.packet;
 
 import com.github.satellite.Satellite;
 import com.github.satellite.event.listeners.EventRecieveSateNet;
-import com.github.satellite.network.packet.packets.SPChangeBlockAction;
-import com.github.satellite.network.packet.packets.SPFillBlocks;
-import com.github.satellite.network.packet.packets.SPGoto;
-import net.minecraft.client.Minecraft;
+import com.github.satellite.network.packet.packets.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +15,9 @@ public class NetWorkManager {
 		this.registedPacket.add(SPGoto.class);
 		this.registedPacket.add(SPChangeBlockAction.class);
 		this.registedPacket.add(SPFillBlocks.class);
-	}
+		this.registedPacket.add(SPRefillPoint.class);
+		this.registedPacket.add(SPClear.class);
+}
 
 	public void readPacket(String str) {
 		for(Class<? extends Packet> p : registedPacket) {
@@ -27,19 +26,26 @@ public class NetWorkManager {
 				
 				if(p1 == SPGoto.class) {
 					SPGoto packet = new SPGoto();
-					packet.readPacket(str.substring(2, str.length()));
+					packet.readPacket(str.substring(2));
 					EventRecieveSateNet e = new EventRecieveSateNet(packet);
 					Satellite.onEvent(e);
 				}
 				if(p1 == SPChangeBlockAction.class) {
 					SPChangeBlockAction packet = new SPChangeBlockAction();
-					packet.readPacket(str.substring(2, str.length()));
+					packet.readPacket(str.substring(2));
 					EventRecieveSateNet e = new EventRecieveSateNet(packet);
 					Satellite.onEvent(e);
 				}
 				if(p1 == SPFillBlocks.class) {
 					SPFillBlocks packet = new SPFillBlocks();
-					packet.readPacket(str.substring(2, str.length()));
+					packet.readPacket(str.substring(2));
+					System.out.print(str);
+					EventRecieveSateNet e = new EventRecieveSateNet(packet);
+					Satellite.onEvent(e);
+				}
+				if(p1 == SPRefillPoint.class) {
+					SPRefillPoint packet = new SPRefillPoint();
+					packet.readPacket(str.substring(2));
 					System.out.print(str);
 					EventRecieveSateNet e = new EventRecieveSateNet(packet);
 					Satellite.onEvent(e);

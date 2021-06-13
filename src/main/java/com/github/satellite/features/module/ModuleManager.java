@@ -1,15 +1,12 @@
 package com.github.satellite.features.module;
 
-import com.github.satellite.Satellite;
 import com.github.satellite.features.module.combat.*;
-import com.github.satellite.features.module.exploit.Bot;
-import com.github.satellite.features.module.misc.AntiChunkBan;
-import com.github.satellite.features.module.misc.Debug;
+import com.github.satellite.features.module.exploit.*;
+import com.github.satellite.features.module.misc.*;
 import com.github.satellite.features.module.movement.*;
 import com.github.satellite.features.module.player.*;
 import com.github.satellite.features.module.render.*;
-import com.github.satellite.features.module.world.AutoBuild;
-import com.github.satellite.features.module.world.AutoSlime;
+import com.github.satellite.features.module.world.*;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.KeyBindSetting;
 import com.github.satellite.setting.ModeSetting;
@@ -64,6 +61,9 @@ public class ModuleManager {
 		modules.add(new AntiCrystal());
 		modules.add(new HighJump());
 		modules.add(new Debug());
+		modules.add(new Ground());
+		modules.add(new Test());
+		modules.add(new ElytraFly());
 	}
 	
 	public static List<Module> getModulesbyCategory(Module.Category c) {

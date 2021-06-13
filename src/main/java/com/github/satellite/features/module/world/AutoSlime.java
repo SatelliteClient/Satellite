@@ -121,17 +121,17 @@ public class AutoSlime extends Module {
 	public void scanPos(BlockPos pos, double dist) {
 		int i = 0;
 		
-		double[] vec = new double[] {160 + pos.getX(), 160 - pos.getZ()};
+		double[] vec = new double[] {pos.getX(), pos.getZ()};
 		
 		double d = MathUtils.getDistanceSq(vec);
 		//if(pos.getY()==18) {i++;}
 		//if(d > 999) {i++;}
 		//if(d > 1002) {i--;}
-		if(d > 40) {i++;}
-		if(d > 41) {i--;}
+		//if(d > 40) {i++;}
+		//if(d > 41) {i--;}
 		//if(d > 50) {i++;}
 		//if(d > 51) {i--;}
-		//if(pos.getY() > mc.player.posY-1) {i=0;}
+		if(pos.getY() > mc.player.posY-1) {i=0;}
 		//if(mc.world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockAir) {i=0;}
 		//if(pos.getY() <= mc.player.posY) {i=0;}
 		//if(pos.getY()==6) {i=1;}

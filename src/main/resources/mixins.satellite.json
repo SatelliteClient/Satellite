@@ -13,6 +13,8 @@
     "MixinEntityRenderer",
     "MixinNetHandlerPlayClient",
     "MixinGuiMainMenu",
+    "MixinEntityLivingBase",
+    "MixinEntity",
     "AccessorMinecraft",
     "AccessorTimer",
     "AccessorEntity",

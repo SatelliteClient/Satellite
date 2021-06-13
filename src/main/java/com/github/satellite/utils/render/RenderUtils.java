@@ -22,6 +22,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
+
 public final class RenderUtils {
 	
 	private static final Minecraft mc = Minecraft.getMinecraft();
@@ -175,29 +177,29 @@ public final class RenderUtils {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
 	}
-	
+
 	public static void drawBlockSolid(BlockPos pos, EnumFacing facing, Color color) {
 		double x=pos.getX();
 		double y=pos.getY();
 		double z=pos.getZ();
-		
+
 		x -= mc.getRenderManager().viewerPosX;
 		y -= mc.getRenderManager().viewerPosY;
 		z -= mc.getRenderManager().viewerPosZ;
-		
+
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
         GlStateManager.disableDepth();
         GlStateManager.disableTexture2D();
-        
+
 		AxisAlignedBB axisAlignedBB = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-		
+
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		bufferbuilder.begin(7, DefaultVertexFormats.ITEM);
 		switch(facing)
 		{
-		
+
 		case UP:
 		{
 			bufferbuilder.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
@@ -218,7 +220,7 @@ public final class RenderUtils {
 		}
 		default:
 			break;
-		
+
 		}
 		tessellator.draw();
         GlStateManager.enableTexture2D();
@@ -229,26 +231,26 @@ public final class RenderUtils {
         GlStateManager.enableTexture2D();
         GlStateManager.popMatrix();
 	}
-	
+
 	public static void drawBlockBox(BlockPos pos, Color color) {
 		double x=pos.getX();
 		double y=pos.getY();
 		double z=pos.getZ();
-		
+
 		x -= mc.getRenderManager().viewerPosX;
 		y -= mc.getRenderManager().viewerPosY;
 		z -= mc.getRenderManager().viewerPosZ;
-		
+
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
         GlStateManager.disableDepth();
         GlStateManager.disableTexture2D();
-        
+
 		AxisAlignedBB axisAlignedBB = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-		
+
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
-		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+		bufferbuilder.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION_COLOR);
 		bufferbuilder.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 		bufferbuilder.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 		bufferbuilder.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
