@@ -1,0 +1,43 @@
+- Combat
+  - AntiCrystal
+  - Criticals
+  - HoleKicker
+  - KillAura
+  - Surround
+  - TPAura
+- Movement
+  - ClickTP
+  - ElytraFly
+  - EntityFly
+  - Fly
+  - HighJump
+  - LongJump
+  - PacketFly
+  - Phase
+  - Scaffold
+  - Speed
+  - Spider
+  - Step
+  - Yaw
+- Misc
+  - AntiChunckBan
+- Player
+  - AntiHunger
+  - Ground
+  - InvMove
+  - NoFall
+  - PacketCanceller
+  - Velocity
+- Render
+  - ClickGUI
+  - ESP
+  - Freecam
+  - FullBright
+  - Map
+  - StorageESP
+  - Tracers
+- Exploit
+  - Bot
+- World
+  - AutoBuild
+  - AutoSlime
