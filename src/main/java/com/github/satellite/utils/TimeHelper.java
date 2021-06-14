@@ -5,9 +5,9 @@ import net.minecraft.client.Minecraft;
 public class TimeHelper {
 	
 	private long lastMS;
-	
+
 	public long getCurrentMS() {
-		return Minecraft.getSystemTime();
+		return Minecraft.getSystemTime() / 1000000L;
 	}
 	
 	public long getLastMS() {

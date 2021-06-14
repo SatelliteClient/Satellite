@@ -55,7 +55,19 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         Satellite.onEvent(e);
     }
 
-    public void sendMovePacket() {
+    @Inject(method = "onUpdateWalkingPlayer", at = @At(value = "HEAD"), cancellable = true)
+    private void PreUpdateWalkingPlayer(CallbackInfo ci) {
+        this.event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround);
+        event.setType(EventType.PRE);
+        Satellite.onEvent(event);
+
+        if (event.isMod()) {
+            ci.cancel();
+            sendMovePacket(event);
+        }
+    }
+
+    public void sendMovePacket(EventMotion event) {
         boolean flag = this.isSprinting();
 
         if (flag != this.serverSprintState)
@@ -91,59 +103,60 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         if (this.isCurrentViewEntity())
         {
             AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
-            double d0 = this.posX - this.lastReportedPosX;
-            double d1 = axisalignedbb.minY - this.lastReportedPosY;
-            double d2 = this.posZ - this.lastReportedPosZ;
-            double d3 = (double)(this.rotationYaw - this.lastReportedYaw);
-            double d4 = (double)(this.rotationPitch - this.lastReportedPitch);
+            double d0 = event.x - this.lastReportedPosX;
+            double d1 = event.y - this.lastReportedPosY;
+            double d2 = event.z - this.lastReportedPosZ;
+            double d3 = (double)(event.yaw - this.lastReportedYaw);
+            double d4 = (double)(event.pitch - this.lastReportedPitch);
             ++this.positionUpdateTicks;
             boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
             boolean flag3 = d3 != 0.0D || d4 != 0.0D;
 
             if (this.isRiding())
             {
-                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
+                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, event.yaw, event.pitch, event.onGround));
                 flag2 = false;
             }
             else if (flag2 && flag3)
             {
-                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.posX, axisalignedbb.minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
+                this.connection.sendPacket(new CPacketPlayer.PositionRotation(event.x, event.y, event.z, event.yaw, event.pitch, event.onGround));
             }
             else if (flag2)
             {
-                this.connection.sendPacket(new CPacketPlayer.Position(this.posX, axisalignedbb.minY, this.posZ, this.onGround));
+                this.connection.sendPacket(new CPacketPlayer.Position(event.x, event.y, event.z, event.onGround));
+
             }
             else if (flag3)
             {
-                this.connection.sendPacket(new CPacketPlayer.Rotation(this.rotationYaw, this.rotationPitch, this.onGround));
+                this.connection.sendPacket(new CPacketPlayer.Rotation(event.yaw, event.pitch, event.onGround));
             }
-            else if (this.prevOnGround != this.onGround)
+            else if (this.prevOnGround != event.onGround)
             {
-                this.connection.sendPacket(new CPacketPlayer(this.onGround));
+                this.connection.sendPacket(new CPacketPlayer(event.onGround));
             }
 
             if (flag2)
             {
-                this.lastReportedPosX = this.posX;
-                this.lastReportedPosY = axisalignedbb.minY;
-                this.lastReportedPosZ = this.posZ;
+                this.lastReportedPosX = event.x;
+                this.lastReportedPosY = event.y;
+                this.lastReportedPosZ = event.z;
                 this.positionUpdateTicks = 0;
             }
 
             if (flag3)
             {
-                this.lastReportedYaw = this.rotationYaw;
-                this.lastReportedPitch = this.rotationPitch;
+                this.lastReportedYaw = event.yaw;
+                this.lastReportedPitch = event.pitch;
             }
 
-            this.prevOnGround = this.onGround;
+            this.prevOnGround = event.onGround;
             this.autoJumpEnabled = this.mc.gameSettings.autoJump;
         }
     }
 
-    @Inject(method = "onUpdateWalkingPlayer", at = @At(value = "HEAD"), cancellable = true)
+    /*@Inject(method = "onUpdateWalkingPlayer", at = @At(value = "HEAD"), cancellable = true)
     private void PreUpdateWalkingPlayer(CallbackInfo ci) {
-        this.event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround);
+        this.event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, event.yaw, event.pitch, event.onGround);
         event.setType(EventType.PRE);
         Satellite.onEvent(event);
 
@@ -162,5 +175,5 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             ci.cancel();
             sendMovePacket();
         }
-    }
+    }*/
 }

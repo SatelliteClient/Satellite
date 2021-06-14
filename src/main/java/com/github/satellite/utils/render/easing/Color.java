@@ -23,16 +23,11 @@ public class Color extends EaseValue {
 	public float easeToBlue;
 	public float easeToAlpha;
 	
-	public float duration;
-	public TimeHelper timeHelper;
-	public Mode easeMode;
-	
 	public Color(float red, float green, float blue, float alpha, @Nullable Mode easeMode) {
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
 		this.alpha = alpha;
-		this.timeHelper = new TimeHelper();
 		
 		this.lastRed = red;
 		this.lastGreen = green;
@@ -57,7 +52,7 @@ public class Color extends EaseValue {
 
 	@Override
 	public void updateEase() {
-		float time = timeHelper.getCurrentMS() - timeHelper.getLastMS();
+		float time = this.timer.getCurrentMS() - this.timer.getLastMS();
 		this.red = lastRed + AnimationUtil.easing(easeMode, time / duration, easeToRed - lastRed);
 		this.green = lastGreen + AnimationUtil.easing(easeMode, time / duration, easeToGreen - lastGreen);
 		this.blue = lastBlue + AnimationUtil.easing(easeMode, time / duration, easeToBlue - lastBlue);
@@ -66,7 +61,7 @@ public class Color extends EaseValue {
 	
 	public void easeTo(float red, float green, float blue, float alpha, float duration, boolean reset) {
 		if(!(this.easeToRed == red && this.easeToGreen == green && this.easeToBlue == blue && this.easeToAlpha == alpha)) {
-			timeHelper.reset();
+			timer.reset();
 			this.lastRed = this.red;
 			this.lastGreen = this.green;
 			this.lastBlue = this.blue;
@@ -187,12 +182,12 @@ public class Color extends EaseValue {
 		this.duration = duration;
 	}
 
-	public TimeHelper getTimeHelper() {
-		return timeHelper;
+	public Time getTime() {
+		return timer;
 	}
 
-	public void setTimeHelper(TimeHelper timeHelper) {
-		this.timeHelper = timeHelper;
+	public void setTime(Time time) {
+		this.timer = time;
 	}
 
 	public Mode getEaseMode() {

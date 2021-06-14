@@ -96,7 +96,7 @@ public class GuiClickGUI extends GuiScreen {
 
 		menu.setColor(ThemeManager.getTheme().dark(0));
 		menu.height.easeTo = height;
-		
+
 		gui.updateCollision(mouseX, mouseY);
 
 		currentScreen.y.easeTo(mouseX < menu.width.value ? (int)(mouseY/50)*50 : currentScreen.y.value, 50, true);

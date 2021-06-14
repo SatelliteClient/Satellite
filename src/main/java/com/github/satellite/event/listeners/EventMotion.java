@@ -9,6 +9,14 @@ public class EventMotion extends Event<EventMotion> {
 	public double x, y, z;
 	public float yaw, pitch;
 	public boolean onGround;
+
+	private double lastX, lastY, lastZ;
+	public float lastYaw, lastPitch;
+	public boolean lastOnGround;
+	
+	public boolean isMod() {
+		return lastX != x || lastY != y || lastZ != z || lastYaw != yaw || lastPitch != pitch || lastOnGround != onGround;
+	}
 	
 	public EventMotion(double x, double y, double z, float yaw, float pitch, boolean onGround) {
 		super();

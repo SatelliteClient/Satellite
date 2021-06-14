@@ -86,7 +86,7 @@ public class Fly extends Module {
 				if(!mc.player.onGround)
 					break;
 				mc.player.jump();
-				PlayerUtils.vClip(.41999998688697815D);
+				mc.player.posY += .41999998688697815D;
 			}
 		}
 		super.onEnable();
@@ -134,7 +134,7 @@ public class Fly extends Module {
 		{
 			switch(hypixelBoost.getMode()) {
 			case "PacketBoost":
-				if(e instanceof EventUpdate) {
+				if(e instanceof EventMotion && e.isPre()) {
 					if(tickTimer>0) {
 						ClientUtils.setTimer(1F);
 						mc.player.motionY=0;
@@ -172,7 +172,7 @@ public class Fly extends Module {
 				}
 				break;
 			case "DamageBoost":
-				if(e instanceof EventUpdate) {
+				if(e instanceof EventMotion && e.isPre()) {
 					ClientUtils.setTimer(tickTimer > 0 ? 1 : ClientUtils.getTimer());
 					mc.player.motionY = 0;
 					PlayerUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed/150);
@@ -180,7 +180,7 @@ public class Fly extends Module {
 				}
 				break;
 			case "Boost":
-				if(e instanceof EventUpdate) {
+				if(e instanceof EventMotion && e.isPre()) {
 					mc.player.motionY = 0;
 					if (tickTimer==10) {
 						if(mc.player.isPotionActive(Potion.getPotionById(1)))
@@ -196,14 +196,14 @@ public class Fly extends Module {
 				}
 				break;
 			case "Funcraft":
-				if(e instanceof EventUpdate) {
+				if(e instanceof EventMotion && e.isPre()) {
 					mc.player.motionY = 0;
 					PlayerUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed / 150);
 					lastTickSpeed = mc.player.collidedHorizontally ? .26D : PlayerUtils.getSpeed();
 				}
 				break;
 			case "Normal":
-				if(e instanceof EventUpdate) {
+				if(e instanceof EventMotion && e.isPre()) {
 					mc.player.motionY = 0;
 					PlayerUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed / 15);
 					lastTickSpeed = mc.player.collidedHorizontally ? .26D : PlayerUtils.getSpeed();
@@ -212,9 +212,8 @@ public class Fly extends Module {
 			}
 			
 			if(e instanceof EventMotion) {
-				if (e.isPre()) {
-					PlayerUtils.vClip(mc.player.ticksExisted%2==0?-1E-5:1E-5);
-				}
+				EventMotion event = (EventMotion)e;
+				event.y+=mc.player.ticksExisted%2==0?1E-5:-1E-5;
 			}
 			if(e instanceof EventPacket) {
 				EventPacket event = (EventPacket)e;

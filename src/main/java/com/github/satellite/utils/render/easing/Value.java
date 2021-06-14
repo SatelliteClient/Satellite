@@ -1,6 +1,5 @@
 package com.github.satellite.utils.render.easing;
 
-import com.github.satellite.utils.TimeHelper;
 import com.github.satellite.utils.render.AnimationUtil;
 import com.github.satellite.utils.render.AnimationUtil.Mode;
 
@@ -11,13 +10,9 @@ public class Value extends EaseValue {
 	public float value;
 	public float lastValue;
 	public float easeTo;
-	public float duration;
-	public TimeHelper timeHelper;
-	public Mode easeMode;
 
 	public Value(double value, @Nullable Mode easeMode) {
 		this.value = (float) value;
-		this.timeHelper = new TimeHelper();
 		this.lastValue = (float) value;
 		this.easeTo = (float) value;
 		this.duration = 1;
@@ -29,7 +24,6 @@ public class Value extends EaseValue {
 
 	public Value(float value, @Nullable Mode easeMode) {
 		this.value = value;
-		this.timeHelper = new TimeHelper();
 		this.lastValue = value;
 		this.easeTo = value;
 		this.duration = 1;
@@ -49,7 +43,7 @@ public class Value extends EaseValue {
 	
 	@Override
 	public void updateEase() {
-		long time = timeHelper.getCurrentMS() - timeHelper.getLastMS();
+		long time = timer.getCurrentMS() - timer.getLastMS();
 		this.value = lastValue + AnimationUtil.easing(easeMode, time / duration, easeTo - lastValue);
 		if(Math.abs(value - easeTo) < 1/duration) {
 			this.value = easeTo;
@@ -58,7 +52,7 @@ public class Value extends EaseValue {
 	
 	public void easeTo(float value, float duration, boolean reset) {
 		if(this.easeTo != value) {
-			timeHelper.reset();
+			timer.reset();
 			this.lastValue = this.value;
 		}
 		this.easeTo = value;
@@ -101,12 +95,12 @@ public class Value extends EaseValue {
 		this.duration = duration;
 	}
 
-	public TimeHelper getTimeHelper() {
-		return timeHelper;
+	public Time getTimeHelper() {
+		return timer;
 	}
 
-	public void setTimeHelper(TimeHelper timeHelper) {
-		this.timeHelper = timeHelper;
+	public void setTimeHelper(Time timeHelper) {
+		this.timer = timeHelper;
 	}
 
 	public Mode getEaseMode() {

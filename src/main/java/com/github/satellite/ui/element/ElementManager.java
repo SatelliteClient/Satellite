@@ -1,5 +1,6 @@
 package com.github.satellite.ui.element;
 
+import com.github.satellite.utils.TimeHelper;
 import com.github.satellite.utils.render.easing.EaseValue;
 
 import java.util.Arrays;
@@ -11,6 +12,16 @@ public class ElementManager {
 	public CopyOnWriteArrayList<Panel> panels = new CopyOnWriteArrayList<>();
 	public Panel currendPanel;
 	public boolean isCollided;
+	public TimeHelper timer = new TimeHelper();
+
+	public void updateTime() {
+		long deltaTime = timer.getCurrentMS() - timer.getLastMS();
+		for (Panel p : panels) {
+			for (EaseValue v : p.values) {
+				v.timer.update(deltaTime);
+			}
+		}
+	}
 	
 	public void updateCollision(int mouseX, int mouseY) {
 		Collections.reverse(panels);
@@ -22,7 +33,7 @@ public class ElementManager {
 			if(mouseX>=p.x.value && mouseX<p.x.value+p.width.value && mouseY>=p.y.value && mouseY<p.y.value+p.height.value) {
 				this.currendPanel = p;
 				if(!p.lastHover) {
-					p.onHover(System.nanoTime() / 1000000L);
+					p.onHover(timer.getCurrentMS());
 				}
 				p.setHover(true);
 				if(p.isCollidable()) {
@@ -32,7 +43,7 @@ public class ElementManager {
 			}else {
 				p.setHover(false);
 				if(p.lastHover) {
-					p.deHover(System.nanoTime() / 1000000L);
+					p.deHover(timer.getCurrentMS());
 				}
 			}
 		}
@@ -42,6 +53,7 @@ public class ElementManager {
 	public int RENDER_PHASE = 0;
 
 	public void draw(int mouseX, int mouseY, float partialTicks) {
+		updateTime();
 		for(Panel p : panels) {
 			for(EaseValue value : p.values) {
 				value.updateEase();

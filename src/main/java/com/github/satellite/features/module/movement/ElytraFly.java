@@ -2,9 +2,11 @@ package com.github.satellite.features.module.movement;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventFlag;
+import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
+import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.PlayerUtils;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketPlayer;
@@ -15,12 +17,16 @@ public class ElytraFly extends Module {
         super("ElytraFly", 0, Category.MOVEMENT);
     }
 
+    ModeSetting mode;
     BooleanSetting autoClose;
+    BooleanSetting packet;
 
     @Override
     public void init() {
+        this.mode = new ModeSetting("Mode", "Vanilla", "Vanilla", "Packet");
         this.autoClose = new BooleanSetting("AutoClose", false);
-        addSetting(autoClose);
+        this.packet = new BooleanSetting("Packet", false);
+        addSetting(mode, autoClose, packet);
         super.init();
     }
 
@@ -28,7 +34,7 @@ public class ElytraFly extends Module {
     public void onEvent(Event<?> e) {
         if (e instanceof EventFlag) {
             EventFlag event = (EventFlag)e;
-            if (event.isOutgoing() && event.flag == 7 && event.entity == mc.player.getEntityId()) {
+            if (packet.isEnable() && event.isOutgoing() && event.flag == 7 && event.entity == mc.player.getEntityId()) {
                 event.setSet(false);
             }
         }
@@ -40,6 +46,10 @@ public class ElytraFly extends Module {
                 mc.player.connection.sendPacket(new CPacketPlayer.Position(mc.player.posX, mc.player.posY, mc.player.posZ, true));
                 mc.player.motionY = 0;
             }
+        }
+        if (e instanceof EventMotion && packet.isEnable()) {
+            EventMotion event = (EventMotion)e;
+
         }
         super.onEvent(e);
     }
