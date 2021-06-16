@@ -214,6 +214,9 @@ public class Fly extends Module {
 			if(e instanceof EventMotion) {
 				EventMotion event = (EventMotion)e;
 				event.y+=mc.player.ticksExisted%2==0?1E-5:-1E-5;
+				if(mc.player.ticksExisted%2!=0) {
+					mc.player.motionY=-1E-5D;
+				}
 			}
 			if(e instanceof EventPacket) {
 				EventPacket event = (EventPacket)e;

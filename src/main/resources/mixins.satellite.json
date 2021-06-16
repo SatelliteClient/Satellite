@@ -18,6 +18,7 @@
     "AccessorMinecraft",
     "AccessorTimer",
     "AccessorEntity",
-    "AccessorEntityPlayer"
+    "AccessorEntityPlayer",
+    "AccessorEntityPlayerSP"
   ]
 }

@@ -1,6 +1,7 @@
 package com.github.satellite.features.module.player;
 
 import com.github.satellite.event.Event;
+import com.github.satellite.event.listeners.EventFlag;
 import com.github.satellite.event.listeners.EventHandleTeleport;
 import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.features.module.Module;
@@ -8,6 +9,7 @@ import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.PlayerUtils;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
+import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
 
@@ -24,7 +26,7 @@ public class NoFall extends Module {
 	
 	@Override
 	public void init() {
-		this.mode = new ModeSetting("Mode", "Packet", new String[] {"Packet", "NCP"});
+		this.mode = new ModeSetting("Mode", "Packet", new String[] {"Packet", "NCP", "ElytraSpoof"});
 		addSetting(mode);
 		super.init();
 	}
@@ -60,6 +62,19 @@ public class NoFall extends Module {
 			if(e instanceof EventHandleTeleport) {
 				EventHandleTeleport event = (EventHandleTeleport)e;
 				teleportId = event.teleportId;
+			}
+		}
+		if (mode.is("ElytraSpoof")) {
+			if (e instanceof EventFlag) {
+				EventFlag event = (EventFlag)e;
+				if (event.isOutgoing() && event.flag == 7 && event.entity == mc.player.getEntityId()) {
+					event.setSet(false);
+				}
+			}
+			if(e instanceof EventMotion) {
+				EventMotion event = (EventMotion)e;
+				mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
+				event.pitch = 0;
 			}
 		}
 		super.onEvent(e);

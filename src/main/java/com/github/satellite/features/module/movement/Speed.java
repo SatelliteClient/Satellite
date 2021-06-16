@@ -1,12 +1,14 @@
 package com.github.satellite.features.module.movement;
 
 import com.github.satellite.event.Event;
+import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.event.listeners.EventPlayerInput;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.mixin.client.AccessorEntityPlayer;
 import com.github.satellite.setting.ModeSetting;
+import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.PlayerUtils;
 import net.minecraft.block.BlockAir;
 import net.minecraft.network.Packet;
@@ -31,7 +33,7 @@ public class Speed extends Module {
 
 	@Override
 	public void init() {
-		this.mode = new ModeSetting("Mode", "NCP", new String[] {"NCP", "OldNCP", "TEST"});
+		this.mode = new ModeSetting("Mode", "NCP", new String[] {"NCP", "OldNCP", "YPort", "TEST"});
 		addSetting(mode);
 		super.init();
 	}
@@ -47,6 +49,8 @@ public class Speed extends Module {
 	int teleportIdF = 0;
 
 	int teleportId = 0, clearLagTeleportId = 0;
+
+	boolean inTimer;
 
 	@Override
 	public void onEvent(Event<?> e) {
@@ -75,7 +79,7 @@ public class Speed extends Module {
 						}
 						mc.player.motionY -= mc.player.motionY < .33319999363422365D ? 9.9999E-4D*5 : 0;
 
-						PlayerUtils.Strafe(PlayerUtils.getSpeed() + (mc.player.motionY == .33319999363422365D && PlayerUtils.getSpeed() > 0.3 ? 0.1 : 0));
+						PlayerUtils.Strafe(PlayerUtils.getSpeed() + (mc.player.motionY == .33319999363422365D && PlayerUtils.getSpeed() > 0.3 ? 0.05 : 0));
 					} else {
 						mc.player.motionX = 0.0D;
 						mc.player.motionZ = 0.0D;
@@ -101,6 +105,20 @@ public class Speed extends Module {
 					}
 			}
     	}
+
+		if(e instanceof EventMotion) {
+			EventMotion event = (EventMotion)e;
+			switch (mode.getMode()) {
+
+				case "YPort":
+					if(mc.player.onGround && (mc.player.moveForward != 0 || mc.player.moveStrafing != 0)) {
+						if(mc.player.ticksExisted % 2 != 0)
+							event.y += .4;
+						PlayerUtils.Strafe(mc.player.ticksExisted % 2 == 0 ? .45F : .2F);
+						ClientUtils.setTimer(1.095F);
+					}
+			}
+		}
 
 		if(e instanceof EventPacket) {
 			EventPacket event = (EventPacket)e;

@@ -1,10 +1,9 @@
 package com.github.satellite.features.module.movement;
 
 import com.github.satellite.event.Event;
-import com.github.satellite.event.listeners.EventFlag;
-import com.github.satellite.event.listeners.EventMotion;
-import com.github.satellite.event.listeners.EventUpdate;
+import com.github.satellite.event.listeners.*;
 import com.github.satellite.features.module.Module;
+import com.github.satellite.mixin.client.AccessorEntityPlayerSP;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.PlayerUtils;
@@ -20,15 +19,20 @@ public class ElytraFly extends Module {
     ModeSetting mode;
     BooleanSetting autoClose;
     BooleanSetting packet;
+    BooleanSetting fly;
 
     @Override
     public void init() {
         this.mode = new ModeSetting("Mode", "Vanilla", "Vanilla", "Packet");
         this.autoClose = new BooleanSetting("AutoClose", false);
         this.packet = new BooleanSetting("Packet", false);
-        addSetting(mode, autoClose, packet);
+        this.fly = new BooleanSetting("float", false);
+        addSetting(mode, autoClose, packet, fly);
         super.init();
     }
+
+    private boolean serverFlyingStat;
+    private boolean flyFlag;
 
     @Override
     public void onEvent(Event<?> e) {
@@ -38,18 +42,45 @@ public class ElytraFly extends Module {
                 event.setSet(false);
             }
         }
+
+        if (e instanceof EventHandleTeleport && e.isPost()) {
+            serverFlyingStat = false;
+            flyFlag = true;
+            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
+        }
+
         if(e instanceof EventUpdate) {
             if (mc.player.onGround) {
-                PlayerUtils.vClip(.42);
+                PlayerUtils.vClip2(.42, false);
+                PlayerUtils.vClip2(.42 - .08, false);
             }else {
-                mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
-                mc.player.connection.sendPacket(new CPacketPlayer.Position(mc.player.posX, mc.player.posY, mc.player.posZ, true));
-                mc.player.motionY = 0;
+                if (mode.is("Packet")) {
+                    mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
+                    mc.player.connection.sendPacket(new CPacketPlayer.Position(mc.player.posX, mc.player.posY, mc.player.posZ, true));
+                }else {
+                    if (mc.player.onGround)
+                        flyFlag = false;
+                    if (!((AccessorEntityPlayerSP)mc.player).getServerSneakState() || !serverFlyingStat || flyFlag) {
+                        serverFlyingStat = true;
+                        ((AccessorEntityPlayerSP)mc.player).setServerSneakState(true);
+                        mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
+                        mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
+                    }
+
+                    if (mc.player.ticksExisted%20==0) {
+                        ((AccessorEntityPlayerSP)mc.player).setServerSneakState(false);
+                    }
+                }
+                if (fly.isEnable())
+                    mc.player.motionY = 0;
             }
         }
         if (e instanceof EventMotion && packet.isEnable()) {
             EventMotion event = (EventMotion)e;
-
+            if (mode.is("Vanilla") && !flyFlag) {
+                event.y += .42;
+                event.onGround = false;
+            }
         }
         super.onEvent(e);
     }
@@ -61,6 +92,12 @@ public class ElytraFly extends Module {
         }else {
             mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
         }
+
+        ((AccessorEntityPlayerSP)mc.player).setServerSneakState(mc.player.isSneaking());
+        if (mc.player.isSneaking())
+            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
+        else
+            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
         super.onDisable();
     }
 }

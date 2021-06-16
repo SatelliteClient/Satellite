@@ -2,6 +2,7 @@ package com.github.satellite.mixin.client;
 
 import com.github.satellite.Satellite;
 import com.github.satellite.event.EventDirection;
+import com.github.satellite.event.EventType;
 import com.github.satellite.event.listeners.EventHandleTeleport;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
@@ -31,6 +32,7 @@ public class MixinNetHandlerPlayClient {
     {
         EventHandleTeleport e = new EventHandleTeleport(packetIn);
         e.setDirection(EventDirection.INCOMING);
+        e.setType(EventType.PRE);
         Satellite.onEvent(e);
 
         if (e.isCancellTeleporting() || e.isCancelled()) {
@@ -91,5 +93,14 @@ public class MixinNetHandlerPlayClient {
                 this.client.displayGuiScreen((GuiScreen)null);
             }
         }
+    }
+
+    @Inject(method = "handlePlayerPosLook", at = @At("RETURN"))
+    public void PostHandlePlayerPosLook(SPacketPlayerPosLook packetIn, CallbackInfo ci)
+    {
+        EventHandleTeleport e = new EventHandleTeleport(packetIn);
+        e.setDirection(EventDirection.INCOMING);
+        e.setType(EventType.POST);
+        Satellite.onEvent(e);
     }
 }

@@ -6,6 +6,7 @@ import com.github.satellite.event.listeners.EventPlayerInput;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
+import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.BlockUtils;
 import com.github.satellite.utils.PlayerUtils;
 import net.minecraft.block.state.IBlockState;
@@ -25,14 +26,18 @@ public class Scaffold extends Module {
 		super("Scaffold", Keyboard.KEY_V, Category.MOVEMENT);
 	}
 
+	ModeSetting mode;
 	BooleanSetting keepY;
 	BooleanSetting swing;
+	BooleanSetting sneakSpoof;
 
 	@Override
 	public void init() {
+		this.mode = new ModeSetting("Swing", "NCP", "NCP", "AAC", "Matrix");
 		this.keepY = new BooleanSetting("keepY", false);
 		this.swing = new BooleanSetting("Swing", true);
-		addSetting(keepY, swing);
+		this.sneakSpoof = new BooleanSetting("SneakSpoof", false);
+		addSetting(mode, keepY, swing, sneakSpoof);
 		super.init();
 	}
 
@@ -50,6 +55,8 @@ public class Scaffold extends Module {
 
 	Vec3d targetPos;
 
+	private boolean placingFlag;
+
 	@Override
 	public void onEvent(Event<?> e) {
 		if(e instanceof EventUpdate) {
@@ -63,14 +70,29 @@ public class Scaffold extends Module {
 				BlockPos pos = new BlockPos(targetPos);
 				IBlockState state = mc.world.getBlockState(pos);
 
+				placingFlag = false;
+				if (sneakSpoof.isEnable())
 				mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
-				for(int i=0; i<1; i++) {
-					if(!poss.isEmpty() && state.getBlock().isReplaceable(mc.world, pos)) {
-						poss.sort(Comparator.comparingDouble(p -> p.dist));
-						poss.get(0).doPlace(swing.isEnable());
+				if (mode.is("NCP") || mode.is("Matrix")) {
+					for(int i=0; i<1; i++) {
+						if(!poss.isEmpty() && state.getBlock().isReplaceable(mc.world, pos)) {
+							poss.sort(Comparator.comparingDouble(p -> p.dist));
+							poss.get(0).doPlace(swing.isEnable());
+							placingFlag = true;
+						}
 					}
 				}
-				mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+				if (mode.is("AAC") && !mc.player.onGround && mc.player.motionY<0) {
+					for(int i=0; i<1; i++) {
+						if(!poss.isEmpty() && state.getBlock().isReplaceable(mc.world, pos)) {
+							poss.sort(Comparator.comparingDouble(p -> p.dist));
+							poss.get(0).doPlace(swing.isEnable());
+							placingFlag = true;
+						}
+					}
+				}
+				if (sneakSpoof.isEnable())
+					mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
 
 				if(!keepY.isEnable() && mc.world.getBlockState(new BlockPos(mc.player).offset(EnumFacing.DOWN, 2)).isFullBlock() && !poss.isEmpty() && mc.player.movementInput.jump && (int)mc.player.lastTickPosY<(int)mc.player.posY) {
 					mc.player.setPosition(mc.player.posX, (int)mc.player.posY, mc.player.posZ);
@@ -84,9 +106,19 @@ public class Scaffold extends Module {
 		if(e instanceof EventMotion) {
 			EventMotion event = (EventMotion)e;
 			if(!poss.isEmpty()) {
-				event.setYaw((float) poss.get(0).rotx);
-				event.setPitch((float) poss.get(0).roty);
-				event.cancel();
+				if (mode.is("NCP")) {
+					event.setYaw((float) poss.get(0).rotx);
+					event.setPitch((float) poss.get(0).roty);
+				}
+				if (mode.is("AAC")) {
+					event.yaw = mc.player.rotationYaw - 180;
+					event.pitch = 83+mc.player.rotationPitch/180;
+				}
+
+				if (mode.is("Matrix")) {
+					event.yaw = mc.player.rotationYaw - 180;
+					event.pitch = 83+mc.player.rotationPitch/180;
+				}
 			}
 		}
 		if(e instanceof EventPlayerInput) {
@@ -97,6 +129,9 @@ public class Scaffold extends Module {
 				event.setSneak(false);
 			}else {
 				isDownMode=false;
+			}
+			if (mode.is("Matrix") && placingFlag) {
+				event.setSneak(true);
 			}
 		}
 		super.onEvent(e);

@@ -241,15 +241,15 @@ public final class RenderUtils {
 		y -= mc.getRenderManager().viewerPosY;
 		z -= mc.getRenderManager().viewerPosZ;
 
-        GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
-        GlStateManager.disableDepth();
-        GlStateManager.disableTexture2D();
+
+		GlStateManager.disableAlpha();
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
 		AxisAlignedBB axisAlignedBB = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		bufferbuilder.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION_COLOR);
 		bufferbuilder.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 		bufferbuilder.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
@@ -301,11 +301,7 @@ public final class RenderUtils {
 		bufferbuilder.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 		tessellator.draw();
 
-        GlStateManager.enableDepth();
-		GlStateManager.depthMask(true);
-        GlStateManager.translate(-x, -y, -z);
-        GlStateManager.enableTexture2D();
-        GlStateManager.popMatrix();
+		GlStateManager.enableAlpha();
 	}
 	
 	public static void drawSelectionBoundingBox(AxisAlignedBB boundingBox) {

@@ -15,6 +15,7 @@ public class FreeCam extends Module {
 	@Override
 	public void onEnable() {
 		renderViewEntity = new EntityOtherPlayerMP(mc.world, mc.player.getGameProfile());
+		renderViewEntity.getGameProfile();
 		
 		mc.world.addEntityToWorld(-2, renderViewEntity);
 

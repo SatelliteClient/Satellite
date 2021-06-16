@@ -101,9 +101,9 @@ public class LongJump extends Module {
 								PlayerUtils.vClip2(d, false);
 							}
 							if (useTimer.isEnable()) {
-								this.state = 1;
+								this.state = 3;
 								this.inTimer = true;
-								ClientUtils.setTimer(Math.min(1.0F, 1.0F / (1+ncpp.length)));
+								ClientUtils.setTimer(Math.min(1.0F, 1.0F / (1+ncpp.length/3)));
 							}
 						}
 

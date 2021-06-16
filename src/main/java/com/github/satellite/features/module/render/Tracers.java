@@ -40,7 +40,7 @@ public class Tracers extends Module {
             //GlStateManager.depthFunc(519);
             //GlStateManager.disableFog();
             
-			GlStateManager.pushMatrix();
+			/*GlStateManager.pushMatrix();
 			GL11.glBlendFunc(770, 771);
 			GL11.glEnable(3042);
 			GL11.glEnable(2848);
@@ -68,19 +68,14 @@ public class Tracers extends Module {
 			GL11.glDisable(3042);
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-			GlStateManager.popMatrix();
+			GlStateManager.popMatrix();*/
 			
 			
 			
 			GlStateManager.pushMatrix();
 			
 			GL11.glBlendFunc(770, 771);
-			GL11.glEnable(3042);
-			GL11.glEnable(2848);
 			GL11.glLineWidth(1.5F);
-			GL11.glDisable(3553);
-			GL11.glDisable(2929);
-			GL11.glDepthMask(false);
 			GL11.glBegin(1);
 
 			for (Entity entity : mc.world.loadedEntityList) {
@@ -94,13 +89,6 @@ public class Tracers extends Module {
 				drawTraces(entity, color);
 			}
 			GL11.glEnd();
-			GL11.glEnable(3553);
-			GL11.glDisable(2848);
-			GL11.glEnable(2929);
-			GL11.glDepthMask(true);
-			GL11.glDisable(3042);
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			GlStateManager.enableAlpha();
 
 			GlStateManager.popMatrix();
 		}
