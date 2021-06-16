@@ -1,6 +1,7 @@
 package com.github.satellite.command;
 
 import com.github.satellite.command.impl.Fill;
+import com.github.satellite.command.impl.Fov;
 import com.github.satellite.command.impl.Stash;
 import com.github.satellite.command.impl.Toggle;
 
@@ -17,6 +18,7 @@ public class CommandManager {
         commands.add(new Toggle());
         commands.add(new Stash());
         commands.add(new Fill());
+        commands.add(new Fov());
     }
 
     public boolean handleCommand(String str) {
