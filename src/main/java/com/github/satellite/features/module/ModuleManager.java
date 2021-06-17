@@ -64,6 +64,7 @@ public class ModuleManager {
 		modules.add(new Ground());
 		modules.add(new Test());
 		modules.add(new ElytraFly());
+		modules.add(new FreeLook());
 	}
 	
 	public static List<Module> getModulesbyCategory(Module.Category c) {

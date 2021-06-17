@@ -8,7 +8,7 @@ public class Time {
     private long time = 0l;
 
     public void update(long deltaTime) {
-        time += deltaTime;
+        this.time += deltaTime;
     }
 
     public Time() {

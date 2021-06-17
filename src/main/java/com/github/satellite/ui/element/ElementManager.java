@@ -10,12 +10,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ElementManager {
 
 	public CopyOnWriteArrayList<Panel> panels = new CopyOnWriteArrayList<>();
-	public Panel currendPanel;
+	public Panel currentPanel;
 	public boolean isCollided;
 	public TimeHelper timer = new TimeHelper();
 
 	public void updateTime() {
-		long deltaTime = timer.getCurrentMS() - timer.getLastMS();
+		long deltaTime = (timer.getCurrentMS() - timer.getLastMS());
 		for (Panel p : panels) {
 			for (EaseValue v : p.values) {
 				v.timer.update(deltaTime);
@@ -31,7 +31,7 @@ public class ElementManager {
 			p.setLastHover(p.isHover);
 			
 			if(mouseX>=p.x.value && mouseX<p.x.value+p.width.value && mouseY>=p.y.value && mouseY<p.y.value+p.height.value) {
-				this.currendPanel = p;
+				this.currentPanel = p;
 				if(!p.lastHover) {
 					p.onHover(timer.getCurrentMS());
 				}
@@ -70,12 +70,12 @@ public class ElementManager {
 		this.panels = panels;
 	}
 
-	public Panel getCurrendPanel() {
-		return currendPanel;
+	public Panel getCurrentPanel() {
+		return currentPanel;
 	}
 
-	public void setCurrendPanel(Panel currendPanel) {
-		this.currendPanel = currendPanel;
+	public void setCurrentPanel(Panel currentPanel) {
+		this.currentPanel = currentPanel;
 	}
 	
 	public void addPanel(Panel...panels) {

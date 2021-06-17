@@ -241,9 +241,10 @@ public final class RenderUtils {
 		y -= mc.getRenderManager().viewerPosY;
 		z -= mc.getRenderManager().viewerPosZ;
 
+		GlStateManager.enableAlpha();
+		GlStateManager.disableLighting();
         GlStateManager.translate(x, y, z);
 
-		GlStateManager.disableAlpha();
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
@@ -300,7 +301,8 @@ public final class RenderUtils {
 		bufferbuilder.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 		tessellator.draw();
 
-		GlStateManager.enableAlpha();
+		GlStateManager.translate(-x, -y, -z);
+		GlStateManager.enableLighting();
 	}
 	
 	public static void drawSelectionBoundingBox(AxisAlignedBB boundingBox) {

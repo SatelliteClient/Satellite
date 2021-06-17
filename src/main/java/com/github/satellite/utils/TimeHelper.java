@@ -6,10 +6,18 @@ public class TimeHelper {
 	
 	private long lastMS;
 
-	public long getCurrentMS() {
-		return Minecraft.getSystemTime() / 10000000L;
+	public TimeHelper() {
+		this.lastMS = this.getCurrentMS();
 	}
-	
+
+	public long getCurrentMS() {
+		return Minecraft.getSystemTime() / 1000000L;
+	}
+
+	public void update() {
+		this.lastMS = this.getCurrentMS();
+	}
+
 	public long getLastMS() {
 		return this.lastMS;
 	}
