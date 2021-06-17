@@ -102,12 +102,10 @@ public class GuiClickGUI extends GuiScreen {
 		menu.width.easeTo(menu.isHover()?150:50, 50, true);
 
 		currentScreen.y.easeTo(mouseX < menu.width.value ? (int)(mouseY/50)*50 : currentScreen.y.value, 50, true);
-		currentScreen.width.easeTo(menu.isHover()?150:50, 50, true);
+		currentScreen.width = menu.width;
 		for(Panel p : menuElements) {
-			if(p instanceof RectPanel) {
-				p.width.easeTo(menu.isHover()?150:50, 50, true);
-			}
-			else if(p instanceof TextPanel) {
+			p.width = menu.width;
+			if(p instanceof TextPanel) {
 				TextPanel panel = (TextPanel) p;
 				panel.alpha.easeTo(menu.isHover()?255:0, 50, true);
 			}

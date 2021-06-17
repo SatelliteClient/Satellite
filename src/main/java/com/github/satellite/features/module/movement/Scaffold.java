@@ -82,7 +82,7 @@ public class Scaffold extends Module {
 						}
 					}
 				}
-				if (mode.is("AAC") && !mc.player.onGround && mc.player.motionY<0) {
+				if (mode.is("AAC") && !mc.player.onGround && mc.player.motionY<.1 && mc.player.ticksExisted%2==0) {
 					for(int i=0; i<1; i++) {
 						if(!poss.isEmpty() && state.getBlock().isReplaceable(mc.world, pos)) {
 							poss.sort(Comparator.comparingDouble(p -> p.dist));
@@ -110,7 +110,7 @@ public class Scaffold extends Module {
 					event.setYaw((float) poss.get(0).rotx);
 					event.setPitch((float) poss.get(0).roty);
 				}
-				if (mode.is("AAC")) {
+				if (mode.is("AAC") && !mc.player.onGround && mc.player.motionY<.1) {
 					event.yaw = mc.player.rotationYaw - 180;
 					event.pitch = 83+mc.player.rotationPitch/180;
 				}
