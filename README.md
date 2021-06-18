@@ -6,7 +6,7 @@ Just download the latest Jar from the release and put it in your mods folder!
 Open the click gui with the `RShift` key
 
 Module List:
-[Module](module.md)
+[Module](MODULE.md)
 
 Command List:
-Coming soon
+[Commahnd](COMMAND.md)
