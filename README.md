@@ -9,4 +9,4 @@ Module List:
 [Module](MODULE.md)
 
 Command List:
-[Commahnd](COMMAND.md)
+[Command](COMMAND.md)
