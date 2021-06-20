@@ -74,6 +74,7 @@ public class ModuleManager {
 		modules.add(new ElytraFly());
 		modules.add(new PhaseFly());
 		modules.add(new AntiOutside());
+		modules.add(new FreeLook());
 	}
 
 	public static List<Module> getModulesbyCategory(Module.Category c) {
