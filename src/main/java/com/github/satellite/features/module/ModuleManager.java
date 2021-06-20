@@ -10,14 +10,22 @@ import com.github.satellite.features.module.world.*;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.KeyBindSetting;
 import com.github.satellite.setting.ModeSetting;
+import com.github.satellite.setting.NumberSetting;
+import com.github.satellite.setting.Setting;
+
 import net.minecraft.client.Minecraft;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.lwjgl.input.Keyboard;
 
 public class ModuleManager {
 
@@ -64,9 +72,10 @@ public class ModuleManager {
 		modules.add(new Ground());
 		modules.add(new Test());
 		modules.add(new ElytraFly());
-		modules.add(new FreeLook());
+		modules.add(new PhaseFly());
+		modules.add(new AntiOutside());
 	}
-	
+
 	public static List<Module> getModulesbyCategory(Module.Category c) {
 		List<Module> moduleList = new ArrayList<>();
 		for(Module m : modules)
@@ -111,6 +120,9 @@ public class ModuleManager {
 
 				final String[] str = {""};
 
+				str[0] += m.isEnable()?"1":"0";
+				str[0] += "\n";
+
 				m.settings.forEach(s -> {
 					if(s instanceof KeyBindSetting){
 						str[0] += "0"+String.valueOf(((KeyBindSetting) s).getKeyCode());
@@ -120,6 +132,9 @@ public class ModuleManager {
 					}
 					if(s instanceof ModeSetting){
 						str[0] += "2"+ ((ModeSetting) s).index;
+					}
+					if(s instanceof NumberSetting){
+						str[0] += "3"+ String.valueOf(((NumberSetting) s).value);
 					}
 					str[0] += "\n";
 				});
@@ -137,8 +152,46 @@ public class ModuleManager {
 		File setting = new File(directory, "setting");
 
 		if (setting.isDirectory()){
-			for (File m : setting.listFiles()){
+			for (Module m : modules){
+				File SettingFile = new File(setting, m.getName());
+				try {
+					FileReader filereader = new FileReader(SettingFile);
+					int ch;
+					String str = "";
+					while((ch = filereader.read()) != -1){
+						str += String.valueOf((char)ch);
+					}
+					int i = 0;
+					for (String val : Arrays.asList(str.split("\n"))) {
+						if(i == 0) {
+							m.setEnable(val.equals("1")?true:false);
+						}else {
 
+							String dat = val.substring(1);
+							if (val.startsWith("0")) {
+								KeyBindSetting bind = (KeyBindSetting)m.settings.get(i-1);
+								bind.keyCode = Integer.parseInt(dat);
+							}
+							if (val.startsWith("1")) {
+								BooleanSetting bind = (BooleanSetting)m.settings.get(i-1);
+								bind.setEnable(val.equals("1"));
+							}
+							if (val.startsWith("2")) {
+								ModeSetting bind = (ModeSetting)m.settings.get(i-1);
+								bind.index = Integer.parseInt(dat);
+							}
+							if (val.startsWith("3")) {
+								NumberSetting bind = (NumberSetting)m.settings.get(i-1);
+								bind.value = Double.parseDouble(dat);
+							}
+						}
+						i++;
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

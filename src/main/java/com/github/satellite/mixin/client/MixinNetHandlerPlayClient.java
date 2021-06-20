@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketThreadUtil;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
@@ -23,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NetHandlerPlayClient.class)
 public class MixinNetHandlerPlayClient {
+
     @Shadow Minecraft client;
     @Shadow NetworkManager netManager;
     @Shadow boolean doneLoadingTerrain;

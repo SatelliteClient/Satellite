@@ -1,8 +1,15 @@
 package com.github.satellite.utils;
 
+import com.github.satellite.mixin.client.AccessorEntity;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
+import net.minecraft.block.BlockHopper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.MoverType;
 import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 
 public class PlayerUtils {
 	
@@ -62,5 +69,28 @@ public class PlayerUtils {
 		float Forward = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
 		float Strafing = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
 		return Forward!=0||Strafing!=0;
+	}
+
+	public static boolean isInsideBlock() {
+		try {
+			AxisAlignedBB playerBoundingBox = ((AccessorEntity)mc.player).boundingBox();
+			for(int x = MathHelper.floor(playerBoundingBox.minX); x < MathHelper.floor(playerBoundingBox.maxX) + 1; x++) {
+				for(int y = MathHelper.floor(playerBoundingBox.minY); y < MathHelper.floor(playerBoundingBox.maxY) + 1; y++) {
+					for(int z = MathHelper.floor(playerBoundingBox.minZ); z < MathHelper.floor(playerBoundingBox.maxZ) + 1; z++) {
+						Block block = Minecraft.getMinecraft().world.getBlockState(new BlockPos(x, y, z)).getBlock();
+						if(block != null && !(block instanceof BlockAir)) {
+							AxisAlignedBB boundingBox = block.getCollisionBoundingBox(Minecraft.getMinecraft().world.getBlockState(new BlockPos(x, y, z)), Minecraft.getMinecraft().world, new BlockPos(x, y, z)).offset(x, y, z);
+							if(block instanceof BlockHopper)
+								boundingBox = new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
+							if(boundingBox != null && playerBoundingBox.intersects(boundingBox))
+								return true;
+						}
+					}
+				}
+			}
+		}catch (Exception e) {
+			return false;
+		}
+		return false;
 	}
 }

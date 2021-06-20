@@ -46,6 +46,7 @@ public class Satellite
 
 		commandManager.init();
 		ModuleManager.registerModules();
+		ModuleManager.loadModuleSetting();
 		GuiClickGUI.loadModules();
 	}
 

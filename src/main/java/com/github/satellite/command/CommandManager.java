@@ -1,6 +1,9 @@
 package com.github.satellite.command;
 
-import com.github.satellite.command.impl.*;
+import com.github.satellite.command.impl.Fill;
+import com.github.satellite.command.impl.Fov;
+import com.github.satellite.command.impl.Stash;
+import com.github.satellite.command.impl.Toggle;
 
 import java.util.ArrayList;
 import java.util.Arrays;

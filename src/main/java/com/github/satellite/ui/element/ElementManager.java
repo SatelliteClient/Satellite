@@ -10,28 +10,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ElementManager {
 
 	public CopyOnWriteArrayList<Panel> panels = new CopyOnWriteArrayList<>();
-	public Panel currentPanel;
+	public Panel currendPanel;
 	public boolean isCollided;
 	public TimeHelper timer = new TimeHelper();
 
 	public void updateTime() {
-		long deltaTime = (timer.getCurrentMS() - timer.getLastMS());
+		long deltaTime = timer.getCurrentMS() - timer.getLastMS();
+		timer.reset();
 		for (Panel p : panels) {
 			for (EaseValue v : p.values) {
 				v.timer.update(deltaTime);
 			}
 		}
 	}
-	
+
 	public void updateCollision(int mouseX, int mouseY) {
 		Collections.reverse(panels);
 		this.isCollided = false;
 		for(Panel p : panels) {
-			
+
 			p.setLastHover(p.isHover);
-			
+
 			if(mouseX>=p.x.value && mouseX<p.x.value+p.width.value && mouseY>=p.y.value && mouseY<p.y.value+p.height.value) {
-				this.currentPanel = p;
+				this.currendPanel = p;
 				if(!p.lastHover) {
 					p.onHover(timer.getCurrentMS());
 				}
@@ -70,20 +71,20 @@ public class ElementManager {
 		this.panels = panels;
 	}
 
-	public Panel getCurrentPanel() {
-		return currentPanel;
+	public Panel getCurrendPanel() {
+		return currendPanel;
 	}
 
-	public void setCurrentPanel(Panel currentPanel) {
-		this.currentPanel = currentPanel;
+	public void setCurrendPanel(Panel currendPanel) {
+		this.currendPanel = currendPanel;
 	}
-	
+
 	public void addPanel(Panel...panels) {
 		this.panels.addAll(Arrays.asList(panels));
 	}
 
 	enum RENDER_PHASE {
 		PRE,
-		
+
 	}
 }

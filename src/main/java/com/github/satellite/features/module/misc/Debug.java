@@ -4,12 +4,14 @@ import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
-import com.github.satellite.features.module.player.Velocity;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.PlayerUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.*;
+import net.minecraft.network.play.server.SPacketBlockAction;
+import net.minecraft.network.play.server.SPacketBlockChange;
+import net.minecraft.network.play.server.SPacketEntityMetadata;
+import net.minecraft.network.play.server.SPacketMultiBlockChange;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
 
@@ -23,7 +25,7 @@ public class Debug extends Module {
 
     @Override
     public void init() {
-        mode = new ModeSetting("Mode", "Riden", new String[] {"Riden", "Speed", "Velocity"});
+        mode = new ModeSetting("Mode", "Riden", new String[] {"Riden", "Speed"});
         addSetting(mode);
         super.init();
     }
@@ -46,19 +48,6 @@ public class Debug extends Module {
             case "Speed":
                 if (e instanceof EventUpdate) {
                     mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(String.valueOf(PlayerUtils.getSpeed())));
-                }
-                break;
-            case "Velocity":
-                if(e instanceof EventPacket) {
-                    EventPacket event = ((EventPacket) e);
-                    if (event.isIncoming()) {
-                        Packet<?> p = event.getPacket();
-
-                        if (p instanceof SPacketEntityVelocity && ((SPacketEntityVelocity) p).getEntityID() == mc.player.getEntityId()) {
-                            SPacketEntityVelocity velocity = (SPacketEntityVelocity) p;
-                            mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(String.valueOf(velocity.getMotionX() / 8000.0D) +", " +String.valueOf(velocity.getMotionY() / 8000.0D) +", " +String.valueOf(velocity.getMotionZ() / 8000.0D)));
-                        }
-                    }
                 }
                 break;
 
