@@ -14,12 +14,12 @@ public class Fov extends Command {
     @Override
     public boolean onCommand(String[] args, String command) {
         if (args.length < 1) {
-            mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString("fov: " + Minecraft.getMinecraft().gameSettings.fovSetting));
+            mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString("fov: " + mc.gameSettings.fovSetting));
         } else {
             try {
                 mc.gameSettings.fovSetting = Float.parseFloat(args[0]);
-            }catch (NumberFormatException e) {
-
+            } catch (NumberFormatException e) {
+                mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(args[0] + " is not number"));
             }
         }
 
