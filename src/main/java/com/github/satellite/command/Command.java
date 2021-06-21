@@ -1,10 +1,15 @@
 package com.github.satellite.command;
 
+import com.github.satellite.Satellite;
+import net.minecraft.client.Minecraft;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class Command {
+
+    protected Minecraft mc = Satellite.mc;
 
     public String name, description, syntax;
     public List<String> aliases = new ArrayList<String>();

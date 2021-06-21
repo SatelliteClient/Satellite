@@ -19,8 +19,6 @@ public class Map extends ModuleGuiObject {
 		super("Map", 0, Category.RENDER, -104, -104, 100, 100, true, true);
 	}
 	
-	Vec3i lastpos;
-	
 	@Override
 	public void onEvent(Event e) {
 		if(e instanceof EventRenderGUI) {
@@ -72,11 +70,5 @@ public class Map extends ModuleGuiObject {
 			RenderUtils.drawRect(x+px-2, y+49, x+px, y+50, ThemeManager.getTheme().light(0).getRGB());
 		}
 		super.onEvent(e);
-	}
-	
-	@Override
-	public void onEnable() {
-		lastpos = mc.player.getPosition();
-		super.onEnable();
 	}
 }
