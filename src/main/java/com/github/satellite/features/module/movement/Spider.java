@@ -5,7 +5,7 @@ import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import org.lwjgl.input.Keyboard;
 
 public class Spider extends Module {
@@ -46,8 +46,8 @@ public class Spider extends Module {
 	            	double motionY=0.42;
 	            	if(mc.player.collidedHorizontally) {
 	            		for(; motionY>-0.15233517546680642;) {
-	            			PlayerUtils.vClip(motionY);
-	            			PlayerUtils.vClip2(0, false);
+	            			MovementUtils.vClip(motionY);
+	            			MovementUtils.vClip2(0, false);
 	                        motionY -= 0.08D;
 	                        motionY *= 0.9800000190734863D;
 	            		}

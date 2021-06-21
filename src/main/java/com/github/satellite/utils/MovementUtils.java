@@ -11,7 +11,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public class PlayerUtils {
+public class MovementUtils {
 	
 	protected static Minecraft mc = Minecraft.getMinecraft();
 	

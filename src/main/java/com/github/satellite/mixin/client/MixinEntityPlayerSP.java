@@ -67,6 +67,13 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
     }
 
+    @Inject(method = "onUpdateWalkingPlayer", at = @At(value = "RETURN"), cancellable = true)
+    private void PostUpdateWalkingPlayer(CallbackInfo ci) {
+        this.event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround);
+        event.setType(EventType.POST);
+        Satellite.onEvent(event);
+    }
+
     public void sendMovePacket(EventMotion event) {
         boolean flag = this.isSprinting();
 

@@ -153,7 +153,7 @@ public class ModuleManager {
 		File setting = new File(directory, "setting");
 
 		if (setting.isDirectory()){
-			for (Module m : modules){
+			for (Module m : modules) {
 				File SettingFile = new File(setting, m.getName());
 				try {
 					FileReader filereader = new FileReader(SettingFile);
@@ -192,6 +192,10 @@ public class ModuleManager {
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
+					SettingFile.delete();
+				} catch (ClassCastException e) {
+					e.printStackTrace();
+					SettingFile.delete();
 				}
 			}
 		}

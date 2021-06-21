@@ -6,7 +6,7 @@ import com.github.satellite.network.SatelliteNetClient;
 import com.github.satellite.event.Event;
 import com.github.satellite.features.module.ModuleManager;
 import com.github.satellite.ui.HUD;
-import com.github.satellite.ui.clickGUI.GuiClickGUI;
+import com.github.satellite.ui.gui.clickGUI.GuiClickGUI;
 import com.github.satellite.ui.theme.ThemeManager;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatEvent;

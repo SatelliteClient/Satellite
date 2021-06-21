@@ -1,7 +1,6 @@
 package com.github.satellite.mixin.client;
 
-import com.github.satellite.ui.login.GuiAltLogin;
-import com.sun.jna.platform.win32.WinDef;
+import com.github.satellite.ui.gui.login.GuiAltLogin;
 import net.minecraft.client.gui.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

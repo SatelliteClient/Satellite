@@ -1,10 +1,11 @@
-package com.github.satellite.ui.clickGUI;
+package com.github.satellite.ui.gui.clickGUI;
 
 import com.github.satellite.Satellite;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.features.module.ModuleManager;
 import com.github.satellite.features.module.render.ClickGUI;
-import com.github.satellite.ui.clickGUI.element.Category;
+import com.github.satellite.mixin.client.AccessorEntityRenderer;
+import com.github.satellite.ui.gui.clickGUI.element.Category;
 import com.github.satellite.ui.element.ElementManager;
 import com.github.satellite.ui.element.Panel;
 import com.github.satellite.ui.element.elements.RectPanel;
@@ -15,7 +16,9 @@ import com.github.satellite.utils.render.AnimationUtil.Mode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,27 +29,27 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GuiClickGUI extends GuiScreen {
 
 	public static CopyOnWriteArrayList<Category> panels;
-	
+
 	public static boolean isCollided;
 
 	public static ElementManager gui = new ElementManager();
-	
+
 	public static RectPanel currentScreen;
-	
+
 	public static RectPanel menu;
-	
+
 	public static List<Panel> menuElements = new ArrayList<Panel>();
-	
+
 	public GuiClickGUI(int screen) {
 		GuiClickGUI.gui.panels = new CopyOnWriteArrayList<>();
-		
+
 		String[] els = new String[] {"ClickGUI", "Map", "Satellite Settings", "Player", "Team", "Waypoints"};
 		int y=0;
 		int h=50;
 
 		GuiClickGUI.menu = new RectPanel(gui, 0, 0, 20, 0, ThemeManager.getTheme().dark(0), true);
 		GuiClickGUI.currentScreen = new RectPanel(gui, 0, screen*h, 25, h, ThemeManager.getTheme().dark(3), false);
-		
+
 		gui.addPanel(menu);
 		menu.setEaseType(Mode.EASEIN);
 
@@ -59,7 +62,7 @@ public class GuiClickGUI extends GuiScreen {
 			menuElements.add(p);
 			y+=h;
 		}
-		
+
 		gui.addPanel(currentScreen);
 		currentScreen.setEaseType(Mode.EASEIN);
 
@@ -74,10 +77,22 @@ public class GuiClickGUI extends GuiScreen {
 			y+=h;
 		}
 	}
-	
+
+	@Override
+	public void initGui() {
+		if (OpenGlHelper.shadersSupported && mc.getRenderViewEntity() instanceof EntityPlayer) {
+			if (((AccessorEntityRenderer)mc.entityRenderer).getShaderGroup() != null) {
+				((AccessorEntityRenderer)mc.entityRenderer).getShaderGroup().deleteShaderGroup();
+			}
+			mc.entityRenderer.loadShader(new ResourceLocation("shaders/post/blur.json"));
+			mc.entityRenderer.stopUseShader();
+		}
+		super.initGui();
+	}
+
 	public static void loadModules() {
 		panels = new CopyOnWriteArrayList<>();
-		
+
 		int x=0;
 		for(Module.Category c : Module.Category.values())
 		{
@@ -87,7 +102,7 @@ public class GuiClickGUI extends GuiScreen {
 			panels.add(new Category(c.name, x, 50, ModuleManager.getModulesbyCategory(c)));
 		}
 	}
-	
+
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		Satellite.themeManager.setTheme(((ClickGUI) ModuleManager.getModulebyClass(ClickGUI.class)).theme.getMode());
@@ -99,7 +114,7 @@ public class GuiClickGUI extends GuiScreen {
 
 		gui.updateCollision(mouseX, mouseY);
 
-		menu.width.easeTo(menu.isHover()?150:50, 50, true);
+		menu.width.easeTo(menu.isHover()?150:50, 100, true);
 
 		currentScreen.y.easeTo(mouseX < menu.width.value ? (int)(mouseY/50)*50 : currentScreen.y.value, 50, true);
 		currentScreen.width = menu.width;
@@ -110,24 +125,24 @@ public class GuiClickGUI extends GuiScreen {
 				panel.alpha.easeTo(menu.isHover()?255:0, 50, true);
 			}
 		}
-		
-		
-		
+
+
+
 		List<Category> drawPanel = (List<Category>) panels.clone();
 
 		isCollided = gui.isCollided;
-		
+
 		for(Category c : drawPanel) {
 			c.update(mouseX, mouseY);
 		}
 
 		Collections.reverse(drawPanel);
-		
+
 		for(Category c : drawPanel) {
 			c.draw(mouseX, mouseY, partialTicks);
 		}
 		Collections.reverse(drawPanel);
-		
+
 		Collections.reverse(drawPanel);
 		
 		/*for(int i=0; i<panels.size(); i++) {
@@ -147,22 +162,22 @@ public class GuiClickGUI extends GuiScreen {
 		}
 		super.keyTyped(typedChar, keyCode);
 	}
-	
+
 	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
 		for(Category p : panels) {
 			p.mouseClicked(mouseX, mouseY, mouseButton);
 		}
 	}
-	
+
 	public void mouseReleased(int mouseX, int mouseY, int state) {
 		for(Category p : panels) {
 			p.mouseReleased(mouseX, mouseY, state);
 		}
 	}
-	
+
 	@Override
 	public void onGuiClosed() {
 		ModuleManager.toggle(ClickGUI.class);
 	}
-	
+
 }

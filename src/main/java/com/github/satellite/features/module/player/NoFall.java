@@ -7,7 +7,7 @@ import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.util.math.Vec3d;
@@ -52,7 +52,7 @@ public class NoFall extends Module {
 					Catch.add(new Vec3d(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ));
 					mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
 					mc.player.motionY=0;
-					PlayerUtils.vClip2(999, true);
+					MovementUtils.vClip2(999, true);
 					ClientUtils.setTimer(0.95F);
 					teleportId++;
 					mc.getConnection().sendPacket(new CPacketConfirmTeleport(teleportId));

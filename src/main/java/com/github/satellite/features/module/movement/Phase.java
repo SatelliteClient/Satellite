@@ -6,7 +6,7 @@ import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
 
@@ -53,15 +53,15 @@ public class Phase extends Module {
 					
 					late = 1 / late;
 					late = 1 - late;
-					PlayerUtils.Strafe(speed - speed*Math.pow(late, tickTimer%tick));
+					MovementUtils.Strafe(speed - speed*Math.pow(late, tickTimer%tick));
 
 					if (tick - (tickTimer%tick) < 20) {
-						PlayerUtils.Strafe(1.98f);
+						MovementUtils.Strafe(1.98f);
 						mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
 					}
 
 					mc.player.setPosition(mc.player.posX + mc.player.motionX, mc.player.posY, mc.player.posZ + mc.player.motionZ);
-					PlayerUtils.vClip2(0, true);
+					MovementUtils.vClip2(0, true);
 					tickTimer++;
 				}
 			}
@@ -97,10 +97,10 @@ public class Phase extends Module {
 			if(e instanceof EventMotion) {
 				EventMotion event = (EventMotion)e;
 				event.y -= 1E-10;
-				PlayerUtils.vClip2(999, true);
+				MovementUtils.vClip2(999, true);
 				mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
-				PlayerUtils.vClip2(-1E-10, true);
-				PlayerUtils.vClip(-1E-10);
+				MovementUtils.vClip2(-1E-10, true);
+				MovementUtils.vClip(-1E-10);
 				toggle();
 			}
 			break;
@@ -114,13 +114,13 @@ public class Phase extends Module {
 				EventMotion event = (EventMotion)e;
 				
 				Vec3d lpos = mc.player.getPositionVector();
-				PlayerUtils.Strafe(7);
+				MovementUtils.Strafe(7);
 				mc.player.posX+=mc.player.motionX;
 				mc.player.posZ+=mc.player.motionZ;
-				PlayerUtils.vClip2(0, true);
-				PlayerUtils.vClip2(0, true);
+				MovementUtils.vClip2(0, true);
+				MovementUtils.vClip2(0, true);
 				mc.player.setPosition(lpos.x, lpos.y, lpos.z);
-				PlayerUtils.freeze();
+				MovementUtils.freeze();
 				
 				event.y -= 1E-10;
 			}

@@ -5,7 +5,7 @@ import com.github.satellite.event.listeners.EventStep;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import org.lwjgl.input.Keyboard;
 
 public class Step extends Module {
@@ -41,7 +41,7 @@ public class Step extends Module {
         		double[] poss = positionsNCP(event.getHeight());
         		ClientUtils.setTimer(Math.min(1.0F, 1.0F / (1+poss.length)));
         		for (double y : poss) {
-        			PlayerUtils.vClip2(y, false);
+        			MovementUtils.vClip2(y, false);
         		}
         	}
         }

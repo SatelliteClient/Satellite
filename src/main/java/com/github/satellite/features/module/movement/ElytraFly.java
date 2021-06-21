@@ -6,7 +6,7 @@ import com.github.satellite.features.module.Module;
 import com.github.satellite.mixin.client.AccessorEntityPlayerSP;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketPlayer;
 
@@ -51,8 +51,8 @@ public class ElytraFly extends Module {
 
         if(e instanceof EventUpdate) {
             if (mc.player.onGround) {
-                PlayerUtils.vClip2(.42, false);
-                PlayerUtils.vClip2(.42 - .08, false);
+                MovementUtils.vClip2(.42, false);
+                MovementUtils.vClip2(.42 - .08, false);
             }else {
                 if (mode.is("Packet")) {
                     mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
@@ -88,7 +88,7 @@ public class ElytraFly extends Module {
     @Override
     public void onDisable() {
         if (autoClose.isEnable()) {
-            PlayerUtils.vClip2(0, true);
+            MovementUtils.vClip2(0, true);
         }else {
             mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_FALL_FLYING));
         }

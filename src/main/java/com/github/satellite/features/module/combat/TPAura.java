@@ -6,7 +6,7 @@ import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MathUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -77,7 +77,7 @@ public class TPAura extends Module {
 						mc.player.motionX = Math.max(Math.min(dx, speed), -speed);
 						mc.player.motionZ = Math.max(Math.min(dz, speed), -speed);
 						ClientUtils.setTimer(1.2F);
-						mc.player.motionY = PlayerUtils.InputY()+Math.max(Math.min(dy, 1), -1);
+						mc.player.motionY = MovementUtils.InputY()+Math.max(Math.min(dy, 1), -1);
 					}
             	}
             }
@@ -137,7 +137,7 @@ public class TPAura extends Module {
 			Vec3d vec = new Vec3d(Math.sin(rx)*Math.cos(ry)*o, o*Math.sin(ry*1), Math.cos(rx)*Math.cos(ry)*o);
 			mc.player.move(MoverType.SELF, vec.x, vec.y, vec.z);
 			
-			PlayerUtils.vClip2(0, true);
+			MovementUtils.vClip2(0, true);
 		}
 	}
 	

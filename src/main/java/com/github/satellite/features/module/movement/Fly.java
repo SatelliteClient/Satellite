@@ -5,7 +5,7 @@ import com.github.satellite.event.listeners.*;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.MoverType;
 import net.minecraft.network.Packet;
@@ -68,7 +68,7 @@ public class Fly extends Module {
 					fallDistance -= 0.0624986421D;
 				}
 				mc.getConnection().sendPacket((Packet<?>)new CPacketPlayer.Position(mc.player.posX, mc.player.posY, mc.player.posZ, true));
-                lastTickSpeed = mc.player.onGround ? mc.player.isPotionActive(Potion.getPotionById(1)) ? 1.34D : 1.261D : PlayerUtils.getSpeed();
+                lastTickSpeed = mc.player.onGround ? mc.player.isPotionActive(Potion.getPotionById(1)) ? 1.34D : 1.261D : MovementUtils.getSpeed();
 				//ClientUtils.setTimer((float) (0.0207464372));
 				break;
 			case "Boost":
@@ -79,7 +79,7 @@ public class Fly extends Module {
 				break;
 			case "Funcraft":
 			case "Normal":
-				lastTickSpeed = mc.player.onGround ? .5D : PlayerUtils.getSpeed();
+				lastTickSpeed = mc.player.onGround ? .5D : MovementUtils.getSpeed();
 				break;
 			}
 			if(mode.getMode() != "PacketBoost") {
@@ -114,10 +114,10 @@ public class Fly extends Module {
 		{
 			if(e instanceof EventMotion) {
 				if (e.isPre()) {
-					mc.player.motionY= PlayerUtils.InputY()*(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
-					PlayerUtils.Strafe(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
-					PlayerUtils.move();
-					PlayerUtils.freeze();
+					mc.player.motionY= MovementUtils.InputY()*(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
+					MovementUtils.Strafe(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:1);
+					MovementUtils.move();
+					MovementUtils.freeze();
 				}
 			}
 			if(e instanceof EventRenderGUI) {
@@ -143,8 +143,8 @@ public class Fly extends Module {
 							mc.player.onGround=true;
 							lastTickSpeed=1;
 						}
-						PlayerUtils.Strafe(mc.player.onGround? 1F : lastTickSpeed < .24? .24 : lastTickSpeed - lastTickSpeed/150);
-						lastTickSpeed=mc.player.collidedHorizontally||mc.gameSettings.keyBindJump.isKeyDown() ? .24 : PlayerUtils.getSpeed();
+						MovementUtils.Strafe(mc.player.onGround? 1F : lastTickSpeed < .24? .24 : lastTickSpeed - lastTickSpeed/150);
+						lastTickSpeed=mc.player.collidedHorizontally||mc.gameSettings.keyBindJump.isKeyDown() ? .24 : MovementUtils.getSpeed();
 						lastTickSpeed -= tickTimer>=9?lastTickSpeed/4:0;
 					}
 					if(tickTimer==0) {
@@ -156,13 +156,13 @@ public class Fly extends Module {
 							y1 -= y;
 							int i=0;
 							for(i=0; i<5; i++) {
-								PlayerUtils.move();
-								PlayerUtils.vClip2(y1, false);
-								PlayerUtils.move();
-								PlayerUtils.vClip2(0, false);
+								MovementUtils.move();
+								MovementUtils.vClip2(y1, false);
+								MovementUtils.move();
+								MovementUtils.vClip2(0, false);
 								ClientUtils.setTimer(1F / (i*2));
 							}
-							PlayerUtils.Strafe(.45D);
+							MovementUtils.Strafe(.45D);
 							mc.player.motionY=-0.08;
 						}
 					}
@@ -175,8 +175,8 @@ public class Fly extends Module {
 				if(e instanceof EventMotion && e.isPre()) {
 					ClientUtils.setTimer(tickTimer > 0 ? 1 : ClientUtils.getTimer());
 					mc.player.motionY = 0;
-					PlayerUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed/150);
-					lastTickSpeed = mc.player.collidedHorizontally ? 0.26 : PlayerUtils.getSpeed();
+					MovementUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed/150);
+					lastTickSpeed = mc.player.collidedHorizontally ? 0.26 : MovementUtils.getSpeed();
 				}
 				break;
 			case "Boost":
@@ -191,22 +191,22 @@ public class Fly extends Module {
 					if (mc.player.isPotionActive(Potion.getPotionById(1)) && tickTimer==20) {
 						lastTickSpeed = 0D;
 					}
-					PlayerUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed/150);
-					lastTickSpeed = mc.player.collidedHorizontally ? .26D : PlayerUtils.getSpeed();
+					MovementUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed/150);
+					lastTickSpeed = mc.player.collidedHorizontally ? .26D : MovementUtils.getSpeed();
 				}
 				break;
 			case "Funcraft":
 				if(e instanceof EventMotion && e.isPre()) {
 					mc.player.motionY = 0;
-					PlayerUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed / 150);
-					lastTickSpeed = mc.player.collidedHorizontally ? .26D : PlayerUtils.getSpeed();
+					MovementUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed / 150);
+					lastTickSpeed = mc.player.collidedHorizontally ? .26D : MovementUtils.getSpeed();
 				}
 				break;
 			case "Normal":
 				if(e instanceof EventMotion && e.isPre()) {
 					mc.player.motionY = 0;
-					PlayerUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed / 15);
-					lastTickSpeed = mc.player.collidedHorizontally ? .26D : PlayerUtils.getSpeed();
+					MovementUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed / 15);
+					lastTickSpeed = mc.player.collidedHorizontally ? .26D : MovementUtils.getSpeed();
 				}
 				break;
 			}
@@ -245,21 +245,21 @@ public class Fly extends Module {
 						clearLagTeleportId=teleportId+1;
 					}
 					
-					PlayerUtils.vClip2(999, true);
+					MovementUtils.vClip2(999, true);
 					mc.getConnection().sendPacket(new CPacketConfirmTeleport(clearLagTeleportId));				
 					
 					double speed=(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:2);
 					if(teleportId==0) {
 						speed=0;
 					}
-					PlayerUtils.Strafe(speed);
+					MovementUtils.Strafe(speed);
 					for(int i1=0; i1<4; i1++) {
-						PlayerUtils.vClip(PlayerUtils.InputY()*speed);
-						PlayerUtils.move();
+						MovementUtils.vClip(MovementUtils.InputY()*speed);
+						MovementUtils.move();
 						CansellingTeleport++;
 					}
 
-					PlayerUtils.freeze();
+					MovementUtils.freeze();
 					clearLagTeleportId++;	
 				}
 			}

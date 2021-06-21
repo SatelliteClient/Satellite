@@ -1,7 +1,7 @@
-package com.github.satellite.ui.clickGUI.element;
+package com.github.satellite.ui.gui.clickGUI.element;
 
 import com.github.satellite.features.module.Module;
-import com.github.satellite.ui.clickGUI.GuiClickGUI;
+import com.github.satellite.ui.gui.clickGUI.GuiClickGUI;
 import com.github.satellite.ui.theme.Theme;
 import com.github.satellite.ui.theme.ThemeManager;
 import com.github.satellite.utils.render.ColorUtils;

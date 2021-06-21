@@ -6,7 +6,7 @@ import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.block.BlockAir;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
@@ -45,7 +45,7 @@ public class PacketFly extends Module {
 
 	@Override
 	public void onEnable() {
-		PlayerUtils.vClip2(-1024, true);
+		MovementUtils.vClip2(-1024, true);
 		super.onEnable();
 	}
 
@@ -68,31 +68,31 @@ public class PacketFly extends Module {
 					}
 
 					if(clearLagTeleportId != 0) {
-						PlayerUtils.vClip2(-1024, true);
+						MovementUtils.vClip2(-1024, true);
 
 						mc.getConnection().sendPacket(new CPacketConfirmTeleport(clearLagTeleportId));
 
-						if(mc.player.ticksExisted%3==0 && PlayerUtils.InputY() <= 0) {
+						if(mc.player.ticksExisted%3==0 && MovementUtils.InputY() <= 0) {
 							mc.player.motionY=-.04D;
 						}
 
-						if(mc.player.ticksExisted%16==0 && PlayerUtils.InputY() > 0) {
+						if(mc.player.ticksExisted%16==0 && MovementUtils.InputY() > 0) {
 							mc.player.motionY=-.10D;
 						}
 					}
 
-					mc.player.motionY += teleportId==0?0: PlayerUtils.InputY()* .062D;
+					mc.player.motionY += teleportId==0?0: MovementUtils.InputY()* .062D;
 
 					speed = teleportId==0? .01 : (mc.world.getBlockState(new BlockPos(mc.player).offset(EnumFacing.DOWN)).getBlock() instanceof BlockAir) ?.25:.1;
-					speed*= PlayerUtils.InputY()>0?0:1;
+					speed*= MovementUtils.InputY()>0?0:1;
 
-					PlayerUtils.Strafe(speed);
+					MovementUtils.Strafe(speed);
 					if (phase.isEnable()) {
 						mc.player.setPosition(mc.player.posX+mc.player.motionX, mc.player.posY+mc.player.motionY, mc.player.posZ+mc.player.motionZ);
 					}else {
-						PlayerUtils.move();
+						MovementUtils.move();
 					}
-					PlayerUtils.freeze();
+					MovementUtils.freeze();
 
 					clearLagTeleportId++;
 				}

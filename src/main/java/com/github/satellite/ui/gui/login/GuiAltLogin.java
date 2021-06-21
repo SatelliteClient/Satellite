@@ -1,9 +1,7 @@
-package com.github.satellite.ui.login;
+package com.github.satellite.ui.gui.login;
 
 import java.io.IOException;
-import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;

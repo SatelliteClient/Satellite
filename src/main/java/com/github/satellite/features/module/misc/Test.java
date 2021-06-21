@@ -2,19 +2,8 @@ package com.github.satellite.features.module.misc;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventMotion;
-import com.github.satellite.event.listeners.EventPacket;
-import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
-import com.github.satellite.setting.ModeSetting;
-import com.github.satellite.utils.PlayerUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.SPacketBlockAction;
-import net.minecraft.network.play.server.SPacketBlockChange;
-import net.minecraft.network.play.server.SPacketEntityMetadata;
-import net.minecraft.network.play.server.SPacketMultiBlockChange;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentString;
+import com.github.satellite.utils.MovementUtils;
 
 public class Test extends Module {
 
@@ -28,9 +17,9 @@ public class Test extends Module {
             if (mc.player.onGround) {
                 double[] ncp = new double[] {0.425D, 0.821D, 0.699D, 0.599D};
                 for (double d : ncp) {
-                    PlayerUtils.vClip2(d, false);
+                    MovementUtils.vClip2(d, false);
                 }
-                PlayerUtils.vClip(.599D);
+                MovementUtils.vClip(.599D);
                 mc.player.motionY = .425D;
             }
         }

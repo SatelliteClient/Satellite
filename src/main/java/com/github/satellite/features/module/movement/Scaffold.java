@@ -8,7 +8,7 @@ import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.BlockUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.util.EnumFacing;
@@ -97,7 +97,7 @@ public class Scaffold extends Module {
 				if(!keepY.isEnable() && mc.world.getBlockState(new BlockPos(mc.player).offset(EnumFacing.DOWN, 2)).isFullBlock() && !poss.isEmpty() && mc.player.movementInput.jump && (int)mc.player.lastTickPosY<(int)mc.player.posY) {
 					mc.player.setPosition(mc.player.posX, (int)mc.player.posY, mc.player.posZ);
 					mc.player.motionY=0.42;
-					PlayerUtils.Strafe(mc.player.motionY/3);
+					MovementUtils.Strafe(mc.player.motionY/3);
 				}
 
 				if(mc.player.onGround)lastGroundY = mc.player.posY;

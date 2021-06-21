@@ -2,10 +2,8 @@ package com.github.satellite.features.module.movement;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventMotion;
-import com.github.satellite.event.listeners.EventPlayerInput;
 import com.github.satellite.features.module.Module;
-import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 
 import net.minecraft.entity.MoverType;
 import net.minecraft.network.play.client.CPacketEntityAction;
@@ -24,11 +22,11 @@ public class PhaseFly extends Module {
 	public void onEvent(Event<?> e) {
 		if(e instanceof EventMotion) {
 			EventMotion event = (EventMotion)e;
-			PlayerUtils.freeze();
+			MovementUtils.freeze();
 			double x = 0, y = 0, z = 0;
 			mc.getConnection().sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
-			if (PlayerUtils.InputY() > 0) {
-				if (PlayerUtils.isInsideBlock()) {
+			if (MovementUtils.InputY() > 0) {
+				if (MovementUtils.isInsideBlock()) {
 					y += 1;
 					tickTimer = 0;
 				}else {
@@ -48,11 +46,11 @@ public class PhaseFly extends Module {
 					y += mc.player.posY - y1;
 					tickTimer++;	
 				}
-			}else if(PlayerUtils.InputY() < 0) {
+			}else if(MovementUtils.InputY() < 0) {
 				y--;
 			}
 			
-			PlayerUtils.Strafe(1);
+			MovementUtils.Strafe(1);
 			x = mc.player.motionX;
 			z = mc.player.motionZ;
 			

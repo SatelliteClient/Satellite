@@ -9,7 +9,7 @@ import com.github.satellite.mixin.client.AccessorEntityPlayer;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.potion.Potion;
 import org.lwjgl.input.Keyboard;
 
@@ -43,30 +43,31 @@ public class LongJump extends Module {
 		switch(mode.getMode()) {
 			case "Vanilla":
 				if(e instanceof EventUpdate && e.isPre()) {
-					PlayerUtils.Strafe(1);
+					MovementUtils.Strafe(1);
 				}
+				break;
 
 			case "NCPLow":
 			{
 				if(e instanceof EventMotion && e.isPre()) {
-					if(mc.player.posY == mc.player.lastTickPosY && mc.player.collidedVertically && mc.player.onGround && PlayerUtils.isMoving()) {
-						PlayerUtils.Strafe(0.1D);
+					if(mc.player.posY == mc.player.lastTickPosY && mc.player.collidedVertically && mc.player.onGround && MovementUtils.isMoving()) {
+						MovementUtils.Strafe(0.1D);
 						mc.player.setPosition(mc.player.lastTickPosX+mc.player.motionX, mc.player.lastTickPosY, mc.player.lastTickPosZ+mc.player.motionZ);
 						if(progress>10) {
-							PlayerUtils.Strafe(.29D);
+							MovementUtils.Strafe(.29D);
 							mc.player.jump();
 							progress=0;
 						}
 						progress++;
 					}
-					if(mc.player.motionY == .33319999363422365 && PlayerUtils.isMoving()) {
+					if(mc.player.motionY == .33319999363422365 && MovementUtils.isMoving()) {
 						if (mc.player.isPotionActive(Potion.getPotionById(1))) {
-							PlayerUtils.Strafe(1.34D);
+							MovementUtils.Strafe(1.34D);
 						} else {
-							PlayerUtils.Strafe(1.261D);
+							MovementUtils.Strafe(1.261D);
 						}
 					}
-					PlayerUtils.Strafe(PlayerUtils.getSpeed());
+					MovementUtils.Strafe(MovementUtils.getSpeed());
 				}
 				break;
 			}
@@ -91,7 +92,7 @@ public class LongJump extends Module {
 					double[] ncp = new double[] {.599D, .423D, .35D, .28D, .217D, .15D, .025D, -.00625D, -.038D, -.0693D, -.102D, -.13D, -.18D, -.1D, -.117D, -.14532D, -.1334D, -.1581D, -.183141D, -.170695D, -.195653D, -.221D, -.209D, -.233D, -.25767D, -.314917D, -.371019D, -.426D, -.49588D, -.56436};
 					double[] ncpp = new double[] {0.425D, 0.821D, 0.699D, 0.599D};
 					//.599D,
-					if(PlayerUtils.isMoving() || jumpFlag || progress > 0) {
+					if(MovementUtils.isMoving() || jumpFlag || progress > 0) {
 						if(mc.player.onGround || progress > 0) {
 							if(progress<ncp.length) {
 								mc.player.motionY = ncp[progress];
@@ -102,7 +103,7 @@ public class LongJump extends Module {
 							if(progress == 0) {
 								mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
 								for (double d : ncpp) {
-									PlayerUtils.vClip2(d, false);
+									MovementUtils.vClip2(d, false);
 								}
 								if (useTimer.isEnable()) {
 									this.state = 3;
@@ -113,18 +114,18 @@ public class LongJump extends Module {
 
 							((AccessorEntityPlayer)mc.player).speedInAir(.02F);
 
-							if(progress == 0) PlayerUtils.Strafe(.29D);
+							if(progress == 0) MovementUtils.Strafe(.29D);
 							if(progress == 1) {
-								PlayerUtils.Strafe(.7D);
+								MovementUtils.Strafe(.7D);
 							}
 							if(progress == 7) {
-								PlayerUtils.Strafe(.26D);
+								MovementUtils.Strafe(.26D);
 							}
 
 							progress++;
 						}
 					}
-					PlayerUtils.Strafe(PlayerUtils.getSpeed());
+					MovementUtils.Strafe(MovementUtils.getSpeed());
 				}
 				break;
 			}
@@ -145,14 +146,14 @@ public class LongJump extends Module {
 				if(e instanceof EventMotion && e.isPre()) {
 					if(mc.player.onGround) {
 						mc.player.jump();
-						PlayerUtils.Strafe(.1);
-						PlayerUtils.vClip(.42 - .42);
+						MovementUtils.Strafe(.1);
+						MovementUtils.vClip(.42 - .42);
 					}
 					((AccessorEntityPlayer)mc.player).speedInAir(0.03f);
 					//mc.player.motionY += 0.05999D;
-					PlayerUtils.Strafe(PlayerUtils.getSpeed());
+					MovementUtils.Strafe(MovementUtils.getSpeed());
 					if(mc.player.motionY == .33319999363422365) {
-						PlayerUtils.Strafe(.5);
+						MovementUtils.Strafe(.5);
 					}else if(mc.player.motionY < .33319999363422365 && mc.player.motionY > -.42) {
 						mc.player.motionY += 0.03D;
 					}

@@ -5,7 +5,7 @@ import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventRenderGUI;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
-import com.github.satellite.ui.clickGUI.GuiClickGUI;
+import com.github.satellite.ui.gui.clickGUI.GuiClickGUI;
 import com.github.satellite.ui.theme.Theme;
 import org.lwjgl.input.Keyboard;
 

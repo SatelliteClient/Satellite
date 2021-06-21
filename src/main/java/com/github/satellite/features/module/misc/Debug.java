@@ -5,13 +5,8 @@ import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
-import com.github.satellite.utils.PlayerUtils;
-import net.minecraft.entity.Entity;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.SPacketBlockAction;
-import net.minecraft.network.play.server.SPacketBlockChange;
-import net.minecraft.network.play.server.SPacketEntityMetadata;
-import net.minecraft.network.play.server.SPacketMultiBlockChange;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
 
@@ -47,7 +42,7 @@ public class Debug extends Module {
                 break;
             case "Speed":
                 if (e instanceof EventUpdate) {
-                    mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(String.valueOf(PlayerUtils.getSpeed())));
+                    mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(String.valueOf(MovementUtils.getSpeed())));
                 }
                 break;
 

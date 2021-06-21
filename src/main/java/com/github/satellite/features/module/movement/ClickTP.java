@@ -8,7 +8,7 @@ import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.ui.theme.ThemeManager;
 import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
+import com.github.satellite.utils.MovementUtils;
 import com.github.satellite.utils.RayTraceUtils;
 import com.github.satellite.utils.Rotation;
 import com.github.satellite.utils.render.ColorUtils;
@@ -44,9 +44,9 @@ public class ClickTP extends Module {
         			BlockPos pos = rayTraceResult.getBlockPos();
         			Vec3d lPos = mc.player.getPositionVector();
         			mc.player.setPosition(pos.getX()+0.5, pos.getY()+1, pos.getZ()+0.5);
-        			PlayerUtils.vClip2(0, true);
+        			MovementUtils.vClip2(0, true);
         			mc.player.setPosition(lPos.x, lPos.y, lPos.z);
-        			PlayerUtils.vClip2(-1E-10, true);
+        			MovementUtils.vClip2(-1E-10, true);
         	    	ClientUtils.setTimer(0.95F);
             	}
         	}

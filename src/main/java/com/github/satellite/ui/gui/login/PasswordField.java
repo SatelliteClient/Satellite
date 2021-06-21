@@ -1,10 +1,8 @@
-package com.github.satellite.ui.login;
+package com.github.satellite.ui.gui.login;
 
 import net.minecraft.util.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.client.renderer.*;
 
 public class PasswordField extends Gui
 {

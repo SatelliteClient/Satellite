@@ -1,6 +1,7 @@
 package com.github.satellite.features.module.render;
 
 import com.github.satellite.Satellite;
+import com.github.satellite.features.module.ModuleGuiObject;
 import com.github.satellite.network.packet.packets.CPPosition;
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventRenderGUI;
@@ -13,29 +14,15 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.math.Vec3i;
 
-public class Map extends Module {
+public class Map extends ModuleGuiObject {
 	public Map() {
-		super("Map", 0, Category.RENDER);
+		super("Map", 0, Category.RENDER, -104, -104, 100, 100, true, true);
 	}
-
-	//ServiceConnection sc = Client.serviceconnection;
 	
 	Vec3i lastpos;
 	
 	@Override
 	public void onEvent(Event e) {
-		if(e instanceof EventUpdate) {
-			if (!Satellite.isConnected)
-				return;
-			int x = (int)(mc.player.posX);
-			int y = (int)(mc.player.posY);
-			int z = (int)(mc.player.posZ);
-			Vec3i vec = new Vec3i(x, y, z);
-			if(lastpos.getX() != vec.getX() || lastpos.getY() != vec.getY() || lastpos.getZ() != vec.getZ()) {
-				Satellite.SatelliteNet.netWorkManager.sendPacket(new CPPosition(vec.getX(), vec.getY(), vec.getZ()));
-				lastpos = new Vec3i(x, y, z);
-			}
-		}
 		if(e instanceof EventRenderGUI) {
 			int x=mc.displayWidth/2 - 100 - 4;
 			int y=new ScaledResolution(mc).getScaledHeight()/1-100-4-(mc.currentScreen instanceof GuiChat?15:0);

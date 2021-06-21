@@ -9,27 +9,20 @@ import com.github.satellite.features.module.Module;
 import com.github.satellite.mixin.client.AccessorEntityPlayer;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
-import com.github.satellite.utils.PlayerUtils;
-import net.minecraft.block.BlockAir;
+import com.github.satellite.utils.MovementUtils;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
-import net.minecraft.network.play.client.CPacketConfirmTransaction;
-import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentString;
 import org.lwjgl.input.Keyboard;
 
 public class Speed extends Module {
 
 
 	public Speed () {
-        super("Speed", Keyboard.KEY_Z, Category.MOVEMENT);
-    }
+		super("Speed", Keyboard.KEY_Z, Category.MOVEMENT);
+	}
 
-    ModeSetting mode;
+	ModeSetting mode;
 
 	@Override
 	public void init() {
@@ -41,7 +34,7 @@ public class Speed extends Module {
 	double lastSpeed;
 	boolean lastGround;
 	boolean moving;
-    boolean OnGround = false;
+	boolean OnGround = false;
 	int tickTimer;
 	int progress;
 	double moveSpeed;
@@ -54,24 +47,24 @@ public class Speed extends Module {
 
 	@Override
 	public void onEvent(Event<?> e) {
-    	if(e instanceof EventUpdate) {
-    		EventUpdate event = (EventUpdate)e;
-    		switch (mode.getMode()) {
+		if(e instanceof EventUpdate) {
+			EventUpdate event = (EventUpdate)e;
+			switch (mode.getMode()) {
 
 				case "NCP":
-					if (PlayerUtils.isMoving()) {
+					if (MovementUtils.isMoving()) {
 						if (mc.player.onGround) {
 							mc.player.jump();
 						}
 						((AccessorEntityPlayer)mc.player).speedInAir(.0223F);
-						PlayerUtils.Strafe(PlayerUtils.getSpeed());
+						MovementUtils.Strafe(MovementUtils.getSpeed());
 					} else {
 						mc.player.motionX = 0.0D;
 						mc.player.motionZ = 0.0D;
 					}
 					break;
 				case "OldNCP":
-					if (PlayerUtils.isMoving()) {
+					if (MovementUtils.isMoving()) {
 						if (mc.player.onGround) {
 							mc.player.jump();
 							mc.player.motionX *= 1.05D;
@@ -79,7 +72,7 @@ public class Speed extends Module {
 						}
 						mc.player.motionY -= mc.player.motionY < .33319999363422365D ? 9.9999E-4D*5 : 0;
 
-						PlayerUtils.Strafe(PlayerUtils.getSpeed() + (mc.player.motionY == .33319999363422365D && PlayerUtils.getSpeed() > 0.3 ? 0.05 : 0));
+						MovementUtils.Strafe(MovementUtils.getSpeed() + (mc.player.motionY == .33319999363422365D && MovementUtils.getSpeed() > 0.3 ? 0.05 : 0));
 					} else {
 						mc.player.motionX = 0.0D;
 						mc.player.motionZ = 0.0D;
@@ -93,29 +86,38 @@ public class Speed extends Module {
 						}
 
 						if(clearLagTeleportId != 0) {
-							PlayerUtils.vClip2(-1024, true);
+							MovementUtils.vClip2(-1024, true);
 
 							mc.getConnection().sendPacket(new CPacketConfirmTeleport(clearLagTeleportId));
 
 							mc.player.motionY = 0;
-							PlayerUtils.Strafe(.24D);
+							MovementUtils.Strafe(.24D);
 						}
 
 						clearLagTeleportId++;
 					}
 			}
-    	}
+		}
 
 		if(e instanceof EventMotion) {
 			EventMotion event = (EventMotion)e;
 			switch (mode.getMode()) {
 
 				case "YPort":
-					if(mc.player.onGround && (mc.player.moveForward != 0 || mc.player.moveStrafing != 0)) {
-						if(mc.player.ticksExisted % 2 != 0)
+					if(mc.player.onGround && MovementUtils.isMoving()) {
+						if(tickTimer % 2 != 0) {
 							event.y += .4;
-						PlayerUtils.Strafe(mc.player.ticksExisted % 2 == 0 ? .45F : .2F);
+						}
+
+						MovementUtils.Strafe(tickTimer % 2 == 0 ? .45F : .2F);
 						ClientUtils.setTimer(1.095F);
+						tickTimer++;
+						if (!mc.player.onGround) {
+							tickTimer = 1;
+						}
+					}
+					if(mc.player.motionY == .33319999363422365) {
+						MovementUtils.Strafe(0);
 					}
 			}
 		}
@@ -130,7 +132,7 @@ public class Speed extends Module {
 							if (p instanceof SPacketPlayerPosLook) {
 								SPacketPlayerPosLook packet = (SPacketPlayerPosLook)p;
 								teleportId = packet.getTeleportId();
-								if(mc.player.getDistance(packet.getX(), packet.getY(), packet.getZ()) < 2) {
+								if(mc.player.getDistance(packet.getX(), packet.getY(), packet.getZ()) < 4) {
 									event.setCancelled(true);
 									mc.getConnection().sendPacket(new CPacketConfirmTeleport(teleportId));
 								}else {
@@ -141,27 +143,29 @@ public class Speed extends Module {
 					}
 			}
 		}
-    	if(e instanceof EventPlayerInput) {
-    		EventPlayerInput event = (EventPlayerInput)e;
-    		event.setJump(false);
-    	}
-        super.onEvent(e);
-    }
-    
-    @Override
-    public void onEnable() {
-    	lastSpeed  = PlayerUtils.getSpeed();
+		if(e instanceof EventPlayerInput) {
+			EventPlayerInput event = (EventPlayerInput)e;
+			if (!(mode.is("YPort") && tickTimer % 2 != 0)) {
+				event.setJump(false);
+			}
+		}
+		super.onEvent(e);
+	}
+
+	@Override
+	public void onEnable() {
+		lastSpeed  = MovementUtils.getSpeed();
 		switch (mode.getMode()) {
 			case "TEST":
 				teleportId         = 0;
 				clearLagTeleportId = 0;
-				PlayerUtils.vClip2(999, true);
+				MovementUtils.vClip2(999, true);
 		}
-    	super.onEnable();
-    }
+		super.onEnable();
+	}
 
-    @Override
-    public void onDisable() {
-        super.onDisable();
-    }
+	@Override
+	public void onDisable() {
+		super.onDisable();
+	}
 }

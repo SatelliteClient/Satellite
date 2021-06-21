@@ -1,4 +1,4 @@
-package com.github.satellite.ui.login;
+package com.github.satellite.ui.gui.login;
 
 import java.net.Proxy;
 

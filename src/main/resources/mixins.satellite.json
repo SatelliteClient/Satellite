@@ -19,6 +19,7 @@
     "AccessorTimer",
     "AccessorEntity",
     "AccessorEntityPlayer",
-    "AccessorEntityPlayerSP"
+    "AccessorEntityPlayerSP",
+    "AccessorEntityRenderer"
   ]
 }
