@@ -2,13 +2,14 @@ package com.github.satellite;
 
 import com.github.satellite.command.CommandManager;
 import com.github.satellite.event.listeners.EventChat;
-import com.github.satellite.network.SatelliteNetClient;
 import com.github.satellite.event.Event;
 import com.github.satellite.features.module.ModuleManager;
 import com.github.satellite.ui.HUD;
 import com.github.satellite.ui.gui.clickGUI.GuiClickGUI;
 import com.github.satellite.ui.theme.ThemeManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -26,8 +27,6 @@ public class Satellite
     public static final String VERSION = "1.1.1";
 
 	public static HUD hud = new HUD();
-	public static SatelliteNetClient SatelliteNet;
-	public static boolean isConnected;
 	public static ThemeManager themeManager = new ThemeManager();
 	public static CommandManager commandManager = new CommandManager();
 	public static Minecraft mc = Minecraft.getMinecraft();
@@ -36,14 +35,6 @@ public class Satellite
     public void init(FMLInitializationEvent event)
     {
 		MinecraftForge.EVENT_BUS.register(this);
-		try {
-			SatelliteNet = new SatelliteNetClient();
-			SatelliteNet.sendLoginPacket();
-			isConnected=true;
-		}catch(Exception e) {
-			isConnected=false;
-		}
-
 		commandManager.init();
 		ModuleManager.registerModules();
 		ModuleManager.loadModuleSetting();
@@ -82,6 +73,8 @@ public class Satellite
 
 		if (commandManager.handleCommand(message)) {
 			event.setCanceled(true);
+		}else {
+			mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString("Command Not Found"));
 		}
 
 		if(message.startsWith(commandManager.prefix)) {

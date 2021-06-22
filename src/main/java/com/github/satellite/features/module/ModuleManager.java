@@ -1,7 +1,6 @@
 package com.github.satellite.features.module;
 
 import com.github.satellite.features.module.combat.*;
-import com.github.satellite.features.module.exploit.*;
 import com.github.satellite.features.module.misc.*;
 import com.github.satellite.features.module.movement.*;
 import com.github.satellite.features.module.player.*;
@@ -11,7 +10,6 @@ import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.KeyBindSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.setting.NumberSetting;
-import com.github.satellite.setting.Setting;
 
 import net.minecraft.client.Minecraft;
 
@@ -24,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.lwjgl.input.Keyboard;
 
 public class ModuleManager {
 
@@ -52,7 +48,6 @@ public class ModuleManager {
 		modules.add(new StorageESP());
 		modules.add(new Jesus());
 		modules.add(new AutoSlime());
-		modules.add(new Bot());
 		modules.add(new Spider());
 		modules.add(new AutoBuild());
 		modules.add(new Surround());

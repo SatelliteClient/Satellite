@@ -76,9 +76,9 @@ public class KillAura extends Module {
     			double x = Math.atan2(dx, dz) * 57.2958;
     			double y = Math.atan2(dy, distxz) * 57.2958;
     			
-    			boolean antibot = false;
+    			boolean bypass = false;
     			
-    			if(antibot) {
+    			if(bypass) {
         			double random = 1 / (Math.abs(new Random().nextInt(1)) + 1);
         			
         			x+=new Random().nextInt(1)-1.5;

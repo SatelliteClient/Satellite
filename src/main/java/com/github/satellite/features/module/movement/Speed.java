@@ -165,7 +165,9 @@ public class Speed extends Module {
 	}
 
 	@Override
-	public void onDisable() {
+	public void onDisable()	{
+		((AccessorEntityPlayer)mc.player).speedInAir(.02F);
+		ClientUtils.setTimer(1F);
 		super.onDisable();
 	}
 }
