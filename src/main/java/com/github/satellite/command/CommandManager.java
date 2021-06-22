@@ -13,8 +13,6 @@ public class CommandManager {
 
     public void init() {
         commands.add(new Toggle());
-        commands.add(new Stash());
-        commands.add(new Fill());
         commands.add(new Fov());
         commands.add(new Yaw());
     }

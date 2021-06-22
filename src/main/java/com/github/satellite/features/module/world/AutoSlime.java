@@ -36,12 +36,7 @@ public class AutoSlime extends Module {
 
 	public CopyOnWriteArrayList<BlockUtils> placeablePos;
 	
-	public CopyOnWriteArrayList<int[]> copy;
-	
 	public int[] lastpos;
-	
-	public double rot=0;
-	public double direction=1;
 	
 	@Override
 	public void onEvent(Event<?> e) {
@@ -52,11 +47,6 @@ public class AutoSlime extends Module {
 		}
 		if(e instanceof EventUpdate) {
 			if(e.isPre()) {
-				if((int)mc.player.posX!=lastpos[0]||(int)mc.player.posZ!=lastpos[1]) {
-					//Client.SatelliteNet.conn.sendQueue.add(String.valueOf((int)mc.player.posX)+","+String.valueOf((int)mc.player.posZ)+","+String.valueOf(mc.world.getHeight((int)mc.player.posX, (int)mc.player.posZ)));
-				}
-				lastpos=new int[] {(int) mc.player.posX, (int) mc.player.posZ};
-
 				if(!mc.player.isSneaking())
 					mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
 				for(int i=0; i < 1; i++) {//(mc.player.ticksExisted%3==0?4:0)
@@ -124,32 +114,8 @@ public class AutoSlime extends Module {
 		double[] vec = new double[] {pos.getX(), pos.getZ()};
 		
 		double d = MathUtils.getDistanceSq(vec);
-		//if(pos.getY()==18) {i++;}
-		//if(d > 999) {i++;}
-		//if(d > 1002) {i--;}
-		//if(d > 40) {i++;}
-		//if(d > 41) {i--;}
-		//if(d > 50) {i++;}
-		//if(d > 51) {i--;}
-		if(pos.getY() > mc.player.posY-1) {i=0;}
-		//if(mc.world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockAir) {i=0;}
-		//if(pos.getY() <= mc.player.posY) {i=0;}
-		//if(pos.getY()==6) {i=1;}
-		//if(pos.getY() == 65) {i=1;}
-		//if(pos.getY() == 119) {i++;}
-		//if(pos.getY() == mc.player.posY-1) {i=1;}
-		//if(pos.getY() == (int)mc.player.posY) {i=1;}
-		//if(pos.getY() < mc.player.posY) {i=1;}
-		//if(mc.world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockEmptyDrops)i++;
-		//if(mc.world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockObsidian)i++;
-		//highway sample
-		/*if(Math.abs(pos.getX())<3) i++;
-		if(pos.getY() != 89) i--;
-		if(pos.getY() == 90) {
-			if(Math.abs(pos.getX())==3) i++;
-			if(Math.abs(pos.getX())==3) i++;
-		}*/
-		
+		if(d > 999) {i++;}
+		if(d > 1002) {i--;}
 		if(i <= 0) return;
 		
 		BlockUtils block = BlockUtils.isPlaceable(pos, dist, true);

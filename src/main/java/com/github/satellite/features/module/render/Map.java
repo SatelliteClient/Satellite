@@ -1,18 +1,13 @@
 package com.github.satellite.features.module.render;
 
-import com.github.satellite.Satellite;
 import com.github.satellite.features.module.ModuleGuiObject;
-import com.github.satellite.network.packet.packets.CPPosition;
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventRenderGUI;
-import com.github.satellite.event.listeners.EventUpdate;
-import com.github.satellite.features.module.Module;
 import com.github.satellite.ui.theme.ThemeManager;
 import com.github.satellite.utils.render.RenderUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.util.math.Vec3i;
 
 public class Map extends ModuleGuiObject {
 	public Map() {

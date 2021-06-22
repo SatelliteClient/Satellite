@@ -8,6 +8,24 @@ import net.minecraft.util.Timer;
 public class ClientUtils {
 
 	protected static Minecraft mc = Minecraft.getMinecraft();
+
+	public boolean konas() {
+		try {
+			Class.forName("com.konasclient.client.3");
+			return true;
+		} catch (ClassNotFoundException|NoClassDefFoundError classNotFoundException) {
+			return false;
+		}
+	}
+
+	public boolean machinelite() {
+		try {
+			Class.forName("com.lite.machinelite.MachineLite");
+			return true;
+		} catch (ClassNotFoundException|NoClassDefFoundError classNotFoundException) {
+			return false;
+		}
+	}
 	
 	public static void setTimer(float d) {
 		d*=20F;
