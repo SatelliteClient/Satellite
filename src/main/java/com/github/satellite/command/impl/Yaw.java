@@ -12,7 +12,7 @@ public class Yaw extends Command {
     }
 
     @Override
-    public boolean onCommand(String[] argsa, String command) {
+    public boolean onCommand(String[] args, String command) {
         if (args.length < 1) {
             mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString("yaw: " + mc.player.cameraYaw));
         } else {
