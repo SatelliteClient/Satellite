@@ -16,6 +16,7 @@ public class CommandManager {
         commands.add(new Stash());
         commands.add(new Fill());
         commands.add(new Fov());
+        commands.add(new Yaw());
     }
 
     public boolean handleCommand(String str) {
