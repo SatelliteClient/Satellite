@@ -36,13 +36,6 @@ public class AutoSlime extends Module {
 
 	public CopyOnWriteArrayList<BlockUtils> placeablePos = new CopyOnWriteArrayList<BlockUtils>();
 
-	public CopyOnWriteArrayList<int[]> copy;
-
-	public int[] lastpos;
-
-	public double rot=0;
-	public double direction=1;
-
 	@Override
 	public void onEvent(Event<?> e) {
 		if(e instanceof EventPlayerInput) {
@@ -52,14 +45,9 @@ public class AutoSlime extends Module {
 		}
 		if(e instanceof EventUpdate) {
 			if(e.isPre()) {
-				if((int)mc.player.posX!=lastpos[0]||(int)mc.player.posZ!=lastpos[1]) {
-					//Client.SatelliteNet.conn.sendQueue.add(String.valueOf((int)mc.player.posX)+","+String.valueOf((int)mc.player.posZ)+","+String.valueOf(mc.world.getHeight((int)mc.player.posX, (int)mc.player.posZ)));
-				}
-				lastpos=new int[] {(int) mc.player.posX, (int) mc.player.posZ};
-
 				if(!mc.player.isSneaking())
 					mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
-				for(int i=0; i < 1; i++) {//(mc.player.ticksExisted%3==0?4:0)
+				for(int i=0; i < 1; i++) {
 					placeablePos = new CopyOnWriteArrayList<BlockUtils>();
 
 					int s = mc.player.inventory.currentItem;
@@ -127,6 +115,7 @@ public class AutoSlime extends Module {
 
 		if(d > 999) {i++;}
 		if(d > 1002) {i--;}
+		if(pos.getY()>mc.player.posY-1) {i=0;}
 
 		if(i <= 0) return;
 
@@ -136,7 +125,6 @@ public class AutoSlime extends Module {
 
 	@Override
 	public void onEnable() {
-		lastpos=new int[] {(int) mc.player.posX, (int) mc.player.posZ};
 		placeablePos = new CopyOnWriteArrayList<BlockUtils>();
 		super.onEnable();
 	}

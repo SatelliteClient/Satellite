@@ -77,14 +77,10 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
     public void sendMovePacket(EventMotion event) {
         boolean flag = this.isSprinting();
 
-        if (flag != this.serverSprintState)
-        {
-            if (flag)
-            {
+        if (flag != this.serverSprintState) {
+            if (flag) {
                 this.connection.sendPacket(new CPacketEntityAction(this, CPacketEntityAction.Action.START_SPRINTING));
-            }
-            else
-            {
+            } else {
                 this.connection.sendPacket(new CPacketEntityAction(this, CPacketEntityAction.Action.STOP_SPRINTING));
             }
 
@@ -93,65 +89,49 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
         boolean flag1 = this.isSneaking();
 
-        if (flag1 != this.serverSneakState)
-        {
-            if (flag1)
-            {
+        if (flag1 != this.serverSneakState) {
+            if (flag1) {
                 this.connection.sendPacket(new CPacketEntityAction(this, CPacketEntityAction.Action.START_SNEAKING));
-            }
-            else
-            {
+            } else {
                 this.connection.sendPacket(new CPacketEntityAction(this, CPacketEntityAction.Action.STOP_SNEAKING));
             }
 
             this.serverSneakState = flag1;
         }
 
-        if (this.isCurrentViewEntity())
-        {
+        if (this.isCurrentViewEntity()) {
             AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
             double d0 = event.x - this.lastReportedPosX;
             double d1 = event.y - this.lastReportedPosY;
             double d2 = event.z - this.lastReportedPosZ;
-            double d3 = (double)(event.yaw - this.lastReportedYaw);
-            double d4 = (double)(event.pitch - this.lastReportedPitch);
+            double d3 = (double) (event.yaw - this.lastReportedYaw);
+            double d4 = (double) (event.pitch - this.lastReportedPitch);
             ++this.positionUpdateTicks;
             boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
             boolean flag3 = d3 != 0.0D || d4 != 0.0D;
 
-            if (this.isRiding())
-            {
+            if (this.isRiding()) {
                 this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, event.yaw, event.pitch, event.onGround));
                 flag2 = false;
-            }
-            else if (flag2 && flag3)
-            {
+            } else if (flag2 && flag3) {
                 this.connection.sendPacket(new CPacketPlayer.PositionRotation(event.x, event.y, event.z, event.yaw, event.pitch, event.onGround));
-            }
-            else if (flag2)
-            {
+            } else if (flag2) {
                 this.connection.sendPacket(new CPacketPlayer.Position(event.x, event.y, event.z, event.onGround));
 
-            }
-            else if (flag3)
-            {
+            } else if (flag3) {
                 this.connection.sendPacket(new CPacketPlayer.Rotation(event.yaw, event.pitch, event.onGround));
-            }
-            else if (this.prevOnGround != event.onGround)
-            {
+            } else if (this.prevOnGround != event.onGround) {
                 this.connection.sendPacket(new CPacketPlayer(event.onGround));
             }
 
-            if (flag2)
-            {
+            if (flag2) {
                 this.lastReportedPosX = event.x;
                 this.lastReportedPosY = event.y;
                 this.lastReportedPosZ = event.z;
                 this.positionUpdateTicks = 0;
             }
 
-            if (flag3)
-            {
+            if (flag3) {
                 this.lastReportedYaw = event.yaw;
                 this.lastReportedPitch = event.pitch;
             }
@@ -160,27 +140,4 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.autoJumpEnabled = this.mc.gameSettings.autoJump;
         }
     }
-
-    /*@Inject(method = "onUpdateWalkingPlayer", at = @At(value = "HEAD"), cancellable = true)
-    private void PreUpdateWalkingPlayer(CallbackInfo ci) {
-        this.event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, event.yaw, event.pitch, event.onGround);
-        event.setType(EventType.PRE);
-        Satellite.onEvent(event);
-
-        if (event.isCancelled()) {
-            ci.cancel();
-            sendMovePacket();
-        }
-    }
-
-    @Inject(method = "onUpdateWalkingPlayer", at = @At("RETURN"), cancellable = true)
-    private void PostUpdateWalkingPlayer(CallbackInfo ci) {
-        event.setType(EventType.POST);
-        Satellite.onEvent(event);
-
-        if (event.isCancelled()) {
-            ci.cancel();
-            sendMovePacket();
-        }
-    }*/
 }
