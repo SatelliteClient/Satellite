@@ -1,16 +1,19 @@
 package com.github.satellite.features.module;
 
+import com.github.satellite.event.Event;
 import com.github.satellite.features.module.combat.*;
 import com.github.satellite.features.module.misc.*;
 import com.github.satellite.features.module.movement.*;
 import com.github.satellite.features.module.player.*;
 import com.github.satellite.features.module.render.*;
+import com.github.satellite.features.module.render.Map;
 import com.github.satellite.features.module.world.*;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.KeyBindSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.setting.NumberSetting;
 
+import com.github.satellite.ui.HUD;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;
@@ -18,9 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ModuleManager {
@@ -70,6 +71,25 @@ public class ModuleManager {
 		modules.add(new PhaseFly());
 		modules.add(new AntiOutside());
 		modules.add(new FreeLook());
+	}
+
+	public static class ModuleComparator implements Comparator<Module> {
+		@Override
+		public int compare(Module o1, Module o2) {
+			if(o1.priority > o2.priority)
+				return -1;
+			if(o1.priority < o2.priority)
+				return 1;
+			return 0;
+		}
+	}
+
+	public static void onEvent(Event<?> e) {
+		Collections.sort(ModuleManager.modules, new HUD.ModuleComparator());
+
+		ModuleManager.modules.stream().forEach(m -> {
+			if(m.isEnable()) m.onEvent(e);
+		});
 	}
 
 	public static List<Module> getModulesbyCategory(Module.Category c) {
@@ -195,5 +215,6 @@ public class ModuleManager {
 			}
 		}
 	}
+
 
 }

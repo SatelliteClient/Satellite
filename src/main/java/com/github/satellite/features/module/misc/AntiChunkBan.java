@@ -21,7 +21,7 @@ public class AntiChunkBan extends Module {
 	
 	@Override
 	public void init() {
-		mode = new ModeSetting("Mode", "Map", new String[] {"Piston", "Map", "Clear Entity"});
+		mode = new ModeSetting("Mode", "Map", new String[] {"Light", "Map", "Clear Entity", "BlockChange"});
 		addSetting(mode);
 		super.init();
 	}

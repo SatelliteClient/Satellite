@@ -3,11 +3,15 @@ package com.github.satellite;
 import com.github.satellite.command.CommandManager;
 import com.github.satellite.event.listeners.EventChat;
 import com.github.satellite.event.Event;
+import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.features.module.ModuleManager;
 import com.github.satellite.ui.HUD;
 import com.github.satellite.ui.gui.clickGUI.GuiClickGUI;
 import com.github.satellite.ui.theme.ThemeManager;
+import com.github.satellite.utils.WorldUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ClientChatEvent;
@@ -41,10 +45,16 @@ public class Satellite
 		GuiClickGUI.loadModules();
 	}
 
-	public static void onEvent(Event<?> e) {
-		ModuleManager.modules.stream().forEach(m -> {
-			if(m.isEnable()) m.onEvent(e);
-		});
+	public static Event<?> onEvent(Event<?> e) {
+		if (e instanceof EventPacket) {
+			EventPacket event = (EventPacket)e;
+			Packet p = event.getPacket();
+			if (p instanceof SPacketTimeUpdate) {
+				WorldUtils.onTime((SPacketTimeUpdate) p);
+			}
+		}
+    	ModuleManager.onEvent(e);
+		return e;
 	}
 
 	@SubscribeEvent

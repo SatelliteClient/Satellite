@@ -112,7 +112,7 @@ public class GuiClickGUI extends GuiScreen {
 		menu.setColor(ThemeManager.getTheme().dark(0));
 		menu.height.easeTo = height;
 
-		//gui.updateCollision(mouseX, mouseY);
+		gui.updateCollision(mouseX, mouseY);
 
 		menu.width.easeTo(menu.isHover()?150:50, 100, true);
 
@@ -130,7 +130,7 @@ public class GuiClickGUI extends GuiScreen {
 
 		List<Category> drawPanel = (List<Category>) panels.clone();
 
-		//isCollided = gui.isCollided;
+		isCollided = gui.isCollided;
 
 		for(Category c : drawPanel) {
 			c.update(mouseX, mouseY);
@@ -152,7 +152,7 @@ public class GuiClickGUI extends GuiScreen {
 		for(int i=1; i<=panels.size(); i++) {
 			panels.get(panels.size()-i).draw(mouseX, mouseY, partialTicks);
 		}*/
-		//gui.draw(mouseX, mouseY, partialTicks);
+		gui.draw(mouseX, mouseY, partialTicks);
 	}
 
 	@Override

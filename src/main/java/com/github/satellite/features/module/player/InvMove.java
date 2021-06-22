@@ -11,7 +11,7 @@ import org.lwjgl.input.Mouse;
 public class InvMove extends Module {
 
 	public InvMove() {
-		super("InvMove", Keyboard.KEY_K, Category.PLAYER);
+		super("InvMove", Keyboard.KEY_K, Category.PLAYER, 1000);
 	}
 	
 	KeyBindSetting MouseMoveKey;

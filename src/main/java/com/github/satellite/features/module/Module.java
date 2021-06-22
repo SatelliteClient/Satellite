@@ -1,6 +1,7 @@
 package com.github.satellite.features.module;
 
 import com.github.satellite.event.Event;
+import com.github.satellite.features.module.render.ClickGUI;
 import com.github.satellite.setting.KeyBindSetting;
 import com.github.satellite.setting.Setting;
 import net.minecraft.client.Minecraft;
@@ -18,6 +19,8 @@ public class Module {
 	public String name;
 	public String displayName;
 	public boolean enable;
+
+	public int priority;
 	
 	public List<Setting> settings = new ArrayList<Setting>();
 	
@@ -28,16 +31,26 @@ public class Module {
 	}
 	
 	public Module(String name, int keyCode, Category category) {
+		if (this instanceof ClickGUI) {
+			this.keyBindSetting = new KeyBindSetting("KeyBind", keyCode);
+		}else {
+			this.keyBindSetting = new KeyBindSetting("KeyBind", 0);
+		}
 		this.name = name;
-		this.keyBindSetting = new KeyBindSetting("KeyBind", keyCode);
 		this.settings.add(keyBindSetting);
 		this.category = category;
+		this.priority = 0;
 		init();
 	}
 	
 	public Module(String name, int keyCode, Category category, boolean enable) {
 		this(name, keyCode, category);
 		this.enable = enable;
+	}
+
+	public Module(String name, int keyCode, Category category, int priority) {
+		this(name, keyCode, category);
+		this.priority = priority;
 	}
 
 	public void addSetting(Setting... settings) {

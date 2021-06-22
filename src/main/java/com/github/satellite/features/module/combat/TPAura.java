@@ -4,6 +4,7 @@ import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
+import com.github.satellite.setting.KeyBindSetting;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MathUtils;
 import com.github.satellite.utils.MovementUtils;
@@ -25,7 +26,16 @@ public class TPAura extends Module {
 	}
 	
 	ArrayList<Entity> targets;
-	
+
+	KeyBindSetting strafe;
+
+	@Override
+	public void init() {
+		this.strafe = new KeyBindSetting("StrafeKey", 0);
+		addSetting(strafe);
+		super.init();
+	}
+
 	float yaw = 0, pitch = 0;
 
 	@Override
@@ -67,7 +77,7 @@ public class TPAura extends Module {
 	    				tpGoBrrrrr(lastX, lastY, lastZ);
 					}
 					
-					if(!Keyboard.isKeyDown(48)) {
+					if(Keyboard.isKeyDown(strafe.getKeyCode())) {
 						double r = Math.toRadians(mc.player.ticksExisted) * 6.19208751;//8.19208751
 						double dist = Math.sqrt(Math.pow(target.posX - mc.player.posX, 2) + Math.pow(target.posZ - mc.player.posZ, 2));
 						double dx = (target.posX+(dist>8?0:Math.sin(r)*8)) - mc.player.posX;
