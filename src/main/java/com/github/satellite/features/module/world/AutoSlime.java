@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AutoSlime extends Module {
-	
+
 	public AutoSlime() {
 		super("AutoSlime", Keyboard.KEY_NONE, Category.WORLD);
 	}
@@ -34,10 +34,15 @@ public class AutoSlime extends Module {
 		super.init();
 	}
 
-	public CopyOnWriteArrayList<BlockUtils> placeablePos;
-	
+	public CopyOnWriteArrayList<BlockUtils> placeablePos = new CopyOnWriteArrayList<BlockUtils>();
+
+	public CopyOnWriteArrayList<int[]> copy;
+
 	public int[] lastpos;
-	
+
+	public double rot=0;
+	public double direction=1;
+
 	@Override
 	public void onEvent(Event<?> e) {
 		if(e instanceof EventPlayerInput) {
@@ -47,18 +52,23 @@ public class AutoSlime extends Module {
 		}
 		if(e instanceof EventUpdate) {
 			if(e.isPre()) {
+				if((int)mc.player.posX!=lastpos[0]||(int)mc.player.posZ!=lastpos[1]) {
+					//Client.SatelliteNet.conn.sendQueue.add(String.valueOf((int)mc.player.posX)+","+String.valueOf((int)mc.player.posZ)+","+String.valueOf(mc.world.getHeight((int)mc.player.posX, (int)mc.player.posZ)));
+				}
+				lastpos=new int[] {(int) mc.player.posX, (int) mc.player.posZ};
+
 				if(!mc.player.isSneaking())
 					mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
 				for(int i=0; i < 1; i++) {//(mc.player.ticksExisted%3==0?4:0)
 					placeablePos = new CopyOnWriteArrayList<BlockUtils>();
-					
+
 					int s = mc.player.inventory.currentItem;
-					
+
 					if(InventoryUtils.getPlaceableItem() != -1)
 						mc.player.inventory.currentItem = InventoryUtils.getPlaceableItem();
-			        
+
 					scanBlock(mc.playerController.getBlockReachDistance()-1);
-					
+
 					for(int i1=0; i1<1; i1++) {
 						if(!placeablePos.isEmpty() && mc.world.getBlockState(placeablePos.get(0).pos).getBlock().isReplaceable(mc.world, placeablePos.get(0).pos)) {
 							placeablePos.sort(Comparator.comparingDouble(p -> p.dist));
@@ -81,7 +91,7 @@ public class AutoSlime extends Module {
 				RenderUtils.drawBlockBox(pos.pos, color);
 			}
 		}
-		
+
 		if(e instanceof EventMotion) {
 			EventMotion event = (EventMotion)e;
 			if(!placeablePos.isEmpty()) {
@@ -91,7 +101,7 @@ public class AutoSlime extends Module {
 		}
 		super.onEvent(e);
 	}
-	
+
 	public void scanBlock(double reach) {
 		for(int dy=(int) -reach; dy<reach; dy++)
 			for(int dx=(int) -reach; dx<reach; dx++)
@@ -103,25 +113,27 @@ public class AutoSlime extends Module {
 						scanPos(new BlockPos(x, y, z), Math.sqrt(dx*dx+dy*dy+dz*dz));
 					}
 	}
-	
+
 	public void scanPos(double x, double y, double z, double dist) {
 		scanPos(new BlockPos(x, y, z), dist);
 	}
-	
+
 	public void scanPos(BlockPos pos, double dist) {
 		int i = 0;
-		
+
 		double[] vec = new double[] {pos.getX(), pos.getZ()};
-		
+
 		double d = MathUtils.getDistanceSq(vec);
+
 		if(d > 999) {i++;}
 		if(d > 1002) {i--;}
+
 		if(i <= 0) return;
-		
+
 		BlockUtils block = BlockUtils.isPlaceable(pos, dist, true);
 		if(block != null) placeablePos.add(block);
 	}
-	
+
 	@Override
 	public void onEnable() {
 		lastpos=new int[] {(int) mc.player.posX, (int) mc.player.posZ};

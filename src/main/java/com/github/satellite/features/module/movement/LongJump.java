@@ -164,11 +164,16 @@ public class LongJump extends Module {
 	}
 
 	@Override
-	public void onDisable() {
-		progress = 0;
+	public void onEnable() {
 		if(mode.is("NCPLow")) {
 			progress=11;
 		}
+		super.onEnable();
+	}
+
+	@Override
+	public void onDisable() {
+		progress = 0;
 		((AccessorEntityPlayer)mc.player).speedInAir(0.02f);
 		if (inTimer) ClientUtils.setTimer(1.0f);
 		super.onDisable();
