@@ -21,7 +21,7 @@ public class Category {
 	
 	public float x, y;
 	public ArrayList<Panel> panels;
-	public boolean extended;
+	public boolean extended = true;
 	public String title;
 
 	public boolean lastMouseClicked;
