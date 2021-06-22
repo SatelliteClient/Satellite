@@ -28,7 +28,7 @@ public class Satellite
 {
     public static final String MOD_ID = "satellite";
     public static final String NAME = "Satellite Utility";
-    public static final String VERSION = "1.1.1";
+    public static final String VERSION = "2.0.3";
 
 	public static HUD hud = new HUD();
 	public static ThemeManager themeManager = new ThemeManager();
