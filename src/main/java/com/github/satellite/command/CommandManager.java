@@ -16,6 +16,7 @@ public class CommandManager {
         commands.add(new LookYaw());
         commands.add(new Toggle());
         commands.add(new Yaw());
+        commands.add(new Prefix());
     }
 
     public boolean handleCommand(String str) {

@@ -3,6 +3,7 @@ package com.github.satellite.features.module.movement;
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.*;
 import com.github.satellite.features.module.Module;
+import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MovementUtils;
@@ -27,12 +28,14 @@ public class Fly extends Module {
 
 	ModeSetting mode;
 	ModeSetting hypixelBoost;
+	BooleanSetting phase;
 
 	@Override
 	public void init() {
 		mode = new ModeSetting("Mode", "Vanilla", new String[] {"Vanilla", "Hypixel", "2b2t Japan"});
 		hypixelBoost = new ModeSetting("hypixelBoost", "Normal", new String[] {"Normal", "Funcraft", "Boost", "PacketBoost", "DamageBoost"});
-		addSetting(mode, hypixelBoost);
+		phase = new BooleanSetting("Phase", false);
+		addSetting(mode, hypixelBoost, phase);
 		super.init();
 	}
 
@@ -242,7 +245,14 @@ public class Fly extends Module {
 
 			case "2b2t Japan":
 			{
-				if(e instanceof EventUpdate) {
+				if (e instanceof EventMotion) {
+					EventMotion event = (EventMotion)e;
+					if (MovementUtils.isMoving()) {
+						event.yaw = 0;
+						event.pitch = 0;
+					}
+				}
+				if (e instanceof EventUpdate) {
 					mc.player.motionY=0;
 
 					CansellingTeleport=0;
@@ -264,7 +274,11 @@ public class Fly extends Module {
 						MovementUtils.Strafe(speed);
 						for(int i1=0; i1<4; i1++) {
 							MovementUtils.vClip(MovementUtils.InputY()*speed);
-							MovementUtils.move();
+							if (phase.isEnable()) {
+								MovementUtils.clip();
+							}else {
+								MovementUtils.move();
+							}
 							CansellingTeleport++;
 						}
 
