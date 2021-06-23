@@ -24,7 +24,7 @@ public class AntiChunkBan extends Module {
 	
 	@Override
 	public void init() {
-		this.mode = new ModeSetting("Mode", "Map", new String[] {"Light", "Map", "Clear Entity", "BlockChange"});
+		this.mode = new ModeSetting("Mode", "Light", new String[] {"Light", "Map"});
 		this.maxLightHeight = new NumberSetting("LightHeight", 255, 0, 255, 1);
 		addSetting(mode, maxLightHeight);
 		super.init();

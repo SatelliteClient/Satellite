@@ -4,6 +4,8 @@ import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
+import com.github.satellite.setting.BooleanSetting;
+import com.github.satellite.setting.NumberSetting;
 import com.github.satellite.utils.BlockUtils;
 import com.github.satellite.utils.InventoryUtils;
 
@@ -16,6 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
+import org.omg.CORBA.BooleanSeqHelper;
 
 public class HoleKicker extends Module {
 
@@ -23,9 +26,15 @@ public class HoleKicker extends Module {
 		super("HoleKicker", Keyboard.KEY_NONE, Category.COMBAT);
 	}
 
+	NumberSetting range;
+	BooleanSetting autoDisable;
+
 	@Override
 	public void init() {
 		super.init();
+		this.range = new NumberSetting("Range", 5.2, Integer.MIN_VALUE, 100, .1);
+		this.autoDisable = new BooleanSetting("Range", true);
+		addSetting(range, autoDisable);
 	}
 
 	int progress = 0;
@@ -42,9 +51,10 @@ public class HoleKicker extends Module {
 	public void onEvent(Event<?> e) {
 		if (e instanceof EventUpdate) {
 			for(Entity entity : mc.world.loadedEntityList) {
-				if(entity == mc.player) continue;
+				if (entity == mc.player) continue;
+				if (mc.player.getDistance(entity) > range.value) continue;
 
-				if(entity instanceof EntityPlayer) {
+				if (entity instanceof EntityPlayer) {
 					int piston = InventoryUtils.pickItem(33);
 					int power = InventoryUtils.pickItem(152);
 
@@ -72,7 +82,7 @@ public class HoleKicker extends Module {
 							pos = new BlockPos(entity).offset(EnumFacing.UP).offset(facing);
 							event = BlockUtils.isPlaceable(pos.offset(f), 0, true);
 							if (BlockUtils.doPlace(event, true)) {
-								//progress = 0;
+								toggle();
 								return;
 							}
 						}
