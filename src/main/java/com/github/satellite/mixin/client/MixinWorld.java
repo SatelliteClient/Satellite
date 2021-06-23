@@ -12,10 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(World.class)
 public class MixinWorld {
-    @Inject(at = @At("HEAD"), method = "checkLightFor", cancellable = true)
-    public void onPreCheckLightFor(EnumSkyBlock lightType, BlockPos pos, CallbackInfoReturnable<Boolean> cib) {
-        if (Satellite.onEvent(new EventLightingUpdate()).isCancelled()) {
-            cib.cancel();
+
+    @Inject(method = "checkLightFor", at = @At("HEAD"), cancellable = true)
+    private void preCheckLightFor(EnumSkyBlock lightType, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+
+        if (Satellite.onEvent(new EventLightingUpdate(pos, lightType)).isCancelled()) {
+            cir.cancel();
         }
     }
 }

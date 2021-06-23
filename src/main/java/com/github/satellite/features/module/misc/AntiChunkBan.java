@@ -1,9 +1,11 @@
 package com.github.satellite.features.module.misc;
 
 import com.github.satellite.event.Event;
+import com.github.satellite.event.listeners.EventLightingUpdate;
 import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
+import com.github.satellite.setting.NumberSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketBlockAction;
@@ -18,39 +20,27 @@ public class AntiChunkBan extends Module {
 	}
 	
 	ModeSetting mode;
+	NumberSetting maxLightHeight;
 	
 	@Override
 	public void init() {
-		mode = new ModeSetting("Mode", "Map", new String[] {"Light", "Map", "Clear Entity", "BlockChange"});
-		addSetting(mode);
+		this.mode = new ModeSetting("Mode", "Map", new String[] {"Light", "Map", "Clear Entity", "BlockChange"});
+		this.maxLightHeight = new NumberSetting("LightHeight", 255, 0, 255, 1);
+		addSetting(mode, maxLightHeight);
 		super.init();
 	}
 
 	@Override
 	public void onEvent(Event<?> e) {
-		for(Entity entity : mc.world.loadedEntityList) if(entity != mc.player) mc.world.removeEntity(entity);
-		if(e instanceof EventPacket) {
-			EventPacket event = (EventPacket)e;
-			Packet p = event.getPacket();
-			if(event.isIncoming()) {
-				switch (mode.getMode()) {
-				case "Piston":
-					if(p instanceof SPacketBlockChange) event.setCancelled(true);
-					if(p instanceof SPacketMultiBlockChange) event.setCancelled(true);
-					//locks.GLOWSTONE.lightValue=0;
-				case "Map":
-					if(p instanceof SPacketEntityMetadata) event.setCancelled(true);
-					if(p instanceof SPacketBlockAction) event.setCancelled(true);
-					break;
-				case "Clear Entity":
-					for(Entity entity : mc.world.loadedEntityList) if(entity != mc.player) mc.world.removeEntity(entity);
-					break;
-					
+		switch (mode.getMode()) {
 
-				default:
-					break;
+			case "Lighit":
+				if (e instanceof EventLightingUpdate) {
+					if (((EventLightingUpdate)e).getPos().getY() > maxLightHeight.value) {
+						e.cancel();
+					}
 				}
-			}
+
 		}
 		super.onEvent(e);
 	}
