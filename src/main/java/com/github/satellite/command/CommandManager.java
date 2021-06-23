@@ -12,8 +12,9 @@ public class CommandManager {
     public String prefix = ".";
 
     public void init() {
-        commands.add(new Toggle());
         commands.add(new Fov());
+        commands.add(new LookYaw());
+        commands.add(new Toggle());
         commands.add(new Yaw());
     }
 
