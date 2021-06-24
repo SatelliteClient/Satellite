@@ -26,6 +26,13 @@ public class EventMotion extends Event<EventMotion> {
 		this.yaw = yaw;
 		this.pitch = pitch;
 		this.onGround = onGround;
+
+		this.lastX = x;
+		this.lastY = y;
+		this.lastZ = z;
+		this.lastYaw = yaw;
+		this.lastPitch = pitch;
+		this.lastOnGround = onGround;
 	}
 
 	public double getX() {

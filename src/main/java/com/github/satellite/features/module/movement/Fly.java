@@ -295,7 +295,7 @@ public class Fly extends Module {
 					Vec3d pos = new Vec3d(event.x, event.y, event.z);
 
 					for (Vec3d vec : catchVec) {
-						if (vec.equals(pos)) {
+						if (vec.distanceTo(pos) < 2) {
 							catchVec.remove(vec);
 							event.setCancellTeleporting(true);
 							CansellingTeleport--;

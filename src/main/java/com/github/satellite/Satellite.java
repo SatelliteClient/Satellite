@@ -12,8 +12,6 @@ import com.github.satellite.utils.WorldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -82,12 +80,6 @@ public class Satellite
 		String message = event.getMessage();
 
 		if (commandManager.handleCommand(message)) {
-			event.setCanceled(true);
-		}else {
-			mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString("Command Not Found"));
-		}
-
-		if(message.startsWith(commandManager.prefix)) {
 			event.setCanceled(true);
 		}
 

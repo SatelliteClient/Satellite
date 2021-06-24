@@ -85,7 +85,7 @@ public class ModuleManager {
 	}
 
 	public static void onEvent(Event<?> e) {
-		Collections.sort(ModuleManager.modules, new HUD.ModuleComparator());
+		Collections.sort(ModuleManager.modules, new ModuleComparator());
 
 		ModuleManager.modules.stream().forEach(m -> {
 			if(m.isEnable()) m.onEvent(e);

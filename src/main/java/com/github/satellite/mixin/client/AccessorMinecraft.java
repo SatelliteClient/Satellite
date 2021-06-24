@@ -11,18 +11,9 @@ public interface AccessorMinecraft {
     @Accessor("timer")
     Timer getTimer();
 
-    @Accessor("rightClickDelayTimer")
-    int getRightClickDelayTimer();
-
-    @Accessor("rightClickDelayTimer")
-    void setRightClickDelayTimer(int paramInt);
-
     @Accessor("session")
     void setSession(Session paramSession);
 
     @Accessor("renderPartialTicksPaused")
     float getRenderPartialTicksPaused();
-
-    @Accessor("leftClickCounter")
-    void setLeftClickCounter(int paramInt);
 }

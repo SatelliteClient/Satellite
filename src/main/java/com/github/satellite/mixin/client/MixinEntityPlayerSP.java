@@ -46,8 +46,6 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
     @Shadow protected abstract boolean isCurrentViewEntity();
 
-    EventMotion event;
-
     @Inject(method = "onUpdate", at = @At("HEAD"))
     private void onUpdate(CallbackInfo ci) {
         EventUpdate e = new EventUpdate();
@@ -57,7 +55,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
     @Inject(method = "onUpdateWalkingPlayer", at = @At(value = "HEAD"), cancellable = true)
     private void PreUpdateWalkingPlayer(CallbackInfo ci) {
-        this.event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround);
+        EventMotion event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround);
         event.setType(EventType.PRE);
         Satellite.onEvent(event);
 
@@ -69,7 +67,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
     @Inject(method = "onUpdateWalkingPlayer", at = @At(value = "RETURN"), cancellable = true)
     private void PostUpdateWalkingPlayer(CallbackInfo ci) {
-        this.event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround);
+        EventMotion event = new EventMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround);
         event.setType(EventType.POST);
         Satellite.onEvent(event);
     }
@@ -100,7 +98,6 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         if (this.isCurrentViewEntity()) {
-            AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
             double d0 = event.x - this.lastReportedPosX;
             double d1 = event.y - this.lastReportedPosY;
             double d2 = event.z - this.lastReportedPosZ;

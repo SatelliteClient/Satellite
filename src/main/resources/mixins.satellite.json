@@ -4,7 +4,6 @@
   "package": "com.github.satellite.mixin.client",
   "refmap": "mixins.satellite.refmap.json",
   "mixins": [
-    "IMixinMapData",
     "MixinEntityPlayerSP",
     "MixinGuiIngame",
     "MixinMinecraft",

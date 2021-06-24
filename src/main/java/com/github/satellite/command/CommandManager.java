@@ -20,18 +20,17 @@ public class CommandManager {
     }
 
     public boolean handleCommand(String str) {
-        if (!str.startsWith(prefix))
-            return false;
+        if (str.startsWith(prefix)) {
+            str = str.substring(1);
 
-        str = str.substring(1);
-
-        String[] args = str.split(" ");
-        if (args.length > 0) {
-            String commandName = args[0];
-            for (Command c : commands) {
-                if (c.aliases.contains(commandName)) {
-                    if (c.onCommand(Arrays.copyOfRange(args, 1, args.length), str)) {
-                        return true;
+            String[] args = str.split(" ");
+            if (args.length > 0) {
+                String commandName = args[0];
+                for (Command c : commands) {
+                    if (c.aliases.contains(commandName)) {
+                        if (c.onCommand(Arrays.copyOfRange(args, 1, args.length), str)) {
+                            return true;
+                        }
                     }
                 }
             }
