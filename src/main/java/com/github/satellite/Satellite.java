@@ -81,6 +81,8 @@ public class Satellite
 
 		if (commandManager.handleCommand(message)) {
 			event.setCanceled(true);
+		}else {
+			event.setMessage(message+"");
 		}
 
 		onEvent(new EventChat(message));

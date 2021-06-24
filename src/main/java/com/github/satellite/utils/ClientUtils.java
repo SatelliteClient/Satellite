@@ -4,6 +4,8 @@ import com.github.satellite.mixin.client.AccessorMinecraft;
 import com.github.satellite.mixin.client.AccessorTimer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;
+import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.TextComponentString;
 
 public class ClientUtils {
 
@@ -36,5 +38,9 @@ public class ClientUtils {
 	public static float getTimer() {
 		Timer timer = ((AccessorMinecraft)mc).getTimer();
 		return 1000.0F / ((AccessorTimer)timer).getTickLength() / 20;
+	}
+
+	public static void addChatMsg(String str) {
+		mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(str));
 	}
 }
