@@ -71,6 +71,7 @@ public class ModuleManager {
 		modules.add(new PhaseFly());
 		modules.add(new AntiOutside());
 		modules.add(new FreeLook());
+		modules.add(new CevBreaker());
 		modules.add(new CivBreak());
 	}
 

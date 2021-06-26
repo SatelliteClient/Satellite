@@ -35,7 +35,6 @@ public class PhaseFly extends Module {
 
 	@Override
 	public void onEnable() {
-		mc.getConnection().sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
 		if (mc.player.movementInput.jump) {
 			mc.player.move(MoverType.SELF, 0, 1, 0);
 			if (mc.player.collidedVertically) {
@@ -45,6 +44,12 @@ public class PhaseFly extends Module {
 			}
 		}
 		super.onEnable();
+	}
+
+	@Override
+	public void onDisable() {
+		mc.getConnection().sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+		super.onDisable();
 	}
 
 	boolean flag;
