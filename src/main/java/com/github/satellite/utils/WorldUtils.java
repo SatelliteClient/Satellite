@@ -9,7 +9,7 @@ public class WorldUtils {
     public static double tps;
 
     public static void onTime(SPacketTimeUpdate packet) {
-        tps = Math.round(tpsCounter.getCurrentMS() - tpsCounter.getLastMS());
+        tps = Math.round(tpsCounter.getCurrentMS() - tpsCounter.getLastMS()) / 50;
         tpsCounter.reset();
     }
 

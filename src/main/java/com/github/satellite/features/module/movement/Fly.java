@@ -245,13 +245,6 @@ public class Fly extends Module {
 
 			case "2b2t Japan":
 			{
-				if (e instanceof EventMotion) {
-					EventMotion event = (EventMotion)e;
-					if (MovementUtils.isMoving()) {
-						event.yaw = 0;
-						event.pitch = 0;
-					}
-				}
 				if (e instanceof EventUpdate) {
 					mc.player.motionY=0;
 

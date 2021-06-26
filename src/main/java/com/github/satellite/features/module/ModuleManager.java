@@ -2,6 +2,7 @@ package com.github.satellite.features.module;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.features.module.combat.*;
+import com.github.satellite.features.module.exploit.CivBreak;
 import com.github.satellite.features.module.misc.*;
 import com.github.satellite.features.module.movement.*;
 import com.github.satellite.features.module.player.*;
@@ -13,7 +14,6 @@ import com.github.satellite.setting.KeyBindSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.setting.NumberSetting;
 
-import com.github.satellite.ui.HUD;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;
@@ -71,6 +71,7 @@ public class ModuleManager {
 		modules.add(new PhaseFly());
 		modules.add(new AntiOutside());
 		modules.add(new FreeLook());
+		modules.add(new CivBreak());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {

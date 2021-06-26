@@ -11,6 +11,15 @@ public class InventoryUtils {
 
 	protected static Minecraft mc = Minecraft.getMinecraft();
 
+	public static int getSlot() {
+		return mc.player.inventory.currentItem;
+	}
+
+	public static void setSlot(int slot) {
+		if (slot > 8 || slot < 0) return;
+		mc.player.inventory.currentItem = slot;
+	}
+
 	public static int getPlaceableItem() {
 		ArrayList<ItemStack> item = new ArrayList<ItemStack>();
 
@@ -24,7 +33,7 @@ public class InventoryUtils {
 			return mc.player.inventory.mainInventory.indexOf(item.get(0));
 		return -1;
 	}
-	
+
 	public static int pickItem(int item) {
 
 		ArrayList<ItemStack> filter = new ArrayList<ItemStack>();
