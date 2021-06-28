@@ -73,6 +73,7 @@ public class ModuleManager {
 		modules.add(new FreeLook());
 		modules.add(new CevBreaker());
 		modules.add(new CivBreak());
+		modules.add(new Notification());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {

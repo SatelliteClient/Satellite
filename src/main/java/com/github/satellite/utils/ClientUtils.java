@@ -1,5 +1,7 @@
 package com.github.satellite.utils;
 
+import com.github.satellite.features.module.ModuleManager;
+import com.github.satellite.features.module.render.Notification;
 import com.github.satellite.mixin.client.AccessorMinecraft;
 import com.github.satellite.mixin.client.AccessorTimer;
 import net.minecraft.client.Minecraft;
@@ -42,5 +44,11 @@ public class ClientUtils {
 
 	public static void addChatMsg(String str) {
 		mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(str));
+	}
+	public static void addPopup(String str) {
+		Notification gui = (Notification) ModuleManager.getModulebyClass(Notification.class);
+		if (gui != null) {
+			gui.addPanel(str);
+		}
 	}
 }

@@ -55,6 +55,8 @@ public class AntiOutside extends Module {
 
 	boolean lastInSideStat;
 
+	int stack;
+
 	@Override
 	public void onEvent(Event<?> e) {
 		if (e instanceof EventMotion && e.isPre()) {
@@ -63,6 +65,9 @@ public class AntiOutside extends Module {
 			mc.player.width = .01f;
 			int tp = 0;
 			int packet = 0;
+			if (stack>0) {
+				stack --;
+			}
 			if (MovementUtils.isInsideBlock() || lastInSideStat) {
 				for (int i = 0; i<400; i++) {
 					int uy = 0;
@@ -101,11 +106,12 @@ public class AntiOutside extends Module {
 		}
 		if (e instanceof EventPacket) {
 			EventPacket event = (EventPacket)e;
-			if (event.getPacket() instanceof SPacketPlayerPosLook) {
-				SPacketPlayerPosLook packet = (SPacketPlayerPosLook)event.getPacket();
-				mc.player.setPosition(packet.getX(), packet.getY(), packet.getZ());
-				lastInSideStat = MovementUtils.isInsideBlock();
+			if (event.getPacket() instanceof SPacketPlayerPosLook && lastInSideStat && stack > 5) {
+				ClientUtils.addPopup("Stack Detected");
+				toggle();
 			}
+			stack++;
+			stack++;
 		}
 		if (e instanceof EventPlayerInput) {
 			EventPlayerInput event = (EventPlayerInput)e;
