@@ -14,4 +14,16 @@ public interface AccessorEntityPlayerSP {
 
     @Accessor("serverSneakState")
     void setServerSneakState(boolean paramBoolean);
+
+    @Accessor("lastReportedPitch")
+    float lastReportedPitch();
+
+    @Accessor("lastReportedPitch")
+    void setLastReportedPitch(float paramFloat);
+
+    @Accessor("lastReportedYaw")
+    float lastReportedYaw();
+
+    @Accessor("lastReportedYaw")
+    void setLastReportedYaw(float paramFloat);
 }

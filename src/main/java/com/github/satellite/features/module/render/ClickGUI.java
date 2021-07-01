@@ -4,6 +4,7 @@ import com.github.satellite.Satellite;
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventRenderGUI;
 import com.github.satellite.features.module.Module;
+import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.ui.gui.clickGUI.GuiClickGUI;
 import com.github.satellite.ui.theme.Theme;
@@ -13,13 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClickGUI extends Module {
-	
+
 	public ClickGUI() {
 		super("ClickGUI", Keyboard.KEY_RSHIFT,	Category.RENDER);
 	}
-	
+
 	public ModeSetting theme;
-	
+	public static BooleanSetting autoGuiScale;
+
 	@Override
 	public void init() {
 		List<String> mode = new ArrayList<String>();
@@ -28,10 +30,11 @@ public class ClickGUI extends Module {
 		}
 		String[] modes = mode.toArray(new String[mode.size()]);
 		this.theme = new ModeSetting("Theme", mode.get(0), modes);
-		settings.add(theme);
+		this.autoGuiScale = new BooleanSetting("AutoResize", true);
+		addSetting(theme, autoGuiScale);
 		super.init();
 	}
-	
+
 	@Override
 	public void onEvent(Event<?> e) {
 		if(e instanceof EventRenderGUI) {
@@ -40,7 +43,7 @@ public class ClickGUI extends Module {
 		}
 		super.onEvent(e);
 	}
-	
+
 	@Override
 	public void onEnable() {
 		mc.displayGuiScreen(new GuiClickGUI(0));

@@ -25,11 +25,11 @@ import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
-public class AntiOutside extends Module {
+public class PhaseWalk extends Module {
 
 
-	public AntiOutside() {
-		super("AntiOutside", 0, Category.MOVEMENT);
+	public PhaseWalk() {
+		super("PhaseWalk", 0, Category.MOVEMENT);
 	}
 
 	NumberSetting offset;
@@ -59,9 +59,9 @@ public class AntiOutside extends Module {
 
 	@Override
 	public void onEvent(Event<?> e) {
-		if (e instanceof EventMotion && e.isPre()) {
+		if (e instanceof EventUpdate && e.isPre()) {
 			ClientUtils.setTimer(1);
-			EventMotion event = (EventMotion)e;
+			//EventMotion event = (EventMotion)e;
 			mc.player.width = .01f;
 			int tp = 0;
 			int packet = 0;
@@ -94,20 +94,20 @@ public class AntiOutside extends Module {
 					BlockPos pos = new BlockPos(mc.player);
 					mc.player.setPosition(pos.getX()+.5, pos.getY(), pos.getZ()+.5);
 				}
-				event.y = mc.player.posY - (mc.player.movementInput.sneak?1:0);
+				//event.y = mc.player.posY - (mc.player.movementInput.sneak?1:0);
 				lastInSideStat = MovementUtils.isInsideBlock();
 				mc.player.motionY = 0;
 				mc.player.onGround = true;
 			}
 			if (mc.player.posY<0) {
-				mc.player.setPosition(mc.player.posX, 1, mc.player.posZ);
+				mc.player.setPosition(mc.player.posX, 1.1, mc.player.posZ);
 				lastInSideStat = true;
 			}
 		}
 		if (e instanceof EventPacket) {
 			EventPacket event = (EventPacket)e;
 			if (event.getPacket() instanceof SPacketPlayerPosLook && lastInSideStat && stack > 5) {
-				ClientUtils.addPopup("Stack Detected");
+				ClientUtils.addNotification("Stack Detected");
 				toggle();
 			}
 			stack++;

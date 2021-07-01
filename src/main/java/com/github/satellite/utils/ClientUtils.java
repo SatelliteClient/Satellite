@@ -45,10 +45,18 @@ public class ClientUtils {
 	public static void addChatMsg(String str) {
 		mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(str));
 	}
-	public static void addPopup(String str) {
+
+	public static void addNotification(String str) {
 		Notification gui = (Notification) ModuleManager.getModulebyClass(Notification.class);
 		if (gui != null) {
-			gui.addPanel(str);
+			gui.addPanel(str, "");
+		}
+	}
+
+	public static void addNotification(String str1, String str2) {
+		Notification gui = (Notification) ModuleManager.getModulebyClass(Notification.class);
+		if (gui != null) {
+			gui.addPanel(str1, str2);
 		}
 	}
 }

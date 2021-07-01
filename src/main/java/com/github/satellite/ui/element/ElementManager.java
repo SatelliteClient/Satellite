@@ -11,6 +11,7 @@ public class ElementManager {
 
 	public CopyOnWriteArrayList<Panel> panels = new CopyOnWriteArrayList<>();
 	public Panel currendPanel;
+	public Panel clickedPanel;
 	public boolean isCollided;
 	public TimeHelper timer = new TimeHelper();
 
@@ -22,6 +23,21 @@ public class ElementManager {
 				v.timer.update(deltaTime);
 			}
 		}
+	}
+
+	public void onMousePressed(int mouseX, int mouseY, int mouseButton) {
+		for(Panel p : panels) {
+
+			p.setLastHover(p.isHover);
+
+			if(mouseX>=p.x.value && mouseX<p.x.value+p.width.value && mouseY>=p.y.value && mouseY<p.y.value+p.height.value) {
+				this.clickedPanel = p;
+			}
+		}
+	}
+
+	public void onMouseReleased(int mouseX, int mouseY) {
+		this.clickedPanel = null;
 	}
 
 	public void updateCollision(int mouseX, int mouseY) {
@@ -53,14 +69,24 @@ public class ElementManager {
 
 	public int RENDER_PHASE = 0;
 
-	public void draw(int mouseX, int mouseY, float partialTicks) {
+	public void updateEasing() {
 		updateTime();
 		for(Panel p : panels) {
 			for(EaseValue value : p.values) {
 				value.updateEase();
 			}
-			p.draw(mouseX, mouseY, partialTicks);
 		}
+	}
+
+	public void draw(int mouseX, int mouseY, float partialTicks) {
+		for(Panel p : panels) {
+			if (p.visible)
+				p.draw(mouseX, mouseY, partialTicks);
+		}
+	}
+
+	public boolean clickedPanel(Panel p) {
+		return clickedPanel == p;
 	}
 
 	public CopyOnWriteArrayList<Panel> getPanels() {

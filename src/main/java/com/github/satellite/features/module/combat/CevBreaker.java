@@ -15,15 +15,19 @@ import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.setting.NumberSetting;
 import com.github.satellite.utils.BlockUtils;
 import com.github.satellite.utils.ClientUtils;
+import com.github.satellite.utils.CrystalUtils;
 import com.github.satellite.utils.InventoryUtils;
 import com.github.satellite.utils.render.RenderUtils;
 
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityEnderCrystal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.network.play.server.SPacketSetSlot;
@@ -37,7 +41,7 @@ import net.minecraft.util.text.TextComponentString;
 public class CevBreaker extends Module {
 
     public CevBreaker() {
-        super("CevBreaker", Keyboard.KEY_NONE, Category.COMBAT);
+        super("CevBreacker", Keyboard.KEY_NONE, Category.COMBAT);
     }
 
     NumberSetting range;
@@ -45,16 +49,20 @@ public class CevBreaker extends Module {
     BooleanSetting positiveCrystal;
     BooleanSetting resetBreakStat;
     BooleanSetting bypass;
+    BooleanSetting changeTarget;
+    BooleanSetting autoDisable;
 
     @Override
     public void init() {
         super.init();
         this.breakMode = new ModeSetting("BreakMode", "Eco", "Check", "Eco", "Positive");
         this.positiveCrystal = new BooleanSetting("Positive", false);
-        this.resetBreakStat = new BooleanSetting("ResetBreakStat", false);
+        this.resetBreakStat = new BooleanSetting("ResetBreakStat", true);
         this.bypass = new BooleanSetting("Bypass", true);
+        this.changeTarget = new BooleanSetting("ChangeTarget", false);
+        this.autoDisable = new BooleanSetting("AutoDisable", true);
         this.range = new NumberSetting("Range", 5.2, Integer.MIN_VALUE, 100, .1);
-        addSetting(breakMode, positiveCrystal, resetBreakStat, bypass, range);
+        addSetting(breakMode, positiveCrystal, resetBreakStat, bypass, changeTarget, autoDisable, range);
     }
 
     int progress = 0;
@@ -64,13 +72,11 @@ public class CevBreaker extends Module {
     boolean flag;
     int civCounter;
     int sleep;
-
-    public void updateCev() {
-
-    }
+    Entity currentEntity;
 
     @Override
     public void onEvent(Event<?> e) {
+
         BlockPos[] block = new BlockPos[] {};
         block = new BlockPos[] {
                 new BlockPos(0, 0, 1),
@@ -80,18 +86,40 @@ public class CevBreaker extends Module {
         };
         if (e instanceof EventUpdate) {
             int slot = InventoryUtils.getSlot();
+            if (changeTarget.isEnable()) {
+                findTarget();
+            }else if (currentEntity == null || currentEntity.getDistance(mc.player) > range.value) {
+                findTarget();
+            }
 
-            for(Entity entity : mc.world.loadedEntityList) {
-                if (entity == mc.player) continue;
-                if (mc.player.getDistance(entity) > 5.2) continue;
+            if (currentEntity != null) {
+                Entity entity = currentEntity;
                 if (entity instanceof EntityPlayer) {
                     int obsidian = InventoryUtils.pickItem(49);
                     int redstone = InventoryUtils.pickItem(152);
                     int pickaxe = InventoryUtils.pickItem(278);
                     int crystal = InventoryUtils.pickItem(426);
+
+                    if (obsidian == -1 || (crystal == -1 && !mc.player.inventory.offHandInventory.get(0).getItem().getClass().equals(Item.getItemById(426).getClass()))) {
+                        ClientUtils.addChatMsg("\u00A77[Satellite] \u00A74No "+(obsidian == -1 ? "Obsidian" : "Crystal")+" Found ");
+                        if (autoDisable.isEnable()) {
+                            InventoryUtils.setSlot(slot);
+                            toggle();
+                            return;
+                        }
+                    }
+                    if (redstone == -1 && bypass.isEnable()) {
+                        ClientUtils.addChatMsg("\u00A77[Satellite] \u00A74No RedstoneBlock Found");
+                        if (autoDisable.isEnable()) {
+                            InventoryUtils.setSlot(slot);
+                            toggle();
+                            return;
+                        }
+                    }
                     if (sleep > 0) {
                         sleep --;
                     }else {
+                        entity.move(MoverType.SELF, 0, -2, 0);
                         switch (progress) {
                             case 0:
                                 // base 設置
@@ -112,7 +140,7 @@ public class CevBreaker extends Module {
                                 // クリスタル設置
                                 //ClientUtils.addChatMsg("" + progress);
                                 InventoryUtils.setSlot(crystal);
-                                new BlockUtils(new BlockPos(entity.posX, entity.posY+3, entity.posZ), 0, EnumFacing.UP, 0).doPlace(false);
+                                CrystalUtils.placeCrystal(new BlockPos(entity.posX, entity.posY+3, entity.posZ));
                                 progress++;
                                 break;
                             case 1:
@@ -168,6 +196,8 @@ public class CevBreaker extends Module {
                         }
                     }
                 }
+                InventoryUtils.setSlot(slot);
+                return;
             }
             InventoryUtils.setSlot(slot);
         }
@@ -186,25 +216,29 @@ public class CevBreaker extends Module {
                     }
                 }
             }
-
         }
         super.onEvent(e);
     }
 
+    public void findTarget() {
+        currentEntity = (Entity) mc.world.loadedEntityList.stream().filter((e) -> e != mc.player && e instanceof EntityLivingBase && e.getDistance(mc.player)<range.value).findFirst().orElse(null);
+    }
+
     @Override
     public void onEnable() {
+        findTarget();
         progress = 0;
         if (resetBreakStat.isEnable()) {
             breakFlag = false;
         }
         flag = false;
         civCounter = 0;
+        sleep = 0;
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        ClientUtils.setTimer(1F);
         super.onDisable();
     }
 

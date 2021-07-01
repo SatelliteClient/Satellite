@@ -11,6 +11,7 @@
     "AccessorMinecraft",
     "AccessorMapData",
     "AccessorTimer",
+    "AccessorNetHandlerPlayClient",
     "MixinEntity",
     "MixinEntityLivingBase",
     "MixinEntityPlayerSP",

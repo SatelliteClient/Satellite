@@ -132,6 +132,10 @@ public class BlockUtils {
 		return false;
 	}
 
+	public static boolean doBreak(BlockPos pos, EnumFacing f) {
+		return mc.playerController.clickBlock(pos, f);
+	}
+
 	public void doBreak() {
 		mc.playerController.onPlayerDamageBlock(new BlockPos(pos.getX() - f.getDirectionVec().getX(), pos.getY() - f.getDirectionVec().getY(), pos.getZ() - f.getDirectionVec().getZ()), f);
 	}

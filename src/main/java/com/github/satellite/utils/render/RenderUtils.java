@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
 
 public final class RenderUtils {
 
@@ -127,9 +126,12 @@ public final class RenderUtils {
 		fontRendererIn.drawString(str, -fontRendererIn.getStringWidth(str) / 2, -fontRendererIn.FONT_HEIGHT/2, color.getRGB());
 		GlStateManager.enableDepth();
 
-		GlStateManager.enableLighting();
+		GlStateManager.enableDepth();
+		GlStateManager.depthMask(true);
+		GlStateManager.translate(-x, -y, -z);
+		GlStateManager.enableTexture2D();
 		GlStateManager.disableBlend();
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.enableLighting();
 		GlStateManager.popMatrix();
 	}
 
@@ -180,12 +182,13 @@ public final class RenderUtils {
 		bufferbuilder.pos((double)(i + 1), (double)(8 + verticalShift), 0.0D).color(r, g, b, a).endVertex();
 		bufferbuilder.pos((double)(i + 1), (double)(-1 + verticalShift), 0.0D).color(r, g, b, a).endVertex();
 		tessellator.draw();
-		GlStateManager.enableTexture2D();
 
+		GlStateManager.enableDepth();
 		GlStateManager.depthMask(true);
-		GlStateManager.enableLighting();
+		GlStateManager.translate(-x, -y, -z);
+		GlStateManager.enableTexture2D();
 		GlStateManager.disableBlend();
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.enableLighting();
 		GlStateManager.popMatrix();
 	}
 
@@ -201,13 +204,16 @@ public final class RenderUtils {
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);
 		GlStateManager.disableDepth();
+		GlStateManager.enableBlend();
+		GlStateManager.disableLighting();
 		GlStateManager.disableTexture2D();
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		AxisAlignedBB axisAlignedBB = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
-		bufferbuilder.begin(7, DefaultVertexFormats.ITEM);
+		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
 		switch(facing)
 		{
 
@@ -234,12 +240,13 @@ public final class RenderUtils {
 
 		}
 		tessellator.draw();
-		GlStateManager.enableTexture2D();
 
 		GlStateManager.enableDepth();
 		GlStateManager.depthMask(true);
 		GlStateManager.translate(-x, -y, -z);
 		GlStateManager.enableTexture2D();
+		GlStateManager.disableBlend();
+		GlStateManager.enableLighting();
 		GlStateManager.popMatrix();
 	}
 
@@ -361,20 +368,11 @@ public final class RenderUtils {
 		double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * mc.getRenderPartialTicks() -
 				mc.getRenderManager().viewerPosZ;
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(x, y, z);
-		GlStateManager.disableDepth();
-		GlStateManager.disableTexture2D();
-
 		double aabbX = entity.getRenderBoundingBox().maxX-entity.getRenderBoundingBox().minX;
 		double aabbY = entity.getRenderBoundingBox().maxY-entity.getRenderBoundingBox().minY;
 		double aabbZ = entity.getRenderBoundingBox().maxZ-entity.getRenderBoundingBox().minZ;
 
 		AxisAlignedBB axisAlignedBB = new AxisAlignedBB(-aabbX/2, 0, -aabbZ/2, aabbX/2, aabbY, aabbZ/2);
-
-		x -= mc.getRenderManager().viewerPosX;
-		y -= mc.getRenderManager().viewerPosY;
-		z -= mc.getRenderManager().viewerPosZ;
 
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);

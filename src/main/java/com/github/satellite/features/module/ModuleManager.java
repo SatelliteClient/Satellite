@@ -69,11 +69,12 @@ public class ModuleManager {
 		modules.add(new Test());
 		modules.add(new ElytraFly());
 		modules.add(new PhaseFly());
-		modules.add(new AntiOutside());
+		modules.add(new PhaseWalk());
 		modules.add(new FreeLook());
 		modules.add(new CevBreaker());
 		modules.add(new CivBreak());
 		modules.add(new Notification());
+		modules.add(new HoleTP());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {

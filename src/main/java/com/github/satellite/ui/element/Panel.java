@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Panel {
 
 	protected Minecraft mc = Satellite.mc;
-	
+
 	public ElementManager elementManager;
 
 	public Value x;
@@ -25,6 +25,8 @@ public class Panel {
 	public boolean isHover;
 	public boolean lastHover;
 	public boolean isCollidable;
+
+	public boolean visible = true;
 
 	public List<EaseValue> values;
 
@@ -78,7 +80,12 @@ public class Panel {
 	public void setElementManager(ElementManager elementManager) {
 		this.elementManager = elementManager;
 	}
-	
+
+	public Panel setVisible(boolean visible) {
+		this.visible = visible;
+		return this;
+	}
+
 	public Value getX() {
 		return x;
 	}

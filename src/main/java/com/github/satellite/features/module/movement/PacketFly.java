@@ -5,17 +5,27 @@ import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
+import com.github.satellite.mixin.client.AccessorEntityPlayerSP;
+import com.github.satellite.mixin.client.AccessorNetHandlerPlayClient;
 import com.github.satellite.setting.BooleanSetting;
+import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MovementUtils;
 import net.minecraft.block.BlockAir;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketThreadUtil;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
 import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
+
+import java.util.ArrayList;
+
 import org.lwjgl.input.Keyboard;
 
 public class PacketFly extends Module {
@@ -53,9 +63,11 @@ public class PacketFly extends Module {
 	double lastPacketX = 0, lastPacketY = 0, lastPacketZ = 0;
 	double speed=0;
 
+	ArrayList<Vec3d> catchVec = new ArrayList<>();
+
 	@Override
 	public void onEvent(Event<?> e) {
-		
+
 		if(e instanceof EventUpdate) {
 			if(e.isPre()) {
 				mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
@@ -68,22 +80,25 @@ public class PacketFly extends Module {
 					}
 
 					if(clearLagTeleportId != 0) {
-						MovementUtils.vClip2(-1024, true);
+						catchVec.add(mc.player.getPositionVector());
+						MovementUtils.vClip2(1010, true);
 
 						mc.getConnection().sendPacket(new CPacketConfirmTeleport(clearLagTeleportId));
 
-						if(mc.player.ticksExisted%3==0 && MovementUtils.InputY() <= 0) {
-							mc.player.motionY=-.04D;
-						}
+						if (!MovementUtils.isInsideBlock()) {
+							if(mc.player.ticksExisted%3==0 && MovementUtils.InputY() <= 0) {
+								mc.player.motionY=-.04D;
+							}
 
-						if(mc.player.ticksExisted%16==0 && MovementUtils.InputY() > 0) {
-							mc.player.motionY=-.10D;
+							if(mc.player.ticksExisted%16==0 && MovementUtils.InputY() > 0) {
+								mc.player.motionY=-.10D;
+							}
 						}
 					}
 
 					mc.player.motionY += teleportId==0?0: MovementUtils.InputY()* .062D;
 
-					speed = teleportId==0? .01 : (mc.world.getBlockState(new BlockPos(mc.player).offset(EnumFacing.DOWN)).getBlock() instanceof BlockAir) ?.25:.1;
+					speed = teleportId==0? .04 : !MovementUtils.isInsideBlock() ?.25 : .1;
 					speed*= MovementUtils.InputY()>0?0:1;
 
 					MovementUtils.Strafe(speed);
@@ -98,15 +113,15 @@ public class PacketFly extends Module {
 				}
 			}
 		}
-		
+
 		if(e instanceof EventMotion) {
 			EventMotion event = ((EventMotion)e);
-			event.setYaw(0);
-			event.setPitch(0);
+			event.setYaw(((AccessorEntityPlayerSP)mc.player).lastReportedYaw());
+			event.setPitch(((AccessorEntityPlayerSP)mc.player).lastReportedPitch());
 			event.setOnGround(true);
 			event.cancel();
 		}
-		
+
 		if(e instanceof EventPacket) {
 			EventPacket event = ((EventPacket)e);
 			Packet<?> p = event.getPacket();
@@ -135,18 +150,83 @@ public class PacketFly extends Module {
 				if (p instanceof SPacketPlayerPosLook) {
 					SPacketPlayerPosLook packet = (SPacketPlayerPosLook)p;
 					teleportId = packet.getTeleportId();
+					Vec3d pos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
+
 					if (debug.isEnable())
 						mc.ingameGUI.addChatMessage(ChatType.SYSTEM, new TextComponentString(String.valueOf(packet.getTeleportId())));
-					if(mc.player.getDistance(packet.getX(), packet.getY(), packet.getZ()) < 2) {
-						event.setCancelled(true);
-						mc.getConnection().sendPacket(new CPacketConfirmTeleport(teleportId));
-					}else {
-						clearLagTeleportId = teleportId;
+
+					for (Vec3d vec : catchVec) {
+						if (vec.equals(pos)) {
+							catchVec.remove(vec);
+							mc.getConnection().sendPacket(new CPacketConfirmTeleport(teleportId));
+							event.cancel();
+							return;
+						}
 					}
+					if (!mc.inGameHasFocus) return;
+					EntityPlayer entityplayer = mc.player;
+					double d0 = packet.getX();
+					double d1 = packet.getY();
+					double d2 = packet.getZ();
+					float f = packet.getYaw();
+					float f1 = packet.getPitch();
+
+					if (packet.getFlags().contains(SPacketPlayerPosLook.EnumFlags.X))
+					{
+						d0 += entityplayer.posX;
+					}
+					else
+					{
+						entityplayer.motionX = 0.0D;
+					}
+
+					if (packet.getFlags().contains(SPacketPlayerPosLook.EnumFlags.Y))
+					{
+						d1 += entityplayer.posY;
+					}
+					else
+					{
+						entityplayer.motionY = 0.0D;
+					}
+
+					if (packet.getFlags().contains(SPacketPlayerPosLook.EnumFlags.Z))
+					{
+						d2 += entityplayer.posZ;
+					}
+					else
+					{
+						entityplayer.motionZ = 0.0D;
+					}
+
+					if (packet.getFlags().contains(SPacketPlayerPosLook.EnumFlags.X_ROT))
+					{
+						f1 += entityplayer.rotationPitch;
+					}
+
+					if (packet.getFlags().contains(SPacketPlayerPosLook.EnumFlags.Y_ROT))
+					{
+						f += entityplayer.rotationYaw;
+					}
+
+					entityplayer.setPosition(d0, d1, d2);
+					mc.getConnection().sendPacket(new CPacketConfirmTeleport(packet.getTeleportId()));
+					mc.getConnection().sendPacket(new CPacketPlayer.PositionRotation(entityplayer.posX, entityplayer.getEntityBoundingBox().minY, entityplayer.posZ, entityplayer.rotationYaw, entityplayer.rotationPitch, false));
+
+					if (!((AccessorNetHandlerPlayClient)mc.getConnection()).doneLoadingTerrain())
+					{
+						mc.player.prevPosX = mc.player.posX;
+						mc.player.prevPosY = mc.player.posY;
+						mc.player.prevPosZ = mc.player.posZ;
+						((AccessorNetHandlerPlayClient)mc.getConnection()).setDoneLoadingTerrain(true);
+						mc.displayGuiScreen((GuiScreen)null);
+					}
+
+					event.cancel();
+					clearLagTeleportId = teleportId;
 				}
 			}
 		}
 		super.onEvent(e);
 	}
-	
+
 }
