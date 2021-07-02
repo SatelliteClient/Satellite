@@ -41,6 +41,7 @@ import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -54,26 +55,41 @@ public class HoleTP extends Module {
 	}
 
 	NumberSetting range;
+	BooleanSetting dupHole;
+	BooleanSetting blockPlace;
 	BooleanSetting autoDisable;
 
 	@Override
 	public void init() {
 		this.range = new NumberSetting("Range", 5.2, Integer.MIN_VALUE, 10, .1);
-		addSetting(range, autoDisable);
+		this.dupHole = new BooleanSetting("CheckDup", true);
+		this.blockPlace = new BooleanSetting("AllowPlace", true);
+		this.autoDisable = new BooleanSetting("AutoDisable", true);
+		addSetting(range, dupHole, blockPlace, autoDisable);
 		super.init();
 	}
 
 	List<BlockPos> hole = new ArrayList<>();
+	List<BlockPos> duphole = new ArrayList<>();
 
 	Entity currentTarget;
 
 	@Override
+	public void onEnable() {
+		tickTimer = 0;
+		super.onEnable();
+	}
+
+	int tickTimer;
+
+	@Override
 	public void onEvent(Event<?> e) {
 		if (e instanceof EventUpdate) {
-			if (mc.player.ticksExisted%4==0) {
+			if (tickTimer%1==0) {
 				Vec3i[] checkpos = new Vec3i[] {new Vec3i(0, -1, 0), new Vec3i(1, 0, 0), new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1), new Vec3i(0, 0, -1)};
 				hole = new CopyOnWriteArrayList<BlockPos>();
-				int checkrange = 50;
+				duphole = new CopyOnWriteArrayList<BlockPos>();
+				int checkrange = 20;
 				for (int x = -checkrange; x<=checkrange; x++) {
 					for (int z = -checkrange; z<=checkrange; z++) {
 						for (int y = -5; y<=5; y++) {
@@ -82,6 +98,7 @@ public class HoleTP extends Module {
 							if (!mc.world.isAirBlock(pos)) continue;
 							if (!mc.world.isAirBlock(pos.offset(EnumFacing.UP))) continue;
 							if (HoleUtils.isHole(pos, true, false).getType().equals(HoleType.SINGLE)) hole.add(pos);
+							if (dupHole.isEnable() && HoleUtils.isHole(pos, false, false).getType().equals(HoleType.DOUBLE)) duphole.add(pos);
 						}
 					}
 				}
@@ -97,27 +114,53 @@ public class HoleTP extends Module {
 							ent.getDistance(mc.player) <= range.value
 			)).findFirst().orElse(null);
 
-			List<BlockPos> holes = new ArrayList<BlockPos>();
+			List<Vec3d> holes = new ArrayList<Vec3d>();
+			List<Vec3d> duoholes = new ArrayList<Vec3d>();
 
 			if (currentTarget != null) {
 
 				hole.forEach(h -> {
 					if (currentTarget.getDistanceSq(h)<Math.pow(range.value-1, 2) && !h.equals(mc.player.getPosition())) {
-						holes.add(h);
+						holes.add(new Vec3d(h).add(.5, 0, .5));
 					}
 				});
 
-				holes.sort((a, b) -> currentTarget.getDistanceSq(a) > currentTarget.getDistanceSq(b) ? 1 : -1);
+				duphole.forEach(h -> {
+					if (currentTarget.getDistanceSq(h)<Math.pow(range.value-1, 2) && !h.equals(mc.player.getPosition())) {
+						Vec3d vec = new Vec3d(h).add(.5, 0, .5);
+						duoholes.add(vec);
+						holes.add(vec);
+					}
+				});
+
+				//holes.sort((a, b) -> currentTarget.getDistanceSq(a) > currentTarget.getDistanceSq(b) ? 1 : -1);
 				if (holes != null && !holes.isEmpty()) {
-					if (mc.player.ticksExisted%1==0) {
+					if (tickTimer%1==0) {
 						Collections.shuffle(holes);
-						BlockPos pos = holes.get(0);
-						MovementUtils.vClip(Math.min(pos.getY(), mc.player.posY)+8-mc.player.posY);
+						Vec3d pos = holes.get(0);
+						MovementUtils.vClip(Math.min(pos.y, mc.player.posY)+8-mc.player.posY);
 						MovementUtils.vClip2(0, true);
-						mc.player.setPosition(pos.getX()+.5, mc.player.posY, pos.getZ()+.5);
+						mc.player.setPosition(pos.x, mc.player.posY, pos.z);
 						MovementUtils.vClip2(0, true);
-						mc.player.setPosition(pos.getX()+.5, pos.getY(), pos.getZ()+.5);
+						mc.player.setPosition(pos.x, pos.y, pos.z);
 						MovementUtils.vClip2(0, true);
+						int slot = InventoryUtils.getSlot();
+						int obsi = InventoryUtils.pickItem(49);
+						if (blockPlace.isEnable() && obsi != -1) {
+							BlockPos[] block = new BlockPos[] {
+									new BlockPos(0, -1, 0),
+									new BlockPos(1, -1, 0), new BlockPos(-1, -1, 0), new BlockPos(0, -1, 1), new BlockPos(0, -1, -1),
+									new BlockPos(1, 0, 0), new BlockPos(-1, 0, 0), new BlockPos(0, 0, 1), new BlockPos(0, 0, -1)};
+							for(BlockPos add : block) {
+								InventoryUtils.setSlot(obsi);
+								BlockPos plpos = new BlockPos(mc.player);
+								BlockUtils util = BlockUtils.isPlaceable(plpos.add(add), 0, true);
+								if(util != null) {
+									util.doPlace(false);
+								}
+							}
+						}
+						InventoryUtils.setSlot(slot);
 						mc.player.motionY = 0;
 						if (autoDisable.isEnable()) {
 							toggle();
@@ -125,8 +168,15 @@ public class HoleTP extends Module {
 					}
 				}
 			}
+
+			++ tickTimer;
 		}
 		if (e instanceof EventRenderWorld) {
+			for (BlockPos pos : duphole) {
+				pos = pos.add(0, -1, 0);
+				RenderUtils.drawBlockSolid(pos, EnumFacing.UP, ColorUtils.alpha(ThemeManager.getTheme().light(2), 0xff));
+				RenderUtils.drawBlockSolid(pos.offset(EnumFacing.UP), EnumFacing.DOWN, ColorUtils.alpha(ThemeManager.getTheme().light(2), 0xff));
+			}
 			for (BlockPos pos : hole) {
 				pos = pos.add(0, -1, 0);
 				RenderUtils.drawBlockSolid(pos, EnumFacing.UP, ColorUtils.alpha(ThemeManager.getTheme().light(1), 0xff));
