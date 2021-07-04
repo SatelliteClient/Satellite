@@ -7,6 +7,7 @@ import net.minecraft.block.BlockHopper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.MoverType;
 import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -25,6 +26,24 @@ public class MovementUtils {
 
 	public static int InputY() {
 		return (mc.player.movementInput.jump ? 1 : 0) + (mc.player.movementInput.sneak ? -1 : 0);
+	}
+
+	public static double InputX() {
+		if (!isMoving()) return 0;
+		float Forward = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
+		float Strafing = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
+
+		double r = Math.atan2(Forward, Strafing)-1.57079633-toRadian(mc.player.rotationYaw);
+		return Math.sin(r);
+	}
+
+	public static double InputZ() {
+		if (!isMoving()) return 0;
+		float Forward = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
+		float Strafing = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
+
+		double r = Math.atan2(Forward, Strafing)-1.57079633-toRadian(mc.player.rotationYaw);
+		return Math.cos(r);
 	}
 
 	public static double getSpeed() {
@@ -96,5 +115,18 @@ public class MovementUtils {
 			return false;
 		}
 		return false;
+	}
+
+	public static float getBaseSpeed() {
+		float baseSpeed = 0.2873F;
+		if (mc.player.isPotionActive(Potion.getPotionById(1))) {
+			int amp = mc.player.getActivePotionEffect(Potion.getPotionById(1)).getAmplifier();
+			baseSpeed *= 1.0F + 0.2F * (amp + 1);
+		}
+		return baseSpeed;
+	}
+
+	public static double nextY(double y) {
+		return (y - .08D) * .9800000190734863D;
 	}
 }

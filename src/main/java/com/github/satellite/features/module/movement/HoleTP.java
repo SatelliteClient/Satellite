@@ -61,7 +61,7 @@ public class HoleTP extends Module {
 
 	@Override
 	public void init() {
-		this.range = new NumberSetting("Range", 5.2, Integer.MIN_VALUE, 10, .1);
+		this.range = new NumberSetting("Range", 5.2, 0, 10, .1);
 		this.dupHole = new BooleanSetting("CheckDup", true);
 		this.blockPlace = new BooleanSetting("AllowPlace", true);
 		this.autoDisable = new BooleanSetting("AutoDisable", true);
@@ -120,22 +120,21 @@ public class HoleTP extends Module {
 			if (currentTarget != null) {
 
 				hole.forEach(h -> {
-					if (currentTarget.getDistanceSq(h)<Math.pow(range.value-1, 2) && !h.equals(mc.player.getPosition())) {
+					if (currentTarget.getDistanceSq(h)<Math.pow(range.value-1, 2) && !h.equals(new BlockPos(mc.player))) {
 						holes.add(new Vec3d(h).add(.5, 0, .5));
 					}
 				});
 
 				duphole.forEach(h -> {
-					if (currentTarget.getDistanceSq(h)<Math.pow(range.value-1, 2) && !h.equals(mc.player.getPosition())) {
+					if (currentTarget.getDistanceSq(h)<Math.pow(range.value-1, 2) && !h.equals(new BlockPos(mc.player))) {
 						Vec3d vec = new Vec3d(h).add(.5, 0, .5);
 						duoholes.add(vec);
 						holes.add(vec);
 					}
 				});
 
-				//holes.sort((a, b) -> currentTarget.getDistanceSq(a) > currentTarget.getDistanceSq(b) ? 1 : -1);
 				if (holes != null && !holes.isEmpty()) {
-					if (tickTimer%1==0) {
+					if (tickTimer%2==0) {
 						Collections.shuffle(holes);
 						Vec3d pos = holes.get(0);
 						MovementUtils.vClip(Math.min(pos.y, mc.player.posY)+8-mc.player.posY);

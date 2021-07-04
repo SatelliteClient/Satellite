@@ -1,18 +1,30 @@
 package com.github.satellite.features.module.movement;
 
 import com.github.satellite.event.Event;
+import com.github.satellite.event.listeners.EventJump;
 import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventPacket;
 import com.github.satellite.event.listeners.EventPlayerInput;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
+import com.github.satellite.mixin.client.AccessorEntity;
 import com.github.satellite.mixin.client.AccessorEntityPlayer;
+import com.github.satellite.mixin.client.AccessorEntityPlayerSP;
 import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MovementUtils;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemAir;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketChatMessage;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
+import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
+import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+
 import org.lwjgl.input.Keyboard;
 
 public class Speed extends Module {
@@ -47,21 +59,43 @@ public class Speed extends Module {
 
 	@Override
 	public void onEvent(Event<?> e) {
-		if(e instanceof EventUpdate) {
-			EventUpdate event = (EventUpdate)e;
+		/*if (e instanceof EventPacket) {
+			Packet p = ((EventPacket)e).getPacket();
+			if (p instanceof SPacketSetSlot && mc.player.isEntityAlive() && !mc.player.isDead) {
+				SPacketSetSlot packet = (SPacketSetSlot)p;
+				if (packet.getStack().getItem() instanceof ItemAir) {
+					mc.getConnection().sendPacket(new CPacketChatMessage("/kill"));
+					mc.player.setDead();
+				}
+			}
+		}*/
+		if(e instanceof EventMotion && e.isPre()) {
+			EventMotion event = (EventMotion)e;
 			switch (mode.getMode()) {
 
 				case "NCP":
-					if (MovementUtils.isMoving()) {
+					lastSpeed += 0.0015;
+					lastSpeed*=.9900000095367432D;
+					//mc.player.motionY -= mc.player.motionY < .33319999363422365D ? 9.9999E-4D : 0;
+					if(mc.player.motionY == .33319999363422365) {
+						mc.player.motionY -= mc.player.motionY < .33319999363422365D ? 9.9999E-4D : 0;
+					}
+					if (!mc.player.onGround) {
+						MovementUtils.Strafe(lastSpeed);
+					}else {
+						MovementUtils.Strafe(mc.player.isSprinting()?.15:.12);
+						lastSpeed = Math.sqrt(Math.pow(Math.abs(mc.player.posX - mc.player.lastTickPosX), 2) + Math.pow(Math.abs(mc.player.posZ - mc.player.lastTickPosZ), 2));
+					}
+					/*if (MovementUtils.isMoving()) {
 						if (mc.player.onGround) {
 							mc.player.jump();
 						}
-						((AccessorEntityPlayer)mc.player).speedInAir(.0223F);
+						mc.player.speedInAir = (.0223F);
 						MovementUtils.Strafe(MovementUtils.getSpeed());
 					} else {
 						mc.player.motionX = 0.0D;
 						mc.player.motionZ = 0.0D;
-					}
+					}*/
 					break;
 				case "OldNCP":
 					if (MovementUtils.isMoving()) {
@@ -99,7 +133,12 @@ public class Speed extends Module {
 			}
 		}
 
-		if(e instanceof EventMotion) {
+		if (e instanceof EventJump) {
+			lastSpeed = .32;
+			MovementUtils.Strafe(.29);
+		}
+
+		if(e instanceof EventMotion && e.isPre()) {
 			EventMotion event = (EventMotion)e;
 			switch (mode.getMode()) {
 
@@ -145,7 +184,7 @@ public class Speed extends Module {
 		}
 		if(e instanceof EventPlayerInput) {
 			EventPlayerInput event = (EventPlayerInput)e;
-			if (!(mode.is("YPort") && tickTimer % 2 != 0)) {
+			if (!(mode.is("YPort") && tickTimer % 2 != 0) && !mode.is("NCP")) {
 				event.setJump(false);
 			}
 		}
