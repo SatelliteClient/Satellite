@@ -11,37 +11,10 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 public class MovementUtils {
 
 	protected static Minecraft mc = Minecraft.getMinecraft();
-
-	public static Vec3d getMotionVector() {
-		return new Vec3d(mc.player.motionX, mc.player.motionY, mc.player.motionZ);
-	}
-
-	public static void setMotionVector(Vec3d vec) {
-		mc.player.motionX = vec.x;
-		mc.player.motionY = vec.y;
-		mc.player.motionZ = vec.z;
-	}
-
-	public static void setPosition(double x, double y, double z) {
-		mc.player.setPosition(x, y, z);
-	}
-
-	public static void setPosition(BlockPos pos) {
-		mc.player.setPosition(pos.getX()+.5, pos.getY(), pos.getZ()+.5);
-	}
-
-	public static void clip(double x, double y, double z) {
-		mc.player.setPosition(mc.player.posX+x, mc.player.posY+y, mc.player.posZ+z);
-	}
-
-	public static void yClip(double y) {
-		mc.player.setPosition(mc.player.posX, y, mc.player.posZ);
-	}
 
 	public static void vClip(double d) {
 		mc.player.setPosition(mc.player.posX, mc.player.posY + d, mc.player.posZ);
@@ -55,8 +28,25 @@ public class MovementUtils {
 		return (mc.player.movementInput.jump ? 1 : 0) + (mc.player.movementInput.sneak ? -1 : 0);
 	}
 
+	public static double InputX() {
+		if (!isMoving()) return 0;
+		float Forward = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
+		float Strafing = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
+
+		double r = Math.atan2(Forward, Strafing)-1.57079633-toRadian(mc.player.rotationYaw);
+		return Math.sin(r);
+	}
+
+	public static double InputZ() {
+		if (!isMoving()) return 0;
+		float Forward = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
+		float Strafing = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
+
+		double r = Math.atan2(Forward, Strafing)-1.57079633-toRadian(mc.player.rotationYaw);
+		return Math.cos(r);
+	}
+
 	public static double getSpeed() {
-		if (mc.player == null) return 0;
 		return Math.sqrt(Math.pow(mc.player.motionX, 2)+Math.pow(mc.player.motionZ, 2));
 	}
 
@@ -86,10 +76,6 @@ public class MovementUtils {
 
 	public static void move() {
 		mc.player.move(MoverType.SELF, mc.player.motionX, mc.player.motionY, mc.player.motionZ);
-	}
-
-	public static void move(double x, double y, double z) {
-		mc.player.move(MoverType.SELF, x, y, z);
 	}
 
 	public static void clip() {
@@ -142,9 +128,5 @@ public class MovementUtils {
 
 	public static double nextY(double y) {
 		return (y - .08D) * .9800000190734863D;
-	}
-
-	public static double nextSpeed(double d) {
-		return d*.9900000095367432D;
 	}
 }
