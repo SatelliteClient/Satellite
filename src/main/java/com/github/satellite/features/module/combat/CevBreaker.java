@@ -1,14 +1,12 @@
 package com.github.satellite.features.module.combat;
 
 import java.awt.Color;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import com.github.satellite.event.Event;
-import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventRenderWorld;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
@@ -21,31 +19,21 @@ import com.github.satellite.utils.CrystalUtils;
 import com.github.satellite.utils.InventoryUtils;
 import com.github.satellite.utils.render.RenderUtils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityEnderCrystal;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketPlayerDigging;
-import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentString;
 
 public class CevBreaker extends Module {
 
     public CevBreaker() {
-        super("CevBreacker", Keyboard.KEY_NONE, Category.COMBAT);
+        super("CevBreaker", Keyboard.KEY_NONE, Category.COMBAT);
     }
 
     NumberSetting range;
@@ -85,7 +73,7 @@ public class CevBreaker extends Module {
     @Override
     public void onEvent(Event<?> e) {
 
-        BlockPos[] block = new BlockPos[] {};
+        BlockPos[] block;
         block = new BlockPos[] {
                 new BlockPos(0, 0, 1),
                 new BlockPos(0, 1, 1),
@@ -144,7 +132,7 @@ public class CevBreaker extends Module {
                                     BlockUtils.doPlace(BlockUtils.isPlaceable(obsiPos, 0, true), false);
                                 }else {
                                     for(BlockPos add : block) {
-                                        if (Arrays.asList(block).indexOf(add) != -1 && bypass.isEnable() && civCounter<1) {
+                                        if (Arrays.asList(block).contains(add) && bypass.isEnable() && civCounter<1) {
                                             flag = true;
                                             InventoryUtils.setSlot(redstone);
                                         }
@@ -241,8 +229,7 @@ public class CevBreaker extends Module {
             }
             InventoryUtils.setSlot(slot);
         }
-        if(e instanceof EventMotion) {
-        }
+
         if(e instanceof EventRenderWorld) {
             if (renderBlocks.isEnable() && currentEntity != null) {
                 if (!onClick.isEnable()) {
@@ -256,7 +243,8 @@ public class CevBreaker extends Module {
 
             RayTraceResult over = mc.getRenderViewEntity().rayTrace(10, mc.getRenderPartialTicks());
 
-            if (over != null && over.sideHit != null && over.getBlockPos() != null) {
+            if (over != null && over.sideHit != null && onClick.isEnable()) {
+                over.getBlockPos();
                 if (renderBlocks.isEnable() && obsiPos == null) {
                     RenderUtils.drawBlockBox(over.getBlockPos().offset(over.sideHit), new Color(0xff, 0xff, 0xff, 0x40));
                 }
@@ -265,7 +253,7 @@ public class CevBreaker extends Module {
                         RenderUtils.drawBlockBox(obsiPos, new Color(0x42, 0x87, 0xf5, 0x40));
                         RenderUtils.drawBlockBox(crysPos, new Color(0xf5, 0x87, 0x42, 0x20));
                     }
-                }else {
+                } else {
                     if (mc.currentScreen == null) {
                         if (Mouse.isButtonDown(1)) {
                             obsiPos = over.getBlockPos();
@@ -283,7 +271,7 @@ public class CevBreaker extends Module {
     }
 
     public void findTarget() {
-        currentEntity = (Entity) mc.world.loadedEntityList.stream().filter((e) -> e != mc.player && e instanceof EntityLivingBase && e.getDistance(mc.player)<range.value).findFirst().orElse(null);
+        currentEntity = mc.world.loadedEntityList.stream().filter((e) -> e != mc.player && e instanceof EntityLivingBase && e.getDistance(mc.player)<range.value).findFirst().orElse(null);
     }
 
     @Override

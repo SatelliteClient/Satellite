@@ -5,15 +5,27 @@ import com.github.satellite.event.listeners.*;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
+import com.github.satellite.setting.NumberSetting;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MovementUtils;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.MoverType;
+import net.minecraft.init.Blocks;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
+import net.minecraft.network.play.client.CPacketKeepAlive;
 import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.network.play.client.CPacketPlayerDigging;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
@@ -27,15 +39,17 @@ public class Fly extends Module {
 	}
 
 	ModeSetting mode;
-	ModeSetting hypixelBoost;
+	NumberSetting speedSetting;
 	BooleanSetting phase;
+	ModeSetting hypixelBoost;
 
 	@Override
 	public void init() {
-		mode = new ModeSetting("Mode", "Vanilla", new String[] {"Vanilla", "Hypixel", "2b2t Japan"});
-		hypixelBoost = new ModeSetting("hypixelBoost", "Normal", new String[] {"Normal", "Funcraft", "Boost", "PacketBoost", "DamageBoost"});
+		mode = new ModeSetting("Mode", "Vanilla", new String[] {"Vanilla", "Hypixel", "2b2t Japan", "TEST1", "TEST2"});
+		speedSetting = new NumberSetting("Speed", 8, 0, 10, 1D/10D);
+		hypixelBoost = new ModeSetting("hypixelBoost", "Normal", new String[] {"Normal", "Funcraft", "Boost", "PacketBoost", "DamageBoost", "TEST1", "TEST2"});
 		phase = new BooleanSetting("Phase", false);
-		addSetting(mode, hypixelBoost, phase);
+		addSetting(mode, speedSetting, hypixelBoost, phase);
 		super.init();
 	}
 
@@ -57,9 +71,11 @@ public class Fly extends Module {
 
 	@Override
 	public void onEnable() {
-
 		catchVec = new ArrayList<>();
-
+		if (mc.player == null) {
+			toggle();
+			return;
+		}
 		lastTickYaw = mc.player.rotationYaw;
 		lastTickPitch = mc.player.rotationPitch;
 		double fallDistance;
@@ -67,6 +83,12 @@ public class Fly extends Module {
 		switch(mode.getMode()) {
 			case "Hypixel":
 				switch(hypixelBoost.getMode()) {
+					case "PacketBoost":
+						lastTickSpeed = .24D;
+						if (!mc.player.onGround)
+							break;
+						lastTickSpeed = mc.player.isPotionActive(Potion.getPotionById(1)) ? 1.34D : 1.261D ;
+						break;
 					case "DamageBoost":
 						if (!mc.player.onGround)
 							break;
@@ -92,12 +114,10 @@ public class Fly extends Module {
 						lastTickSpeed = mc.player.onGround ? .5D : MovementUtils.getSpeed();
 						break;
 				}
-				if(mode.getMode() != "PacketBoost") {
-					if(!mc.player.onGround)
-						break;
-					mc.player.jump();
-					mc.player.posY += .41999998688697815D;
-				}
+				if(!mc.player.onGround)
+					break;
+				mc.player.jump();
+				mc.player.posY += .41999998688697815D;
 		}
 		super.onEnable();
 	}
@@ -115,7 +135,7 @@ public class Fly extends Module {
 	@Override
 	public void onEvent(Event<?> e) {
 		if(e instanceof EventUpdate) {
-			setDisplayName("Fly \u00A77" + ((ModeSetting)settings.get(1)).getMode());
+			setDisplayName("Fly \u00A77" + mode.getMode());
 		}
 
 		switch(mode.getMode()) {
@@ -146,40 +166,14 @@ public class Fly extends Module {
 				switch(hypixelBoost.getMode()) {
 					case "PacketBoost":
 						if(e instanceof EventMotion && e.isPre()) {
-							if(tickTimer>0) {
-								ClientUtils.setTimer(1F);
-								mc.player.motionY=0;
-								if(mc.player.onGround) {
-									mc.player.move(MoverType.SELF, 0, tickTimer==1 ? .42 : 0, 0);
-									mc.player.onGround=true;
-									lastTickSpeed=1;
-								}
-								MovementUtils.Strafe(mc.player.onGround? 1F : lastTickSpeed < .24? .24 : lastTickSpeed - lastTickSpeed/150);
-								lastTickSpeed=mc.player.collidedHorizontally||mc.gameSettings.keyBindJump.isKeyDown() ? .24 : MovementUtils.getSpeed();
-								lastTickSpeed -= tickTimer>=9?lastTickSpeed/4:0;
-							}
-							if(tickTimer==0) {
-								if(mc.player.onGround) {
-									double y = mc.player.posY;
-									mc.player.move(MoverType.SELF, 0, .42, 0);
-									double y1 = mc.player.posY;
-									mc.player.move(MoverType.SELF, 0, -.42, 0);
-									y1 -= y;
-									int i=0;
-									for(i=0; i<5; i++) {
-										MovementUtils.move();
-										MovementUtils.vClip2(y1, false);
-										MovementUtils.move();
-										MovementUtils.vClip2(0, false);
-										ClientUtils.setTimer(1F / (i*2));
-									}
-									MovementUtils.Strafe(.45D);
-									mc.player.motionY=-0.08;
-								}
-							}
-
-							lastTickYaw = mc.player.rotationYaw;
-							lastTickPitch = mc.player.rotationPitch;
+							ClientUtils.setTimer(1F);
+							mc.player.motionY=0;
+							MovementUtils.Strafe(mc.player.onGround? 1F : lastTickSpeed < .24? .24 : lastTickSpeed - lastTickSpeed/150);
+							/*if (tickTimer > 7) {
+								MovementUtils.Strafe(MovementUtils.getSpeed()/4);
+							}*/
+							lastTickSpeed=mc.player.collidedHorizontally||mc.gameSettings.keyBindJump.isKeyDown() ? .24 : MovementUtils.getSpeed();
+							lastTickSpeed -= tickTimer>=7?lastTickSpeed/4:0;
 						}
 						break;
 					case "DamageBoost":
@@ -228,6 +222,7 @@ public class Fly extends Module {
 					if(mc.player.ticksExisted%2!=0) {
 						mc.player.motionY=-1E-5D;
 					}
+					tickTimer ++;
 				}
 				if(e instanceof EventPacket) {
 					EventPacket event = (EventPacket)e;
@@ -260,20 +255,18 @@ public class Fly extends Module {
 						MovementUtils.vClip2(999, true);
 						mc.getConnection().sendPacket(new CPacketConfirmTeleport(clearLagTeleportId));
 
-						double speed=(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:2);
+						double speed=(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:speedSetting.value);
 						if(teleportId==0) {
 							speed=0;
 						}
 						MovementUtils.Strafe(speed);
-						for(int i1=0; i1<4; i1++) {
-							MovementUtils.vClip(MovementUtils.InputY()*speed);
-							if (phase.isEnable()) {
-								MovementUtils.clip();
-							}else {
-								MovementUtils.move();
-							}
-							CansellingTeleport++;
+						MovementUtils.vClip(MovementUtils.InputY()*speed);
+						if (phase.isEnable()) {
+							MovementUtils.clip();
+						}else {
+							MovementUtils.move();
 						}
+						CansellingTeleport++;
 
 						MovementUtils.freeze();
 						clearLagTeleportId++;
@@ -288,7 +281,7 @@ public class Fly extends Module {
 					Vec3d pos = new Vec3d(event.x, event.y, event.z);
 
 					for (Vec3d vec : catchVec) {
-						if (vec.distanceTo(pos) < 2) {
+						if (vec.equals(pos)) {
 							catchVec.remove(vec);
 							event.setCancellTeleporting(true);
 							CansellingTeleport--;
@@ -298,8 +291,67 @@ public class Fly extends Module {
 				}
 
 				if(e instanceof EventRenderGUI) {
-					String speed = String.valueOf(Math.sqrt(Math.pow(mc.player.posX - mc.player.lastTickPosX, 2) + Math.pow(mc.player.posZ - mc.player.lastTickPosZ, 2)) * 10);
+					String speed = String.valueOf(Math.sqrt(Math.pow(mc.player.posX - mc.player.lastTickPosX, 2) + Math.pow(mc.player.posZ - mc.player.lastTickPosZ, 2)) * 20);
 					new Gui().drawString(mc.fontRenderer, speed, mc.displayWidth/4 - mc.fontRenderer.getStringWidth(speed)/2, mc.displayHeight/4 - mc.fontRenderer.FONT_HEIGHT/2, 0xffffffff);
+				}
+				break;
+			}
+
+			case "TEST1":
+			{
+				if (e instanceof EventJump && e.isPost()) {
+					MovementUtils.Strafe(MovementUtils.getSpeed());
+				}
+				if (e instanceof EventUpdate) {
+					if (mc.player.onGround) {
+						//mc.player.jump();
+					}
+				}
+				if (e instanceof EventMotion) {
+					EventMotion event = (EventMotion)e;
+					mc.player.motionY -= 0;
+					mc.player.motionY -= (mc.player.motionY - MovementUtils.nextY(mc.player.motionY)) * .058D;
+					mc.player.motionX += (mc.player.motionX - MovementUtils.nextSpeed(mc.player.motionX)) * .149D;
+					mc.player.motionZ += (mc.player.motionZ - MovementUtils.nextSpeed(mc.player.motionZ)) * .149D;
+					lastTickSpeed = mc.player.motionY;
+				}
+				break;
+			}
+
+			case "TEST2":
+			{
+				if (e instanceof EventMotion) {
+					EventMotion event = (EventMotion)e;
+					event.pitch = -90F;
+					ClientUtils.setTimer(1.0F);
+					if (mc.player.motionY > 0) return;
+					mc.player.motionX = 0;
+					mc.player.motionZ = 0;
+					ClientUtils.setTimer(0.27F);
+					tickTimer ++;
+					if (tickTimer%2==0) {
+						mc.getConnection().sendPacket(new CPacketPlayerTryUseItem(EnumHand.MAIN_HAND));
+						ClientUtils.setTimer(0.3F);
+					}else {
+						mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(0, 0, 0), EnumFacing.DOWN));
+						ClientUtils.setTimer(.05F);
+					}
+					if (tickTimer > 0) {
+						//tickTimer = 0;
+					}
+				}
+				if (e instanceof EventPacket && e.isIncoming()) {
+					EventPacket event = (EventPacket)e;
+					Packet p = event.getPacket();
+					if (p instanceof SPacketEntityVelocity) {
+						SPacketEntityVelocity packet = (SPacketEntityVelocity)p;
+						if (packet.getEntityID() == mc.player.getEntityId()) {
+							//mc.player.motionY = .36075;
+							mc.player.motionY = packet.getMotionY()/8000.0D;
+							//MovementUtils.Strafe(5);
+							e.cancel();
+						}
+					}
 				}
 				break;
 			}
