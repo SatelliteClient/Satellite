@@ -1,6 +1,5 @@
 package com.github.satellite.ui.gui.clickGUI.element;
 
-import com.github.satellite.event.listeners.EventSettingClicked;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.KeyBindSetting;
@@ -144,12 +143,7 @@ public class Panel {
 					NumberSetting setting = (NumberSetting)s;
 					int stwidth = fontRendererObj.getStringWidth(setting.name);
 					RenderUtils.glColor(255, 255, 255, 255);
-					double inc = setting.value/setting.maximum * 92 + 8;
-					if (Mouse.isButtonDown(0) && (hover || hoveredSetting == i)) {
-						double mouX = (mouseX-x-100-4)*1.1;
-						setting.setValue(mouX/setting.maximum);
-					}
-					inc = setting.value/setting.maximum * 92 + 8;
+					double inc = setting.value/setting.maximum;
 					RenderUtils.drawRect(x+105, YY+y+fontRendererObj.FONT_HEIGHT+5, x+200-4, YY+y+fontRendererObj.FONT_HEIGHT+7, theme.light(2).getRGB());
 					RenderUtils.drawRect(x+105, YY+y+fontRendererObj.FONT_HEIGHT+5, x+100+inc-4, YY+y+fontRendererObj.FONT_HEIGHT+7, theme.light(0).getRGB());
 					RenderUtils.glColor(255, 255, 255, 255);
@@ -176,7 +170,6 @@ public class Panel {
 			Setting s = module.settings.get(selectedSetting);
 			if(s instanceof KeyBindSetting) {
 				if(mouseButton == 1) {
-					module.onEvent(new EventSettingClicked(s));
 					((KeyBindSetting)s).setKeyCode(0);
 					selectedSetting=-1;
 				}
@@ -191,17 +184,14 @@ public class Panel {
 		if(hoveredSetting != -1) {
 			if(module.settings.get(hoveredSetting) instanceof KeyBindSetting) {
 				if(state == 0) selectedSetting = hoveredSetting;
-				module.onEvent(new EventSettingClicked(module.settings.get(hoveredSetting)));
 			}
 
 			if(module.settings.get(hoveredSetting) instanceof ModeSetting) {
 				((ModeSetting)module.settings.get(hoveredSetting)).cycle();
-				module.onEvent(new EventSettingClicked(module.settings.get(hoveredSetting)));
 			}
 
 			if(module.settings.get(hoveredSetting) instanceof BooleanSetting) {
 				((BooleanSetting)module.settings.get(hoveredSetting)).toggle();
-				module.onEvent(new EventSettingClicked(module.settings.get(hoveredSetting)));
 			}
 		}
 

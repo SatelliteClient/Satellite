@@ -55,24 +55,6 @@ public class MovementUtils {
 		return (mc.player.movementInput.jump ? 1 : 0) + (mc.player.movementInput.sneak ? -1 : 0);
 	}
 
-	public static double InputX() {
-		if (!isMoving()) return 0;
-		float Forward = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
-		float Strafing = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
-
-		double r = Math.atan2(Forward, Strafing)-1.57079633-toRadian(mc.player.rotationYaw);
-		return Math.sin(r);
-	}
-
-	public static double InputZ() {
-		if (!isMoving()) return 0;
-		float Forward = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
-		float Strafing = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
-
-		double r = Math.atan2(Forward, Strafing)-1.57079633-toRadian(mc.player.rotationYaw);
-		return Math.cos(r);
-	}
-
 	public static double getSpeed() {
 		if (mc.player == null) return 0;
 		return Math.sqrt(Math.pow(mc.player.motionX, 2)+Math.pow(mc.player.motionZ, 2));
