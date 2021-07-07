@@ -1,6 +1,7 @@
 package com.github.satellite.event.listeners;
 
 import com.github.satellite.event.Event;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
@@ -13,11 +14,11 @@ public class EventMotion extends Event<EventMotion> {
 	private double lastX, lastY, lastZ;
 	public float lastYaw, lastPitch;
 	public boolean lastOnGround;
-	
+
 	public boolean isMod() {
 		return lastX != x || lastY != y || lastZ != z || lastYaw != yaw || lastPitch != pitch || lastOnGround != onGround;
 	}
-	
+
 	public EventMotion(double x, double y, double z, float yaw, float pitch, boolean onGround) {
 		super();
 		this.x = x;
@@ -82,4 +83,17 @@ public class EventMotion extends Event<EventMotion> {
 	public void setOnGround(boolean onGround) {
 		this.onGround = onGround;
 	}
+
+	public void setPosition(double x, double y, double z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	public void setPosition(BlockPos pos) {
+		this.x = pos.getX()+.5;
+		this.y = pos.getY();
+		this.z = pos.getZ()+.5;
+	}
+
 }

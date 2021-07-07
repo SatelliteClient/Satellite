@@ -147,7 +147,8 @@ public class Panel {
 					double inc = setting.value/setting.maximum * 92 + 8;
 					if (Mouse.isButtonDown(0) && (hover || hoveredSetting == i)) {
 						double mouX = (mouseX-x-100-4)*1.1;
-						setting.setValue(mouX/setting.maximum);
+						double d = setting.maximum - setting.minimum;
+						setting.setValue(mouX/100*d);
 					}
 					inc = setting.value/setting.maximum * 92 + 8;
 					RenderUtils.drawRect(x+105, YY+y+fontRendererObj.FONT_HEIGHT+5, x+200-4, YY+y+fontRendererObj.FONT_HEIGHT+7, theme.light(2).getRGB());
