@@ -4,7 +4,8 @@ import com.github.satellite.event.Event;
 
 public class EventPlayerInput extends Event<EventPlayerInput> {
 	
-	boolean forward, back, left, right, jump, sneak;
+	public boolean forward, back, left, right, jump, sneak;
+	private boolean lastForward, lastBack, lastLeft, lastRight, lastJump, lastSneak;
 
 	public EventPlayerInput(boolean forward, boolean back, boolean left, boolean right, boolean jump, boolean sneak) {
 		super();
@@ -14,6 +15,17 @@ public class EventPlayerInput extends Event<EventPlayerInput> {
 		this.right = right;
 		this.jump = jump;
 		this.sneak = sneak;
+
+		this.lastForward = forward;
+		this.lastBack = back;
+		this.lastLeft = left;
+		this.lastRight = right;
+		this.lastJump = jump;
+		this.lastSneak = sneak;
+	}
+
+	public boolean isModded() {
+		return lastForward != forward || lastBack != back || lastLeft != left || lastRight != right || lastJump != jump || lastSneak != sneak;
 	}
 
 	public boolean isForward() {

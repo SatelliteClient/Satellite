@@ -1,6 +1,7 @@
 package com.github.satellite.mixin.client;
 
 import com.github.satellite.Satellite;
+import com.github.satellite.event.EventType;
 import com.github.satellite.event.listeners.EventPlayerInput;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.MovementInput;
@@ -30,59 +31,61 @@ public class MixinMovementInputFromOptions extends MovementInput {
 
         Satellite.onEvent(e);
 
-        this.moveStrafe = 0.0F;
-        this.moveForward = 0.0F;
+        if (e.isModded()) {
+            this.moveStrafe = 0.0F;
+            this.moveForward = 0.0F;
 
-        if (e.isForward())
-        {
-            ++this.moveForward;
-            this.forwardKeyDown = true;
-        }
-        else
-        {
-            this.forwardKeyDown = false;
-        }
+            if (e.isForward())
+            {
+                ++this.moveForward;
+                this.forwardKeyDown = true;
+            }
+            else
+            {
+                this.forwardKeyDown = false;
+            }
 
-        if (e.isBack())
-        {
-            --this.moveForward;
-            this.backKeyDown = true;
-        }
-        else
-        {
-            this.backKeyDown = false;
-        }
+            if (e.isBack())
+            {
+                --this.moveForward;
+                this.backKeyDown = true;
+            }
+            else
+            {
+                this.backKeyDown = false;
+            }
 
-        if (e.isLeft())
-        {
-            ++this.moveStrafe;
-            this.leftKeyDown = true;
-        }
-        else
-        {
-            this.leftKeyDown = false;
-        }
+            if (e.isLeft())
+            {
+                ++this.moveStrafe;
+                this.leftKeyDown = true;
+            }
+            else
+            {
+                this.leftKeyDown = false;
+            }
 
-        if (e.isRight())
-        {
-            --this.moveStrafe;
-            this.rightKeyDown = true;
-        }
-        else
-        {
-            this.rightKeyDown = false;
-        }
+            if (e.isRight())
+            {
+                --this.moveStrafe;
+                this.rightKeyDown = true;
+            }
+            else
+            {
+                this.rightKeyDown = false;
+            }
 
-        this.jump = e.isJump();
-        this.sneak = e.isSneak();
+            this.jump = e.isJump();
+            this.sneak = e.isSneak();
 
-        if (this.sneak)
-        {
-            this.moveStrafe = (float)((double)this.moveStrafe * 0.3D);
-            this.moveForward = (float)((double)this.moveForward * 0.3D);
+            if (this.sneak)
+            {
+                this.moveStrafe = (float)((double)this.moveStrafe * 0.3D);
+                this.moveForward = (float)((double)this.moveForward * 0.3D);
+            }
+
+            ci.cancel();
         }
-
-        ci.cancel();
     }
 }
 

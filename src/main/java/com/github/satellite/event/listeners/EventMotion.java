@@ -15,7 +15,7 @@ public class EventMotion extends Event<EventMotion> {
 	public float lastYaw, lastPitch;
 	public boolean lastOnGround;
 
-	public boolean isMod() {
+	public boolean isModded() {
 		return lastX != x || lastY != y || lastZ != z || lastYaw != yaw || lastPitch != pitch || lastOnGround != onGround;
 	}
 

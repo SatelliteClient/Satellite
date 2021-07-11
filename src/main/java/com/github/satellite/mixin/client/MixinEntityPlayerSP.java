@@ -2,7 +2,6 @@ package com.github.satellite.mixin.client;
 
 import com.github.satellite.Satellite;
 import com.github.satellite.event.EventType;
-import com.github.satellite.event.listeners.EventLightingUpdate;
 import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.mojang.authlib.GameProfile;
@@ -10,17 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketPlayer;
-import net.minecraft.stats.RecipeBook;
-import net.minecraft.stats.StatisticsManager;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -68,7 +58,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         event.setType(EventType.PRE);
         Satellite.onEvent(event);
 
-        if (event.isMod()) {
+        if (event.isModded()) {
             ci.cancel();
             sendMovePacket(event);
         }
