@@ -21,7 +21,7 @@
   - Step
   - Yaw
 - Misc
-  - AntiChunckBan
+  - AntiChunkBan
 - Player
   - AntiHunger
   - Ground
