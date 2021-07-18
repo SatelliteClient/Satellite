@@ -18,7 +18,7 @@ public class MixinMovementInputFromOptions extends MovementInput {
 
     @Shadow @Final private GameSettings gameSettings;
 
-    @Inject(method = "updatePlayerMoveState", at = @At(value = "HEAD", target = "Lnet/minecraft/client/Minecraft;rightClickDelayTimer:I"), cancellable = true)
+    @Inject(method = "updatePlayerMoveState", at = @At(value = "HEAD"), cancellable = true)
     private void updatePlayerMoveState(CallbackInfo ci) {
         EventPlayerInput e = new EventPlayerInput(
                 this.gameSettings.keyBindForward.isKeyDown(),
