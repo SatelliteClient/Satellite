@@ -2,7 +2,6 @@ package com.github.satellite.features.module.combat;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventMotion;
-import com.github.satellite.event.listeners.EventRender;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
@@ -13,27 +12,15 @@ import com.github.satellite.utils.CrystalUtils;
 import com.github.satellite.utils.InventoryUtils;
 import com.github.satellite.utils.TargetUtils;
 
-import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockCompressedPowered;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.BlockPistonExtension;
-import net.minecraft.block.BlockPistonMoving;
-import net.minecraft.block.BlockRedstoneDiode;
-import net.minecraft.block.state.BlockPistonStructureHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityEnderCrystal;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
-import org.newdawn.slick.tests.xml.Inventory;
-import org.omg.CORBA.BooleanSeqHelper;
 
 public class PistonAura2 extends Module {
 	

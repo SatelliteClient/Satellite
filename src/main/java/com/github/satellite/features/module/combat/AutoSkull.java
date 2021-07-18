@@ -27,7 +27,7 @@ public class AutoSkull extends Module {
 	public void onEvent(Event<?> e) {
 		
         if(e instanceof EventUpdate) {
-        	int skull = InventoryUtils.pickItem(397);
+        	int skull = InventoryUtils.pickItem(397, false);
         	if(skull != -1) {
 	        	int item = mc.player.inventory.currentItem;
         		mc.player.inventory.currentItem = skull;

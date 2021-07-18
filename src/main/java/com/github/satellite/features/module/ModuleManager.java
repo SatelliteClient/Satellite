@@ -75,6 +75,8 @@ public class ModuleManager {
 		modules.add(new CivBreak());
 		modules.add(new Notification());
 		modules.add(new HoleTP());
+		modules.add(new PistonAura());
+		modules.add(new PistonAura2());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {

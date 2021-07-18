@@ -32,7 +32,7 @@ public class AntiCrystal extends Module {
 	public void onEvent(Event<?> e) {
 		
         if(e instanceof EventUpdate) {
-        	int plate = InventoryUtils.pickItem(this.mode.is("Plate")?72:72);
+        	int plate = InventoryUtils.pickItem(this.mode.is("Plate")?72:72, false);
         	if(plate != -1) {
 	        	int item = mc.player.inventory.currentItem;
         		mc.player.inventory.currentItem = plate;
