@@ -29,14 +29,14 @@ public class PistonAura2 extends Module {
 	}
 
 	NumberSetting range;
-	BooleanSetting cheackPiston;
+	BooleanSetting checkPiston;
 	
     @Override
     public void init() {
     	super.init();
     	this.range = new NumberSetting("Range", 5.2, Integer.MIN_VALUE, 100, .1);
-    	this.cheackPiston = new BooleanSetting("cheackPiston", true);
-    	addSetting(range, cheackPiston);
+    	this.checkPiston = new BooleanSetting("checkPiston", true);
+    	addSetting(range, checkPiston);
     }
     
     int progress = 0;

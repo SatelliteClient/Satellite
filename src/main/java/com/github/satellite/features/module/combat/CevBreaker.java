@@ -45,7 +45,7 @@ import net.minecraft.util.text.TextComponentString;
 public class CevBreaker extends Module {
 
     public CevBreaker() {
-        super("CevBreacker", Keyboard.KEY_NONE, Category.COMBAT);
+        super("CevBreaker", Keyboard.KEY_NONE, Category.COMBAT);
     }
 
     NumberSetting range;
