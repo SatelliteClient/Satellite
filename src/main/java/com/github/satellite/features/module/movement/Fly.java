@@ -8,23 +8,18 @@ import com.github.satellite.setting.ModeSetting;
 import com.github.satellite.setting.NumberSetting;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MovementUtils;
+import com.google.common.base.Supplier;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.entity.MoverType;
-import net.minecraft.init.Blocks;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
-import net.minecraft.network.play.client.CPacketKeepAlive;
 import net.minecraft.network.play.client.CPacketPlayer;
-import net.minecraft.network.play.client.CPacketPlayerDigging;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
+import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -40,16 +35,44 @@ public class Fly extends Module {
 
 	ModeSetting mode;
 	NumberSetting speedSetting;
+	NumberSetting speedSetting1;
+	NumberSetting speedSetting2;
 	BooleanSetting phase;
 	ModeSetting hypixelBoost;
 
 	@Override
 	public void init() {
-		mode = new ModeSetting("Mode", "Vanilla", new String[] {"Vanilla", "Hypixel", "2b2t Japan", "TEST1", "TEST2"});
-		speedSetting = new NumberSetting("Speed", 8, 0, 25, 0.5D);
-		hypixelBoost = new ModeSetting("hypixelBoost", "Normal", new String[] {"Normal", "Funcraft", "Boost", "PacketBoost", "DamageBoost", "TEST1", "TEST2"});
-		phase = new BooleanSetting("Phase", false);
-		addSetting(mode, speedSetting, hypixelBoost, phase);
+		mode = new ModeSetting("Mode", null, "Vanilla", new String[] {"Vanilla", "NCPHypixel", "2b2t Japan", "TEST1", "TEST2", "TEST3"});
+
+		speedSetting = new NumberSetting("Speed", new Supplier<Boolean>() {
+			@Override
+			public Boolean get() {
+				return mode.is("2b2t Japan");
+			}
+		}, 8, 0, 25, 0.5D);
+		speedSetting1 = new NumberSetting("Speed", new Supplier<Boolean>() {
+			@Override
+			public Boolean get() {
+				return !mode.is("2b2t Japan");
+			}
+		}, 1, 0, 10, 0.1D);
+		speedSetting2 = new NumberSetting("ElytraSpeed", new Supplier<Boolean>() {
+			@Override
+			public Boolean get() {
+				return mode.is("Vanilla");
+			}
+		}, 1, 0, 10, 0.1D);
+
+
+
+		hypixelBoost = new ModeSetting("hypixelBoost", new Supplier<Boolean>() {
+			@Override
+			public Boolean get() {
+				return mode.is("NCPHypixel");
+			}
+		}, "Normal", new String[] {"Normal", "Funcraft", "Boost", "PacketBoost", "DamageBoost", "TEST1", "TEST2"});
+		phase = new BooleanSetting("Phase", null, false);
+		addSetting(mode, speedSetting, speedSetting1, speedSetting2, hypixelBoost, phase);
 		super.init();
 	}
 
@@ -69,6 +92,8 @@ public class Fly extends Module {
 
 	ArrayList<Vec3d> catchVec = new ArrayList<>();
 
+	Vec3d lastCatch = Vec3d.ZERO;
+
 	@Override
 	public void onEnable() {
 		catchVec = new ArrayList<>();
@@ -81,7 +106,7 @@ public class Fly extends Module {
 		double fallDistance;
 
 		switch(mode.getMode()) {
-			case "Hypixel":
+			case "NCPHypixel":
 				switch(hypixelBoost.getMode()) {
 					case "PacketBoost":
 						lastTickSpeed = .24D;
@@ -142,9 +167,14 @@ public class Fly extends Module {
 
 			case "Vanilla":
 			{
-				if(e instanceof EventMotion) {
+				if (e instanceof EventUpdate) {
+				}
+				if (e instanceof EventMotion && e.isPre()) {
 					if (e.isPre()) {
-						double speed = speedSetting.value;
+						if (mc.player.isElytraFlying()) {
+							mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
+						}
+						double speed = mc.player.isElytraFlying()?speedSetting2.value:speedSetting1.value;
 						mc.player.motionY= MovementUtils.InputY()*(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:speed);
 						MovementUtils.Strafe(Keyboard.isKeyDown(Keyboard.KEY_B)?0.1:speed);
 						MovementUtils.move();
@@ -161,7 +191,7 @@ public class Fly extends Module {
 
 
 
-			case "Hypixel":
+			case "NCPHypixel":
 			{
 				switch(hypixelBoost.getMode()) {
 					case "PacketBoost":
@@ -187,15 +217,6 @@ public class Fly extends Module {
 					case "Boost":
 						if(e instanceof EventMotion && e.isPre()) {
 							mc.player.motionY = 0;
-							if (tickTimer==10) {
-								if(mc.player.isPotionActive(Potion.getPotionById(1)))
-									lastTickSpeed = .464531D;
-								else
-									lastTickSpeed = 0D;
-							}
-							if (mc.player.isPotionActive(Potion.getPotionById(1)) && tickTimer==20) {
-								lastTickSpeed = 0D;
-							}
 							MovementUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed/150);
 							lastTickSpeed = mc.player.collidedHorizontally ? .26D : MovementUtils.getSpeed();
 						}
@@ -213,15 +234,19 @@ public class Fly extends Module {
 							MovementUtils.Strafe(lastTickSpeed < .26D ? .26D : lastTickSpeed - lastTickSpeed / 15);
 							lastTickSpeed = mc.player.collidedHorizontally ? .26D : MovementUtils.getSpeed();
 						}
+
+					case "TEST1":
+						if(e instanceof EventMotion && e.isPre()) {
+							mc.player.motionY = MovementUtils.InputY()*speedSetting.value;
+							mc.player.motionX = MovementUtils.InputX()*speedSetting.value;
+							mc.player.motionZ = MovementUtils.InputZ()*speedSetting.value;
+						}
 						break;
 				}
 
 				if(e instanceof EventMotion) {
 					EventMotion event = (EventMotion)e;
 					event.y+=mc.player.ticksExisted%2==0?1E-5:-1E-5;
-					if(mc.player.ticksExisted%2!=0) {
-						mc.player.motionY=-1E-5D;
-					}
 					tickTimer ++;
 				}
 				if(e instanceof EventPacket) {
@@ -319,42 +344,71 @@ public class Fly extends Module {
 
 			case "TEST2":
 			{
-				if (e instanceof EventMotion) {
-					EventMotion event = (EventMotion)e;
-					event.pitch = -90F;
-					ClientUtils.setTimer(1.0F);
-					if (mc.player.motionY > 0) return;
-					mc.player.motionX = 0;
-					mc.player.motionZ = 0;
-					ClientUtils.setTimer(0.27F);
-					tickTimer ++;
-					if (tickTimer%2==0) {
-						mc.getConnection().sendPacket(new CPacketPlayerTryUseItem(EnumHand.MAIN_HAND));
-						ClientUtils.setTimer(0.3F);
+				//Matrix Fly
+				if(e instanceof EventMotion) {
+					if (mc.player.ticksExisted%2==0) {
+						MovementUtils.Strafe(.1);
 					}else {
-						mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(0, 0, 0), EnumFacing.DOWN));
-						ClientUtils.setTimer(.05F);
+						mc.player.motionY = 0;
 					}
-					if (tickTimer > 0) {
-						//tickTimer = 0;
+					MovementUtils.Strafe(.1);
+					if ((int)(tickTimer/6)%20!=0) {
+						ClientUtils.setTimer(8F);
+					}else {
+						ClientUtils.setTimer(.1F);
 					}
+					tickTimer ++;
+					//mc.player.motionY = 0;
 				}
-				if (e instanceof EventPacket && e.isIncoming()) {
+				if (e instanceof EventPacket) {
 					EventPacket event = (EventPacket)e;
 					Packet p = event.getPacket();
-					if (p instanceof SPacketEntityVelocity) {
-						SPacketEntityVelocity packet = (SPacketEntityVelocity)p;
-						if (packet.getEntityID() == mc.player.getEntityId()) {
-							//mc.player.motionY = .36075;
-							mc.player.motionY = packet.getMotionY()/8000.0D;
-							//MovementUtils.Strafe(5);
-							e.cancel();
-						}
+					if (p instanceof SPacketPlayerPosLook) {
 					}
 				}
+
+				//ACR
+				/*if (e instanceof EventMotion) {
+					if (mc.player.ticksExisted%4!=0) {
+						MovementUtils.Strafe(1);
+					}else {
+						MovementUtils.Strafe(99);
+					}
+				}*/
+				
+				/*if(e instanceof EventMotion) {
+					EventMotion event = (EventMotion)e;
+					if (mc.player.ticksExisted%20==0) {
+						mc.getConnection().sendPacket(new CPacketChatMessage("/heal"));
+					}
+					if (mc.player.fallDistance > 0) {
+						event.setOnGround(true);
+						MovementUtils.freeze();
+						float dist = mc.player.fallDistance;
+						double y = mc.player.posY;
+						MovementUtils.move(0, -1, 0);
+						ClientUtils.setTimer(0.5F);
+						if (mc.player.collidedVertically) {
+							MovementUtils.vClip2(-1E-10, true);
+							lastCatch = new Vec3d(mc.player.posX, mc.player.posY-1E-10, mc.player.posZ);
+						}else {
+							mc.getConnection().sendPacket(new CPacketPlayer.Position(lastCatch.x, lastCatch.y, lastCatch.z, true));
+						}
+						MovementUtils.yClip(y);
+						mc.player.fallDistance = dist;
+						MovementUtils.Strafe(0.1);
+					}
+				}*/
 				break;
 			}
-
+			case "TEST3":
+				if (e instanceof EventMotion) {
+					if (e.isPost()) {
+						mc.getConnection().sendPacket(new CPacketPlayerTryUseItemOnBlock(new BlockPos(mc.player).offset(EnumFacing.DOWN, 2), EnumFacing.UP, EnumHand.MAIN_HAND, 0, 1, 0));
+						ClientUtils.setTimer(ClientUtils.getTimer()+(mc.player.ticksExisted%10==0?1:0));
+						ClientUtils.setTimer(ClientUtils.getTimer()+(1-ClientUtils.getTimer())/5f);
+					}
+				}
 		}
 		super.onEvent(e);
 	}

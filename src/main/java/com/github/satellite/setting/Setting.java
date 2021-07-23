@@ -1,11 +1,17 @@
 package com.github.satellite.setting;
 
-public class Setting {
+import java.util.function.Supplier;
+
+public class Setting <T> {
 
 	public String name;
+	public T value;
+	public final Supplier<Boolean> visibility;
 
-	public void draw(float x, float y) {
-		
+	public Setting(String name, Supplier<Boolean> visibility, T value) {
+		this.name = name;
+		this.visibility = visibility;
+		this.value = value;
 	}
-	
+
 }

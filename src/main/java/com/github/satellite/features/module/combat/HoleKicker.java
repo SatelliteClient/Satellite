@@ -2,12 +2,14 @@ package com.github.satellite.features.module.combat;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventMotion;
+import com.github.satellite.event.listeners.EventRenderWorld;
 import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.NumberSetting;
 import com.github.satellite.utils.BlockUtils;
 import com.github.satellite.utils.InventoryUtils;
+import com.github.satellite.utils.render.RenderUtils;
 
 import net.minecraft.block.BlockAir;
 import net.minecraft.entity.Entity;
@@ -28,12 +30,13 @@ public class HoleKicker extends Module {
 
 	NumberSetting range;
 	BooleanSetting autoDisable;
+	BooleanSetting fill;
 
 	@Override
 	public void init() {
 		super.init();
-		this.range = new NumberSetting("Range", 5.2, Integer.MIN_VALUE, 100, .1);
-		this.autoDisable = new BooleanSetting("Range", true);
+		this.range = new NumberSetting("Range", null, 5.2, 0, 10, .1);
+		this.autoDisable = new BooleanSetting("AutoDisable", true);
 		addSetting(range, autoDisable);
 	}
 
@@ -55,8 +58,8 @@ public class HoleKicker extends Module {
 				if (mc.player.getDistance(entity) > range.value) continue;
 
 				if (entity instanceof EntityPlayer) {
-					int piston = InventoryUtils.pickItem(33);
-					int power = InventoryUtils.pickItem(152);
+					int piston = InventoryUtils.pickItem(33, false);
+					int power = InventoryUtils.pickItem(152, false);
 
 					BlockPos pos = new BlockPos(entity).offset(EnumFacing.UP);
 
@@ -69,9 +72,9 @@ public class HoleKicker extends Module {
 						}
 						return;
 					}
+					mc.player.inventory.currentItem = piston;
 					BlockUtils event = BlockUtils.isPlaceable(pos.offset(facing), 0, true);
 					if (event != null) {
-						mc.player.inventory.currentItem = piston;
 						if (!event.doPlace(true)) {
 							return;
 						}
@@ -82,6 +85,7 @@ public class HoleKicker extends Module {
 							pos = new BlockPos(entity).offset(EnumFacing.UP).offset(facing);
 							event = BlockUtils.isPlaceable(pos.offset(f), 0, true);
 							if (BlockUtils.doPlace(event, true)) {
+								BlockUtils.doPlace(BlockUtils.isPlaceable(new BlockPos(entity), 0, false), false);
 								toggle();
 								return;
 							}
@@ -119,13 +123,17 @@ public class HoleKicker extends Module {
 
 	public EnumFacing getFacing(BlockPos position) {
 		for (EnumFacing f : EnumFacing.values()) {
-			BlockPos pos = new BlockPos(position).offset(f);
+			final BlockPos pos = new BlockPos(position);
 
-			if (pos.getY() != position.getY())
+			if (pos.offset(f).getY() != position.getY())
 				continue;
 
-			if (mc.world.isAirBlock(pos)) {
-				return f;
+			if (!mc.world.isAirBlock(pos.offset(f, -1).offset(EnumFacing.DOWN))) {
+				if (mc.world.isAirBlock(pos.offset(f, -1))) {
+					if (mc.world.isAirBlock(pos.offset(f))) {
+						return f;
+					}
+				}
 			}
 		}
 		return null;

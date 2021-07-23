@@ -9,7 +9,7 @@ import java.util.List;
 public class CommandManager {
 
     public List<Command> commands = new ArrayList<Command>();
-    public String prefix = ".";
+    public static String prefix = ".";
 
     public void init() {
         commands.add(new Fov());

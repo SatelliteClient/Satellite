@@ -14,6 +14,7 @@ import com.github.satellite.utils.render.ColorUtils;
 import com.github.satellite.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -102,6 +103,7 @@ public class Panel {
 			for(Setting s : module.settings) {
 				if(s == null)
 					continue;
+				if(s.visibility == null || (boolean) s.visibility.get());else continue;
 
 				boolean hover = currentSetting == i;
 
@@ -121,14 +123,14 @@ public class Panel {
 					RenderUtils.glColor(255, 255, 255, 255);
 					fontRendererObj.drawString(setting.name+": "+(selectedSetting==i?"inputwaiting...":Keyboard.getKeyName(setting.getKeyCode())), (int)(100+x+7), (int)(YY+y+7), 0x40ffffff);
 				}
-				if(s instanceof ModeSetting) {
+				else if(s instanceof ModeSetting) {
 					if(hover) hoveredSetting = i;
 
 					ModeSetting setting = (ModeSetting)s;
 					RenderUtils.glColor(255, 255, 255, 255);
 					fontRendererObj.drawString(setting.name+": "+setting.getMode(), (int)(100+x+7), (int)(YY+y+7), 0x40ffffff);
 				}
-				if(s instanceof BooleanSetting) {
+				else if(s instanceof BooleanSetting) {
 					if(hover) hoveredSetting = i;
 
 					BooleanSetting setting = (BooleanSetting)s;
@@ -138,7 +140,7 @@ public class Panel {
 					RenderUtils.glColor(255, 255, 255, 255);
 					fontRendererObj.drawString(setting.name, (int)(100+x+7), (int)(YY+y+7), 0x40ffffff);
 				}
-				if(s instanceof NumberSetting) {
+				else if(s instanceof NumberSetting) {
 					if(hover) hoveredSetting = i;
 
 					NumberSetting setting = (NumberSetting)s;
@@ -155,6 +157,10 @@ public class Panel {
 					RenderUtils.drawRect(x+105, YY+y+fontRendererObj.FONT_HEIGHT+5, x+100+inc-4, YY+y+fontRendererObj.FONT_HEIGHT+7, theme.light(0).getRGB());
 					RenderUtils.glColor(255, 255, 255, 255);
 					fontRendererObj.drawString(setting.name+" : "+String.valueOf(setting.getValue()), (int)(100+x+7), (int)(YY+y+3), 0x40ffffff);
+				}
+				else  {
+					RenderUtils.glColor(255, 255, 255, 255);
+					fontRendererObj.drawString(s.name, (int)(100+x+7), (int)(YY+y+7), 0x40ffffff);
 				}
 				i++;
 				YY+=fontRendererObj.FONT_HEIGHT+11;

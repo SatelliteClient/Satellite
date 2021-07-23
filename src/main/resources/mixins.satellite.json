@@ -12,6 +12,7 @@
     "AccessorMapData",
     "AccessorTimer",
     "AccessorNetHandlerPlayClient",
+    "AccessorCPacketChatMessage",
     "MixinEntity",
     "MixinEntityLivingBase",
     "MixinEntityPlayerSP",
