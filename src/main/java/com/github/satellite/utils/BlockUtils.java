@@ -5,7 +5,6 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -37,11 +36,7 @@ public class BlockUtils {
 		if(!isAir(pos))
 			return null;
 
-		//if(!itemblock.canPlaceBlockOnSide(mc.world, mc.player.inventoryContainer.getInventory().get(mc.player.inventory.currentItem), pos, player, itemstack))
-		//    return EnumActionResult.FAIL;
-		if(!(mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock)) return null;
-
-		AxisAlignedBB axisalignedbb = ((ItemBlock)mc.player.inventory.getCurrentItem().getItem()).getBlock().getDefaultState().getCollisionBoundingBox(mc.world, pos);
+		AxisAlignedBB axisalignedbb = Block.FULL_BLOCK_AABB;
 
 		if(!isAir(pos)) {
 			if (mc.world.getBlockState(pos).getBlock() instanceof BlockLiquid) {
@@ -49,12 +44,11 @@ public class BlockUtils {
 				if (block instanceof BlockLiquid) {
 					event.f = EnumFacing.DOWN;
 					event.pos.offset(EnumFacing.UP);
-					return event;
 				}else {
 					event.f = EnumFacing.UP;
 					event.pos.offset(EnumFacing.DOWN);
-					return event;
 				}
+				return event;
 			}
 		}
 
@@ -121,7 +115,6 @@ public class BlockUtils {
 		this.rotx=x-90;
 
 		EnumActionResult enumactionresult = mc.playerController.processRightClickBlock(mc.player, mc.world, new BlockPos(pos.getX() - f.getDirectionVec().getX(), pos.getY() - f.getDirectionVec().getY(), pos.getZ() - f.getDirectionVec().getZ()), f, vec, EnumHand.MAIN_HAND);
-
 		if (enumactionresult == EnumActionResult.SUCCESS)
 		{
 			if (swing)

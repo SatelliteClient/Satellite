@@ -15,6 +15,10 @@ import com.github.satellite.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -65,6 +69,7 @@ public class Panel {
 			for(Setting s : module.settings) {
 				if(s == null)
 					continue;
+				if(s.visibility == null || (boolean) s.visibility.get());else continue;
 
 				boolean hover =
 						!GuiClickGUI.isCollided&&
@@ -181,6 +186,13 @@ public class Panel {
 	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if(selectedSetting != -1) {
 			Setting s = module.settings.get(selectedSetting);
+			if(s instanceof BooleanSetting) {
+				if(mouseButton == 1) {
+					module.onEvent(new EventSettingClicked(s));
+					((BooleanSetting)s).toggle();
+					selectedSetting=-1;
+				}
+			}
 			if(s instanceof KeyBindSetting) {
 				if(mouseButton == 1) {
 					module.onEvent(new EventSettingClicked(s));
@@ -194,20 +206,28 @@ public class Panel {
 	}
 
 	public void mouseReleased(int mouseX, int mouseY, int state) {
-
 		if(hoveredSetting != -1) {
-			if(module.settings.get(hoveredSetting) instanceof KeyBindSetting) {
+			List<Setting> visibleSettings = new ArrayList<>();
+			module.settings.forEach(s -> {
+				if (s.visibility == null || (boolean)s.visibility.get()) visibleSettings.add(s);
+			});
+			Setting cur = visibleSettings.get(currentSetting);
+			if (cur == null) {
+				System.out.println("wat except in cgui");
+				return;
+			}
+			if(cur instanceof KeyBindSetting) {
 				if(state == 0) selectedSetting = hoveredSetting;
 				module.onEvent(new EventSettingClicked(module.settings.get(hoveredSetting)));
 			}
 
-			if(module.settings.get(hoveredSetting) instanceof ModeSetting) {
-				((ModeSetting)module.settings.get(hoveredSetting)).cycle();
+			if(cur instanceof ModeSetting) {
+				((ModeSetting)cur).cycle();
 				module.onEvent(new EventSettingClicked(module.settings.get(hoveredSetting)));
 			}
 
-			if(module.settings.get(hoveredSetting) instanceof BooleanSetting) {
-				((BooleanSetting)module.settings.get(hoveredSetting)).toggle();
+			if(cur instanceof BooleanSetting) {
+				((BooleanSetting)cur).toggle();
 				module.onEvent(new EventSettingClicked(module.settings.get(hoveredSetting)));
 			}
 		}
