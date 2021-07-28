@@ -13,8 +13,8 @@ import net.minecraft.util.math.BlockPos;
 public class HoleUtils {
 
     /**
-     *  kami-blue/client
-     *  @author kami-blue
+     *  WurstPlus/wurst-plus-three
+     *  @author WurstPlus
      */
 
 	protected static Minecraft mc = Satellite.mc;
