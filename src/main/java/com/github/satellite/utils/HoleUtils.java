@@ -11,7 +11,12 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 public class HoleUtils {
-	
+
+    /**
+     *  kami-blue/client
+     *  @author kami-blue
+     */
+
 	protected static Minecraft mc = Satellite.mc;
 
     public static BlockSafety isBlockSafe(Block block) {

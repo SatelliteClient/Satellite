@@ -26,6 +26,10 @@ import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 
 public final class RenderUtils {
 
+	/**
+	 *  @author CCBlueX
+	 */
+
 	private static final Minecraft mc = Minecraft.getMinecraft();
 
 	private static final Map<Integer, Boolean> glCapMap = new HashMap<>();

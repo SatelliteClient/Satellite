@@ -61,6 +61,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         if (event.isModded()) {
             ci.cancel();
             sendMovePacket(event);
+            System.out.println("Move Modded!");
         }
     }
 

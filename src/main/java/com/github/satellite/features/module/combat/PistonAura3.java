@@ -39,17 +39,16 @@ public class PistonAura3 extends Module {
 		super("PistonAura3", Keyboard.KEY_NONE, Category.COMBAT);
 	}
 
-	NumberSetting range;
-	NumberSetting delay1;
-	NumberSetting delay2;
+	NumberSetting range, delay1, delay2, min;
 	BooleanSetting cheackPiston;
 
 	@Override
 	public void init() {
 		super.init();
-		addSetting(this.range = new NumberSetting("Range", null, 5.2, 0, 100, .1));
+		addSetting(this.range = new NumberSetting("Range", null, 5.2, 0, 15, .1));
 		addSetting(this.delay1 = new NumberSetting("ChangeDelay", null, 5, 0, 20, 1));
 		addSetting(this.delay2 = new NumberSetting("PlaceDelay", null, 2, 0, 100, 1));
+		addSetting(this.min = new NumberSetting("MinDamage", null, 21, 0, 100, .5));
 	}
 
 	int progress = 0;
@@ -84,8 +83,20 @@ public class PistonAura3 extends Module {
 						for (int dz = -range; dz <= range; dz++) {
 							BlockPos pos = new BlockPos(mc.player).add(dx, dy, dz);
 							if (player.getDistanceSq(pos) > range*range) continue;
+							boolean b = false;
+							for (BlockPos off : pistonoff) {
+								if (mc.world.getBlockState(pos.add(off)).getBlock() instanceof BlockObsidian) {
+									b = true;
+									break;
+								}
+								if (mc.world.getBlockState(pos.add(off)).getBlock() instanceof BlockEmptyDrops) {
+									b = true;
+									break;
+								}
+							}
+							if (!b) continue;
 							float damage = getDamage(new Vec3d(pos).add(.5, 0, .5));
-							if (damage < 21) continue;
+							if (damage < min.value) continue;
 							PA pa = new PA(pos, damage);
 							if (!pa.canPA()) continue;
 							attackable.add(pa);
@@ -132,13 +143,6 @@ public class PistonAura3 extends Module {
 			InventoryUtils.pop();
 		}
 		if (e instanceof EventRenderWorld) {
-
-			/*for (PA pos : attackable) {
-				RenderUtils.drawBlockBox(pos.crystal, ColorUtils.alpha(new Color(0xff0000), 0x20), false);
-				RenderUtils.drawBlockBox(pos.piston, ColorUtils.alpha(new Color(0x00ff00), 0x20), false);
-				RenderUtils.drawBlockBox(pos.power, ColorUtils.alpha(new Color(0x0000ff), 0x20), false);
-				RenderUtils.drawBlockBox(pos.crystal.offset(pos.pistonFacing), ColorUtils.alpha(new Color(0xffffff), 0x20), false);
-			}*/
 			if (!attackable.isEmpty()) {
 				RenderUtils.drawBlockBox(attackable.get(0).crystal, ColorUtils.alpha(new Color(0xff0000), 0x20));
 				RenderUtils.drawBlockBox(attackable.get(0).piston, ColorUtils.alpha(new Color(0x00ff00), 0x20));
@@ -192,40 +196,40 @@ public class PistonAura3 extends Module {
 		return null;
 	}
 
-	public class PA {
+	public static final BlockPos[] pistonoff = new BlockPos[] {
+			/*y = -1*/
+			new BlockPos(-1, -1, -1),
+			new BlockPos(0, -1, -1),
+			new BlockPos(1, -1, -1),
+			new BlockPos(-1, -1, 0),
+			new BlockPos(0, -1, 0),
+			new BlockPos(1, -1, 0),
+			new BlockPos(-1, -1, 1),
+			new BlockPos(0, -1, 1),
+			new BlockPos(1, -1, 1),
+			/*y = 0*/
+			new BlockPos(-1, 0, -1),
+			new BlockPos(0, 0, -1),
+			new BlockPos(1, 0, -1),
+			new BlockPos(-1, 0, 0),
+			new BlockPos(0, 0, 0),
+			new BlockPos(1, 0, 0),
+			new BlockPos(-1, 0, 1),
+			new BlockPos(0, 0, 1),
+			new BlockPos(1, 0, 1),
+			/*y = 1*/
+			new BlockPos(-1, 1, -1),
+			new BlockPos(0, 1, -1),
+			new BlockPos(1, 1, -1),
+			new BlockPos(-1, 1, 0),
+			new BlockPos(0, 1, 0),
+			new BlockPos(1, 1, 0),
+			new BlockPos(-1, 1, 1),
+			new BlockPos(0, 1, 1),
+			new BlockPos(1, 1, 1)
+	};
 
-		public final BlockPos[] pistonoff = new BlockPos[] {
-				/*y = -1*/
-				new BlockPos(-1, -1, -1),
-				new BlockPos(0, -1, -1),
-				new BlockPos(1, -1, -1),
-				new BlockPos(-1, -1, 0),
-				new BlockPos(0, -1, 0),
-				new BlockPos(1, -1, 0),
-				new BlockPos(-1, -1, 1),
-				new BlockPos(0, -1, 1),
-				new BlockPos(1, -1, 1),
-				/*y = 0*/
-				new BlockPos(-1, 0, -1),
-				new BlockPos(0, 0, -1),
-				new BlockPos(1, 0, -1),
-				new BlockPos(-1, 0, 0),
-				new BlockPos(0, 0, 0),
-				new BlockPos(1, 0, 0),
-				new BlockPos(-1, 0, 1),
-				new BlockPos(0, 0, 1),
-				new BlockPos(1, 0, 1),
-				/*y = 1*/
-				new BlockPos(-1, 1, -1),
-				new BlockPos(0, 1, -1),
-				new BlockPos(1, 1, -1),
-				new BlockPos(-1, 1, 0),
-				new BlockPos(0, 1, 0),
-				new BlockPos(1, 1, 0),
-				new BlockPos(-1, 1, 1),
-				new BlockPos(0, 1, 1),
-				new BlockPos(1, 1, 1)
-		};
+	public class PA {
 
 		public BlockPos pos;
 		public BlockPos crystal;
@@ -244,22 +248,21 @@ public class PistonAura3 extends Module {
 			double pist = .5;
 			for (EnumFacing f : EnumFacing.values()) {
 				BlockPos crypos = pos.offset(f);
-				//check
 				if (!mc.world.isAirBlock(crypos)) continue;
 				if (!mc.world.isAirBlock(crypos.offset(EnumFacing.UP))) continue;
 				if (!(mc.world.getBlockState(crypos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockObsidian) && !(mc.world.getBlockState(crypos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockEmptyDrops)) continue;
 				if (!mc.world.checkNoEntityCollision(Block.FULL_BLOCK_AABB.offset(crypos))) continue;
-				//check2
 				this.crystal = crypos;
 				this.pistonFacing = rotateHantaigawa(f);
-				if (!mc.world.isAirBlock(crypos.offset(pistonFacing))) continue;
+				if (pistonFacing == EnumFacing.UP) continue;
+				if (!mc.world.isAirBlock(crypos.offset(pistonFacing))) this.damage /= 2;
 
 				for (BlockPos off : pistonoff) {
 					BlockPos pispos = crystal.add(off);
 					if (pispos.equals(crypos)) continue;
 					if (crypos.offset(EnumFacing.UP).equals(pispos)) continue;
 					if (crypos.offset(pistonFacing).equals(pispos)) continue;
-					//if (mc.world.checkNoEntityCollision(Block.FULL_BLOCK_AABB.offset(pispos))) continue;
+					if (!mc.world.checkNoEntityCollision(Block.FULL_BLOCK_AABB.offset(pispos))) continue;
 					if (BlockUtils.isPlaceable(pispos, 0, true) == null) continue;
 					if (pistonFacing.getDirectionVec().getX()>0 && pispos.getX()-pist > crypos.getX()) continue;
 					if (pistonFacing.getDirectionVec().getY()>0 && pispos.getY()-pist > crypos.getY()) continue;

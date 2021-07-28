@@ -79,6 +79,7 @@ public class ModuleManager {
 		modules.add(new PistonAura2());
 		modules.add(new PistonAura3());
 		modules.add(new ChatSuffix());
+		modules.add(new Vclip());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {
