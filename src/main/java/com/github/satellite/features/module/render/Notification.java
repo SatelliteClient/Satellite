@@ -2,8 +2,6 @@ package com.github.satellite.features.module.render;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.lwjgl.input.Keyboard;
-
 import com.github.satellite.Satellite;
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventRenderGUI;
@@ -33,8 +31,8 @@ public class Notification extends Module {
 		panels.add(new OutlinePanel(gui, sr.getScaledWidth()-4, sr.getScaledHeight()-31, 104, 30-4, ColorUtils.alpha(ThemeManager.getTheme().dark(0), 0x40), false));
 		panels.add(new RectPanel(gui, sr.getScaledWidth()-4, sr.getScaledHeight()-31, 104, 30-4, ColorUtils.alpha(ThemeManager.getTheme().dark(0), 0x0f), false));
 		panels.add(new RectPanel(gui, sr.getScaledWidth()-4, sr.getScaledHeight()-31, 106, 30-2, ColorUtils.alpha(ThemeManager.getTheme().dark(0), 0x10), false));
-		panels.add(new TextPanel(gui, sr.getScaledWidth(), sr.getScaledHeight()-31+4, 106, 30-2, false, mc.fontRenderer, str1, new Color(ColorUtils.alpha(ThemeManager.getTheme().light(0), 0xff), Mode.EASEIN)));
-		panels.add(new TextPanel(gui, sr.getScaledWidth(), sr.getScaledHeight()-31+4, 106, 30-2, false, mc.fontRenderer, str1, new Color(ColorUtils.alpha(ThemeManager.getTheme().light(0), 0xff), Mode.EASEIN)));
+		panels.add(new TextPanel(gui, sr.getScaledWidth(), sr.getScaledHeight()-31+4, 106, 30-2, false, mc.fontRenderer, str1, new Color(ColorUtils.alpha(ThemeManager.getTheme().light(0), 0xff), Mode.EASEOUT)));
+		panels.add(new TextPanel(gui, sr.getScaledWidth(), sr.getScaledHeight()-31+4, 106, 30-2, false, mc.fontRenderer, str1, new Color(ColorUtils.alpha(ThemeManager.getTheme().light(0), 0xff), Mode.EASEOUT)));
 		panels.add(new RectPanel(gui, sr.getScaledWidth()-4, sr.getScaledHeight()-8, 104, 2.0F, ColorUtils.alpha(ThemeManager.getTheme().dark(0), 0xff), false));
 		panels.add(new RectPanel(gui, sr.getScaledWidth()-4, sr.getScaledHeight()-8, 0, 2.0F, ColorUtils.alpha(ThemeManager.getTheme().dark(1), 0xff), false));
 		Satellite.hud.gui.addPanel(panels.get(panels.size() - 7));
@@ -52,7 +50,7 @@ public class Notification extends Module {
 			int i = 0;
 			ScaledResolution sr = new ScaledResolution(mc);
 			for (Panel p : panels) {
-				p.setEaseType(Mode.EASEIN);
+				p.setEaseType(Mode.EASEOUT);
 				if (p instanceof TextPanel) {
 					p.x.easeTo((float) (p.x.timer.hasReached(10) ? sr.getScaledWidth_double()-104 : sr.getScaledWidth_double()-4), 100, true);
 					p.y.easeTo(sr.getScaledHeight()-31-30*(int)(panels.indexOf(p)/7)+4, 50, true);

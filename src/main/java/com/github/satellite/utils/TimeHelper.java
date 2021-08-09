@@ -9,7 +9,7 @@ public class TimeHelper {
 	private long lastMS;
 
 	public long getCurrentMS() {
-		return System.currentTimeMillis();
+		return Minecraft.getSystemTime();
 	}
 
 	public long getLastMS() {

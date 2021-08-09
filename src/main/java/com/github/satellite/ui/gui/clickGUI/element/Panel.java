@@ -2,11 +2,7 @@ package com.github.satellite.ui.gui.clickGUI.element;
 
 import com.github.satellite.event.listeners.EventSettingClicked;
 import com.github.satellite.features.module.Module;
-import com.github.satellite.setting.BooleanSetting;
-import com.github.satellite.setting.KeyBindSetting;
-import com.github.satellite.setting.ModeSetting;
-import com.github.satellite.setting.NumberSetting;
-import com.github.satellite.setting.Setting;
+import com.github.satellite.setting.*;
 import com.github.satellite.ui.gui.clickGUI.GuiClickGUI;
 import com.github.satellite.ui.theme.Theme;
 import com.github.satellite.ui.theme.ThemeManager;
@@ -14,13 +10,11 @@ import com.github.satellite.utils.render.ColorUtils;
 import com.github.satellite.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
 public class Panel {
 
@@ -184,7 +178,7 @@ public class Panel {
 	}
 
 	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if(selectedSetting != -1) {
+		if(selectedSetting != -1 && hoveredSetting != -1) {
 			Setting s = module.settings.get(selectedSetting);
 			if(s instanceof BooleanSetting) {
 				if(mouseButton == 1) {

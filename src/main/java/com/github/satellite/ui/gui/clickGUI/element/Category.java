@@ -47,16 +47,15 @@ public class Category {
 		this.y = y;
 		this.title = title;
 
-		this.panels = new ArrayList<Panel>();
+		this.panels = new ArrayList<>();
 
-		Collections.sort(module, new ModuleComparator());
+		Collections.sort(module, Comparator.comparing(one -> one.name));
 
 		int elementY=0;
 		for(Module m : module) {
 			this.panels.add(new Panel(x, y+elementY, m));
 			elementY += 20;
 		}
-
 	}
 
 	public void update(int mouseX, int mouseY) {

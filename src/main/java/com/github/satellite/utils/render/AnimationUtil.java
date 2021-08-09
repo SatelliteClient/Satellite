@@ -10,9 +10,9 @@ public class AnimationUtil {
 		switch(mode) {
 		case NONE:
 			return d;
-		case EASEIN:
-			return (float) (d - d * Math.pow(args.length>0?args[0]:0.5f, t));
 		case EASEOUT:
+			return (float) (d - d * Math.pow(args.length>0?args[0]:0.5f, t));
+		case EASEIN:
 			return d - d / t;
 		case LINEAR:
 			return d * t;
@@ -22,8 +22,8 @@ public class AnimationUtil {
 	
 	public enum Mode {
 		NONE,
-		EASEIN,
 		EASEOUT,
+		EASEIN,
 		LINEAR;
 	}
 }

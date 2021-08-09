@@ -32,15 +32,16 @@ public class Value extends EaseValue {
 			this.easeMode = Mode.NONE;
 		}
 	}
-	
+
 	public float getValue() {
 		return value;
 	}
-	
+
 	public void setValue(float value) {
 		this.value = value;
+		this.lastValue = value;
 	}
-	
+
 	@Override
 	public void updateEase() {
 		long time = timer.getCurrentMS() - timer.getLastMS();
@@ -49,7 +50,7 @@ public class Value extends EaseValue {
 			this.value = easeTo;
 		}
 	}
-	
+
 	public void easeTo(float value, float duration, boolean reset) {
 		if(this.easeTo != value) {
 			timer.reset();
@@ -58,14 +59,14 @@ public class Value extends EaseValue {
 		this.easeTo = value;
 		this.duration = duration;
 	}
-	
+
 	public enum num {
 		ZERO(0),
 		ONE(1),
 		TEN(10);
-		
+
 		public Value value;
-		
+
 		private num(float value) {
 			this.value = new Value(value, null);
 		}

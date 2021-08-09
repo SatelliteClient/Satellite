@@ -1,5 +1,7 @@
 package com.github.satellite.utils;
 
+import javax.annotation.Nullable;
+
 import com.github.satellite.Satellite;
 
 import net.minecraft.block.Block;
@@ -11,6 +13,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemEndCrystal;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -98,11 +101,42 @@ public class CrystalUtils {
 		Vec3d vec = getVectorForRotation(-y, x-90);
 		if (mc.player.inventory.offHandInventory.get(0).getItem().getClass().equals(Item.getItemById(426).getClass())) {
 			return mc.playerController.processRightClickBlock(mc.player, mc.world, pos.offset(EnumFacing.DOWN), EnumFacing.UP, vec, EnumHand.OFF_HAND);
-		}else if (InventoryUtils.pickItem(426) != -1) {
-			InventoryUtils.setSlot(InventoryUtils.pickItem(426));
+		}else if (InventoryUtils.pickItem(426, false) != -1) {
+			InventoryUtils.setSlot(InventoryUtils.pickItem(426, false));
 			return mc.playerController.processRightClickBlock(mc.player, mc.world, pos.offset(EnumFacing.DOWN), EnumFacing.UP, vec, EnumHand.MAIN_HAND);
 		}
 		return EnumActionResult.FAIL;
+	}
+
+	public static double getDamage(Vec3d pos, @Nullable Entity target) {
+		Entity entity = target == null ? mc.player : target;
+		float damage = 6.0F;
+		float f3 = damage * 2.0F;
+		Vec3d vec3d = pos;
+
+		if (!entity.isImmuneToExplosions())
+		{
+			double d12 = entity.getDistance(pos.x, pos.y, pos.z) / (double)f3;
+
+			if (d12 <= 1.0D)
+			{
+				double d5 = entity.posX - pos.x;
+				double d7 = entity.posY + (double)entity.getEyeHeight() - pos.y;
+				double d9 = entity.posZ - pos.z;
+				double d13 = (double)MathHelper.sqrt(d5 * d5 + d7 * d7 + d9 * d9);
+
+				if (d13 != 0.0D)
+				{
+					d5 = d5 / d13;
+					d7 = d7 / d13;
+					d9 = d9 / d13;
+					double d14 = (double)mc.world.getBlockDensity(pos, entity.getEntityBoundingBox());
+					double d10 = (1.0D - d12) * d14;
+					return (float)((int)((d10 * d10 + d10) / 2.0D * 7.0D * (double)f3 + 1.0D));
+				}
+			}
+		}
+		return 0;
 	}
 
 }

@@ -72,6 +72,8 @@ public class Panel {
 
 	public void onHover(long time) {}
 	public void deHover(long time) {}
+	public void onClicked(boolean isSelf, long time) {}
+	public void keyTyped(char typedChar, int keyCode) {}
 
 	public ElementManager getElementManager() {
 		return elementManager;

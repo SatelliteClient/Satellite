@@ -17,9 +17,7 @@ import com.github.satellite.utils.render.AnimationUtil.Mode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -52,6 +50,8 @@ public class GuiClickGUI extends GuiScreen {
 
 	public static int lastScreen = 0;
 
+	public Value scrolly;
+
 	public GuiClickGUI(int screen) {
 		//setup map
 		MAP_GUI = new ElementManager();
@@ -78,27 +78,28 @@ public class GuiClickGUI extends GuiScreen {
 		GuiClickGUI.currentScreen = new RectPanel(gui, 0, screen*h, 25, h, ThemeManager.getTheme().dark(3), false);
 
 		gui.addPanel(menu);
-		menu.setEaseType(Mode.EASEIN);
+		gui.addValue(this.scrolly = new Value(0, Mode.EASEOUT));
+		menu.setEaseType(Mode.EASEOUT);
 
 		GuiClickGUI.gui.addPanel(menu);
 
 		for(@SuppressWarnings("unused") String str : els) {
 			RectPanel p = new RectPanel(gui, 0, y, 20, h, ThemeManager.getTheme().dark(1), false);
-			p.setEaseType(Mode.EASEIN);
+			p.setEaseType(Mode.EASEOUT);
 			gui.addPanel(p);
 			menuElements.add(p);
 			y+=h;
 		}
 
 		gui.addPanel(currentScreen);
-		currentScreen.setEaseType(Mode.EASEIN);
+		currentScreen.setEaseType(Mode.EASEOUT);
 
 		FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
 
 		y=0;
 		for(String str : els) {
-			TextPanel p = new TextPanel(gui, 54, y+25, 0, 0, false, fr, str, new Color(255, 255, 255, 0, Mode.EASEIN));
-			p.setEaseType(Mode.EASEIN);
+			TextPanel p = new TextPanel(gui, 54, y+25, 0, 0, false, fr, str, new Color(255, 255, 255, 0, Mode.EASEOUT));
+			p.setEaseType(Mode.EASEOUT);
 			gui.addPanel(p);
 			menuElements.add(p);
 			y+=h;
@@ -139,6 +140,9 @@ public class GuiClickGUI extends GuiScreen {
 			width /= size;
 			GL11.glScalef(size, size, 1);
 		}
+		GL11.glTranslated(0, scrolly.value, 0);
+		mouseY -= scrolly.value;
+		scrolly.easeTo(Math.min(0, scrolly.easeTo+Mouse.getDWheel()*.2f), 50, true);
 		Satellite.themeManager.setTheme(((ClickGUI) ModuleManager.getModulebyClass(ClickGUI.class)).theme.getMode());
 
 		isCollided=false;
@@ -235,7 +239,7 @@ public class GuiClickGUI extends GuiScreen {
 		for(int i=1; i<=panels.size(); i++) {
 			panels.get(panels.size()-i).draw(mouseX, mouseY, partialTicks);
 		}*/
-		//gui.updateEasing();
+		gui.updateEasing();
 		//gui.draw(mouseX, mouseY, partialTicks);
 	}
 

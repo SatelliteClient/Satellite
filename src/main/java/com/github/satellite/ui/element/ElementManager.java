@@ -2,6 +2,7 @@ package com.github.satellite.ui.element;
 
 import com.github.satellite.utils.TimeHelper;
 import com.github.satellite.utils.render.easing.EaseValue;
+import com.github.satellite.utils.render.easing.Value;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ElementManager {
 
 	public CopyOnWriteArrayList<Panel> panels = new CopyOnWriteArrayList<>();
+	public CopyOnWriteArrayList<EaseValue> values = new CopyOnWriteArrayList<>();
 	public Panel currendPanel;
 	public Panel clickedPanel;
 	public boolean isCollided;
@@ -18,6 +20,9 @@ public class ElementManager {
 	public void updateTime() {
 		long deltaTime = timer.getCurrentMS() - timer.getLastMS();
 		timer.reset();
+		for (EaseValue v : values) {
+			v.timer.update(deltaTime);
+		}
 		for (Panel p : panels) {
 			for (EaseValue v : p.values) {
 				v.timer.update(deltaTime);
@@ -32,6 +37,9 @@ public class ElementManager {
 
 			if(mouseX>=p.x.value && mouseX<p.x.value+p.width.value && mouseY>=p.y.value && mouseY<p.y.value+p.height.value) {
 				this.clickedPanel = p;
+				p.onClicked(true, timer.getCurrentMS());
+			}else {
+				p.onClicked(false, timer.getCurrentMS());
 			}
 		}
 	}
@@ -71,6 +79,9 @@ public class ElementManager {
 
 	public void updateEasing() {
 		updateTime();
+		for(EaseValue value : values) {
+			value.updateEase();
+		}
 		for(Panel p : panels) {
 			for(EaseValue value : p.values) {
 				value.updateEase();
@@ -112,5 +123,15 @@ public class ElementManager {
 	enum RENDER_PHASE {
 		PRE,
 
+	}
+
+	public void addValue(EaseValue... values) {
+		this.values.addAll(Arrays.asList(values));
+	}
+
+	public void keyTyped(char typedChar, int keyCode) {
+		panels.forEach(p -> {
+			p.keyTyped(typedChar, keyCode);
+		});
 	}
 }

@@ -7,7 +7,9 @@ import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.NumberSetting;
+import com.github.satellite.ui.theme.ThemeManager;
 import com.github.satellite.utils.BlockUtils;
+import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.CrystalUtils;
 import com.github.satellite.utils.InventoryUtils;
 import com.github.satellite.utils.TargetUtils;
@@ -15,15 +17,31 @@ import com.github.satellite.utils.render.ColorUtils;
 import com.github.satellite.utils.render.RenderUtils;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
+import net.minecraft.block.BlockCompressedPowered;
 import net.minecraft.block.BlockEmptyDrops;
 import net.minecraft.block.BlockObsidian;
+import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.BlockPistonExtension;
+import net.minecraft.block.BlockPistonMoving;
+import net.minecraft.block.BlockRedstoneDiode;
+import net.minecraft.block.state.BlockPistonStructureHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityEnderCrystal;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.item.Item;
+import net.minecraft.network.play.client.CPacketPlayerDigging;
+import net.minecraft.network.play.client.CPacketPlayerDigging.Action;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.Color;
@@ -32,6 +50,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
+import org.omg.CORBA.BooleanSeqHelper;
+
 
 public class PistonAura3 extends Module {
 
@@ -69,12 +89,27 @@ public class PistonAura3 extends Module {
 	public void onEvent(Event<?> e) {
 		if (e instanceof EventUpdate) {
 			InventoryUtils.push();
+
+			int pitem = InventoryUtils.pickItem(33, false);
+			int cryst = InventoryUtils.pickItem(426, false);
+			int powtem1 = InventoryUtils.pickItem(152, false);
+			int powtem2 = InventoryUtils.pickItem(76, false);
+			if (pitem == -1 || cryst == -1 || (powtem1 == -1 && powtem2 == -1)) {
+				ClientUtils.addChatMsg("\u00A77[Satellite] \u00A74Item Not Found ");
+				toggle();
+			}
 			if (!TargetUtils.findTarget(range.value)) return;
 			Entity entity = TargetUtils.currentTarget;
 			Entity player= TargetUtils.currentTarget;
 			BlockPos playerPos = new BlockPos(TargetUtils.currentTarget);
 
 			int range = (int) this.range.value;
+
+			/*InventoryUtils.setSlot(InventoryUtils.pickItem(49, false));
+			BlockUtils.doPlace(BlockUtils.isPlaceable(playerPos.offset(EnumFacing.EAST, 1), 0, true), false);
+			BlockUtils.doPlace(BlockUtils.isPlaceable(playerPos.offset(EnumFacing.EAST, 1).offset(EnumFacing.UP), 0, true), false);
+			BlockUtils.doPlace(BlockUtils.isPlaceable(playerPos.offset(EnumFacing.EAST, 1).offset(EnumFacing.UP, 2), 0, true), false);
+			BlockUtils.doPlace(BlockUtils.isPlaceable(playerPos.offset(EnumFacing.UP, 2), 0, true), false);*/
 
 			if (attackable.isEmpty() || attackable.get(0).stage>delay1.value) {
 				attackable = new ArrayList<>();
@@ -95,7 +130,7 @@ public class PistonAura3 extends Module {
 								}
 							}
 							if (!b) continue;
-							float damage = getDamage(new Vec3d(pos).add(.5, 0, .5));
+							double damage = CrystalUtils.getDamage(new Vec3d(pos).add(.5, 0, .5), TargetUtils.currentTarget);
 							if (damage < min.value) continue;
 							PA pa = new PA(pos, damage);
 							if (!pa.canPA()) continue;
@@ -135,6 +170,7 @@ public class PistonAura3 extends Module {
 
 			for (Entity et : mc.world.loadedEntityList) {
 				if (et instanceof EntityEnderCrystal) {
+					if (et.getDistance(mc.player) > range.value) continue;
 					mc.playerController.attackEntity(mc.player, et);
 					mc.player.swingArm(EnumHand.MAIN_HAND);
 				}
@@ -144,44 +180,15 @@ public class PistonAura3 extends Module {
 		}
 		if (e instanceof EventRenderWorld) {
 			if (!attackable.isEmpty()) {
-				RenderUtils.drawBlockBox(attackable.get(0).crystal, ColorUtils.alpha(new Color(0xff0000), 0x20));
-				RenderUtils.drawBlockBox(attackable.get(0).piston, ColorUtils.alpha(new Color(0x00ff00), 0x20));
-				RenderUtils.drawBlockBox(attackable.get(0).power, ColorUtils.alpha(new Color(0x0000ff), 0x20));
+				Color col = ThemeManager.getTheme().dark(2);
+				RenderUtils.drawBlockBox(attackable.get(0).crystal, ColorUtils.alpha(col, 0x20));
+				RenderUtils.drawBlockBox(attackable.get(0).piston, ColorUtils.alpha(col, 0x20));
+				if (attackable.get(0).power != null)
+					RenderUtils.drawBlockBox(attackable.get(0).power, ColorUtils.alpha(col, 0x20));
 				RenderUtils.drawBlockBox(attackable.get(0).crystal.offset(attackable.get(0).pistonFacing), ColorUtils.alpha(new Color(0xffffff), 0x20));
 			}
 		}
 		super.onEvent(e);
-	}
-
-	public float getDamage(Vec3d pos) {
-		Entity entity = TargetUtils.currentTarget;
-		float damage = 6.0F;
-		float f3 = damage * 2.0F;
-		Vec3d vec3d = pos;
-
-		if (!entity.isImmuneToExplosions())
-		{
-			double d12 = entity.getDistance(pos.x, pos.y, pos.z) / (double)f3;
-
-			if (d12 <= 1.0D)
-			{
-				double d5 = entity.posX - pos.x;
-				double d7 = entity.posY + (double)entity.getEyeHeight() - pos.y;
-				double d9 = entity.posZ - pos.z;
-				double d13 = (double)MathHelper.sqrt(d5 * d5 + d7 * d7 + d9 * d9);
-
-				if (d13 != 0.0D)
-				{
-					d5 = d5 / d13;
-					d7 = d7 / d13;
-					d9 = d9 / d13;
-					double d14 = (double)mc.world.getBlockDensity(pos, entity.getEntityBoundingBox());
-					double d10 = (1.0D - d12) * d14;
-					return (float)((int)((d10 * d10 + d10) / 2.0D * 7.0D * (double)f3 + 1.0D));
-				}
-			}
-		}
-		return 0;
 	}
 
 	public EnumFacing getFacing(BlockPos position) {
@@ -236,34 +243,70 @@ public class PistonAura3 extends Module {
 		public BlockPos power;
 		public EnumFacing pistonFacing;
 		public BlockPos piston;
-		public float damage;
+		public double damage;
 
-		public PA(BlockPos pos, float damage) {
+		public PA(BlockPos pos, double damage) {
 			this.pos = pos;
 			this.damage = damage;
 			this.stage = 0;
 		}
 
 		public boolean canPA() {
+			boolean isTorch = InventoryUtils.pickItem(76, false) != -1;
 			double pist = .5;
 			for (EnumFacing f : EnumFacing.values()) {
 				BlockPos crypos = pos.offset(f);
+				//check
 				if (!mc.world.isAirBlock(crypos)) continue;
 				if (!mc.world.isAirBlock(crypos.offset(EnumFacing.UP))) continue;
+				if (!TargetUtils.canAttack(mc.player.getPositionVector().add(0, mc.player.getEyeHeight(), 0), new Vec3d(crypos).add(.5D, 1.7D, .5D))) continue;
 				if (!(mc.world.getBlockState(crypos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockObsidian) && !(mc.world.getBlockState(crypos.offset(EnumFacing.DOWN)).getBlock() instanceof BlockEmptyDrops)) continue;
 				if (!mc.world.checkNoEntityCollision(Block.FULL_BLOCK_AABB.offset(crypos))) continue;
+				if (mc.player.getDistanceSq((double)crypos.getX() + 0.5D, (double)crypos.getY() + 0.5D, (double)crypos.getZ() + 0.5D) >= 64.0D) continue;
+				//check2
 				this.crystal = crypos;
 				this.pistonFacing = rotateHantaigawa(f);
-				if (pistonFacing == EnumFacing.UP) continue;
-				if (!mc.world.isAirBlock(crypos.offset(pistonFacing))) this.damage /= 2;
+				if (pistonFacing == EnumFacing.DOWN) continue;
+				if (!mc.world.isAirBlock(crypos.offset(pistonFacing))) continue;
 
 				for (BlockPos off : pistonoff) {
 					BlockPos pispos = crystal.add(off);
 					if (pispos.equals(crypos)) continue;
 					if (crypos.offset(EnumFacing.UP).equals(pispos)) continue;
 					if (crypos.offset(pistonFacing).equals(pispos)) continue;
+					EnumFacing sfac = EnumFacing.getDirectionFromEntityLiving(pispos, mc.player);
+					if (sfac.getAxis() == Axis.Y) {
+						if (pistonFacing != sfac) continue;
+					}
+					if (pistonFacing.getAxis() == Axis.Y) {
+						if (pistonFacing != sfac) continue;
+					}
+					this.power = null;
+					if (mc.world.isBlockPowered(pispos)) {
+						if (BlockUtils.isPlaceable(pispos, 0, true) == null) continue;
+					}else {
+						for (EnumFacing fa : EnumFacing.values()) {
+							BlockPos powpos = pispos.offset(fa);
+							if (pispos.equals(powpos)) continue;
+							if (pispos.offset(pistonFacing).equals(powpos)) continue;
+							if (crypos.equals(powpos)) continue;
+							if (crypos.offset(EnumFacing.UP).equals(powpos)) continue;
+							if (mc.player.getDistanceSq((double)powpos.getX() + 0.5D, (double)powpos.getY() + 0.5D, (double)powpos.getZ() + 0.5D) >= 64.0D) continue;
+							if (BlockUtils.isPlaceable(powpos, 0, true) == null) continue;
+
+							if (pistonFacing.getDirectionVec().getX()>0 && powpos.getX()-pist > crypos.getX()) continue;
+							if (pistonFacing.getDirectionVec().getY()>0 && powpos.getY()-pist > crypos.getY()) continue;
+							if (pistonFacing.getDirectionVec().getZ()>0 && powpos.getZ()-pist > crypos.getZ()) continue;
+							if (pistonFacing.getDirectionVec().getX()<0 && powpos.getX()+pist < crypos.getX()) continue;
+							if (pistonFacing.getDirectionVec().getY()<0 && powpos.getY()+pist < crypos.getY()) continue;
+							if (pistonFacing.getDirectionVec().getZ()<0 && powpos.getZ()+pist < crypos.getZ()) continue;
+							if (!mc.world.isAirBlock(powpos)) continue;
+							this.power = powpos;
+						}
+						if (power == null) continue;
+					}
+					if (mc.player.getDistanceSq((double)pispos.getX() + 0.5D, (double)pispos.getY() + 0.5D, (double)pispos.getZ() + 0.5D) >= 64.0D) continue;
 					if (!mc.world.checkNoEntityCollision(Block.FULL_BLOCK_AABB.offset(pispos))) continue;
-					if (BlockUtils.isPlaceable(pispos, 0, true) == null) continue;
 					if (pistonFacing.getDirectionVec().getX()>0 && pispos.getX()-pist > crypos.getX()) continue;
 					if (pistonFacing.getDirectionVec().getY()>0 && pispos.getY()-pist > crypos.getY()) continue;
 					if (pistonFacing.getDirectionVec().getZ()>0 && pispos.getZ()-pist > crypos.getZ()) continue;
@@ -274,29 +317,9 @@ public class PistonAura3 extends Module {
 					if (!mc.world.isAirBlock(pispos.offset(pistonFacing))) continue;
 					if (pispos.getY()<crystal.getY() && pistonFacing.getAxis() != Axis.Y) continue;
 					this.piston = pispos;
-
-					for (EnumFacing fa : EnumFacing.values()) {
-						BlockPos powpos = pispos.offset(fa);
-						if (pispos.equals(powpos)) continue;
-						if (pispos.offset(pistonFacing).equals(powpos)) continue;
-						if (crypos.equals(powpos)) continue;
-						if (crypos.offset(EnumFacing.UP).equals(powpos)) continue;
-						if (!mc.world.checkNoEntityCollision(Block.FULL_BLOCK_AABB.offset(powpos))) continue;
-
-						if (pistonFacing.getDirectionVec().getX()>0 && powpos.getX()-pist > crypos.getX()) continue;
-						if (pistonFacing.getDirectionVec().getY()>0 && powpos.getY()-pist > crypos.getY()) continue;
-						if (pistonFacing.getDirectionVec().getZ()>0 && powpos.getZ()-pist > crypos.getZ()) continue;
-						if (pistonFacing.getDirectionVec().getX()<0 && powpos.getX()+pist < crypos.getX()) continue;
-						if (pistonFacing.getDirectionVec().getY()<0 && powpos.getY()+pist < crypos.getY()) continue;
-						if (pistonFacing.getDirectionVec().getZ()<0 && powpos.getZ()+pist < crypos.getZ()) continue;
-						if (!mc.world.isAirBlock(powpos)) continue;
-						this.power = powpos;
-
-						return true;
-					}
+					return true;
 				}
 			}
-
 			return false;
 		}
 
@@ -305,7 +328,8 @@ public class PistonAura3 extends Module {
 		public void updatePA(EventMotion event) {
 			int obsiitem = InventoryUtils.pickItem(49, false);
 			int pitem = InventoryUtils.pickItem(33, false);
-			int powtem = InventoryUtils.pickItem(152, false);
+			int powtem1 = InventoryUtils.pickItem(152, false);
+			int powtem2 = InventoryUtils.pickItem(76, false);
 			int cryst = InventoryUtils.pickItem(426, false);
 
 			switch (pistonFacing) {
@@ -339,18 +363,31 @@ public class PistonAura3 extends Module {
 				InventoryUtils.setSlot(pitem);
 				BlockUtils.doPlace(BlockUtils.isPlaceable(piston, 0, false), true);
 
-				InventoryUtils.setSlot(powtem);
-				BlockUtils.doPlace(BlockUtils.isPlaceable(power, 0, false), true);
+				if (power != null) {
+					InventoryUtils.setSlot(powtem1);
+					InventoryUtils.setSlot(powtem2);
+					BlockUtils.doPlace(BlockUtils.isPlaceable(power, 0, false), true);
+				}
+
+				InventoryUtils.setSlot(pitem);
+				BlockUtils.doPlace(BlockUtils.isPlaceable(piston, 0, false), true);
 
 				InventoryUtils.setSlot(cryst);
 				CrystalUtils.placeCrystal(crystal);
 
-				BlockUtils.doPlace(BlockUtils.isPlaceable(piston, 0, false), true);
+				if (power != null) {
+					InventoryUtils.setSlot(powtem1);
+					InventoryUtils.setSlot(powtem2);
+					BlockUtils.doPlace(BlockUtils.isPlaceable(power, 0, false), true);
+				}
 			}
 
 			if (stage == delay2.value+1) {
+				InventoryUtils.setSlot(cryst);
 				mc.world.setBlockToAir(piston);
-				mc.world.setBlockToAir(power);
+				if (power != null) {
+					mc.world.setBlockToAir(power);
+				}
 			}
 			stage ++;
 		}

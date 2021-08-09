@@ -80,6 +80,9 @@ public class ModuleManager {
 		modules.add(new PistonAura3());
 		modules.add(new ChatSuffix());
 		modules.add(new Vclip());
+		modules.add(new CrystalAura());
+		modules.add(new HoleESP());
+		modules.add(new AutoTotem());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {
