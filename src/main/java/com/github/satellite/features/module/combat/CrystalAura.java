@@ -78,7 +78,8 @@ public class CrystalAura extends Module {
 			int crystal = InventoryUtils.pickItem(426, false);
 			
 			crys = new ArrayList<>();
-
+			BlockPos playerPos = new BlockPos(TargetUtils.currentTarget);
+			
 			for (int dx = -range; dx <= range; dx++) {
 				for (int dy = -range; dy <= range; dy++) {
 					for (int dz = -range; dz <= range; dz++) {
@@ -106,20 +107,33 @@ public class CrystalAura extends Module {
 						if (damage > maxdmg && selfdmg < self.getValue()) {
 							crys.add(new Crystal(pos, damage, selfdmg));
 						}
+						
+						//ClientUtils.addChatMsg("Pos   : " + pos);
+						//ClientUtils.addChatMsg("MaxPos: " + maxpos);
+						//ClientUtils.addChatMsg("Player: " + playerPos);
 					}
 				}
 			}
 
-			crys.sort((a, b) -> {
-				if (a == null && b == null)
+			crys.sort(new Comparator<Crystal>() {
+				@Override
+				public int compare(Crystal a, Crystal b) {
+					if (a == null && b == null)
+						return 0;
+					
+					if (a.damage-a.selfDamage>b.damage-b.selfDamage)
+						return -1;
+					
+					if (a.damage-a.selfDamage<b.damage-b.selfDamage)
+						return 1;
+					/*if (a.damage>b.damage)
+						return -1;
+					
+					if (a.damage<b.damage)
+						return 1;*/
+					
 					return 0;
-
-				if (a.damage-a.selfDamage>b.damage-b.selfDamage)
-					return -1;
-
-				if (a.damage-a.selfDamage<b.damage-b.selfDamage)
-					return 1;
-				return 0;
+				}
 			});
 			
 
@@ -136,7 +150,7 @@ public class CrystalAura extends Module {
                 if (target instanceof EntityEnderCrystal) {
         			if (!crys.isEmpty()) {
         				Crystal c = crys.get(0);
-        				if (c.pos.equals(new BlockPos(target))) 
+        				if (c.pos.equals(new BlockPos(target)))
         					mc.getConnection().sendPacket(new CPacketUseEntity(target));
         			}
                 }
@@ -145,7 +159,9 @@ public class CrystalAura extends Module {
 			
 			InventoryUtils.pop();
 		}
-		if (e instanceof EventRenderWorld) {
+		if (e instanceof EventRenderWorld && e.isPost()) {
+			for (Crystal c : crys) {
+			}
 			if (!crys.isEmpty()) {
 				Crystal c = crys.get(0);
 				RenderUtils.drawBlockBox(c.pos.offset(EnumFacing.DOWN), ColorUtils.alpha(ThemeManager.getTheme().light(1), 0x40));
@@ -157,7 +173,7 @@ public class CrystalAura extends Module {
 		super.onEvent(e);
 	}
     
-	public static class Crystal {
+	public class Crystal {
 		
 		public BlockPos pos;
 		public double damage;

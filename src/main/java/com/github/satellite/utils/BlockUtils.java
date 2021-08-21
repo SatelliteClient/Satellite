@@ -3,12 +3,8 @@ package com.github.satellite.utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.network.play.client.CPacketHeldItemChange;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -32,14 +28,6 @@ public class BlockUtils {
 			return false;
 
 		return event.doPlace(swing);
-	}
-
-	public static boolean doPlaceSilent(BlockUtils event, int slot, boolean swing) {
-		if (event == null || !mc.player.inventory.isHotbar(slot))
-			return false;
-		if (swing)
-			mc.player.swingArm(EnumHand.MAIN_HAND);
-		return event.silentPlace(slot) == EnumActionResult.SUCCESS;
 	}
 
 	public static BlockUtils isPlaceable(BlockPos pos, double dist, boolean Collide) {
@@ -126,7 +114,7 @@ public class BlockUtils {
 		this.roty=-y;
 		this.rotx=x-90;
 
-		EnumActionResult enumactionresult = mc.playerController.processRightClickBlock(mc.player, mc.world, pos.offset(f, -1), f, vec, EnumHand.MAIN_HAND);
+		EnumActionResult enumactionresult = mc.playerController.processRightClickBlock(mc.player, mc.world, new BlockPos(pos.getX() - f.getDirectionVec().getX(), pos.getY() - f.getDirectionVec().getY(), pos.getZ() - f.getDirectionVec().getZ()), f, vec, EnumHand.MAIN_HAND);
 		if (enumactionresult == EnumActionResult.SUCCESS)
 		{
 			if (swing)
@@ -142,22 +130,7 @@ public class BlockUtils {
 	}
 
 	public void doBreak() {
-		mc.playerController.onPlayerDamageBlock(pos.offset(f, -1), f);
-	}
-
-	public EnumActionResult silentPlace(int slot) {
-		if (!mc.player.inventory.isHotbar(slot)) return EnumActionResult.FAIL;
-		int s = mc.player.inventory.currentItem;
-		mc.player.inventory.currentItem = slot;
-		ItemBlock block = (ItemBlock) mc.player.inventory.mainInventory.get(slot).getItem();
-		IBlockState a =  block.getBlock().getStateForPlacement(mc.world, pos.offset(f, -1), f, 0, 0, 0, 0, mc.player);
-		mc.world.setBlockState(pos, a);
-//		if (a == EnumActionResult.SUCCESS) {
-		mc.getConnection().sendPacket(new CPacketHeldItemChange(slot));
-		mc.getConnection().sendPacket(new CPacketPlayerTryUseItemOnBlock(pos.offset(f, -1), f, EnumHand.MAIN_HAND, 0, 0, 0));
-//		}
-		mc.player.inventory.currentItem = s;
-		return EnumActionResult.SUCCESS;
+		mc.playerController.onPlayerDamageBlock(new BlockPos(pos.getX() - f.getDirectionVec().getX(), pos.getY() - f.getDirectionVec().getY(), pos.getZ() - f.getDirectionVec().getZ()), f);
 	}
 
 	protected final Vec3d getVectorForRotation(float pitch, float yaw)

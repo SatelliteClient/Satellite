@@ -13,7 +13,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemEndCrystal;
-import net.minecraft.network.play.client.CPacketHeldItemChange;
 import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -107,27 +106,6 @@ public class CrystalUtils {
 			return mc.playerController.processRightClickBlock(mc.player, mc.world, pos.offset(EnumFacing.DOWN), EnumFacing.UP, vec, EnumHand.MAIN_HAND);
 		}
 		return EnumActionResult.FAIL;
-	}
-
-	public static boolean placeCrystalSilent(BlockPos pos) {
-		pos.offset(EnumFacing.DOWN);
-		double dx=(pos.getX()+0.5-mc.player.posX);
-		double dy=(pos.getY()+0.5-mc.player.posY) - .5 -mc.player.getEyeHeight();
-		double dz=(pos.getZ()+0.5-mc.player.posZ);
-
-		double x=getDirection2D(dz, dx);
-		double y=getDirection2D(dy, Math.sqrt(dx*dx+dz*dz));
-		int slot = InventoryUtils.pickItem(426, false);
-		if (slot == -1 && mc.player.inventory.offHandInventory.get(0).getItem() != Items.END_CRYSTAL) return false;
-
-		Vec3d vec = getVectorForRotation(-y, x-90);
-		if (mc.player.inventory.offHandInventory.get(0).getItem() == Items.END_CRYSTAL) {
-			mc.getConnection().sendPacket(new CPacketPlayerTryUseItemOnBlock(pos.offset(EnumFacing.DOWN), EnumFacing.UP, EnumHand.OFF_HAND, 0, 0, 0));
-		}else if (InventoryUtils.pickItem(426, false) != -1) {
-			mc.getConnection().sendPacket(new CPacketHeldItemChange(slot));
-			mc.getConnection().sendPacket(new CPacketPlayerTryUseItemOnBlock(pos.offset(EnumFacing.DOWN), EnumFacing.UP, EnumHand.MAIN_HAND, 0, 0, 0));
-		}
-		return true;
 	}
 
 	public static double getDamage(Vec3d pos, @Nullable Entity target) {
