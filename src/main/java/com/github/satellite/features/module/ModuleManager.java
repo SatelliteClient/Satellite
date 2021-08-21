@@ -83,6 +83,7 @@ public class ModuleManager {
 		modules.add(new CrystalAura());
 		modules.add(new HoleESP());
 		modules.add(new AutoTotem());
+		modules.add(new FakePlayer());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {
