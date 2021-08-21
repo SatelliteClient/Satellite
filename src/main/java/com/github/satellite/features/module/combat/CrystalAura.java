@@ -18,8 +18,11 @@ import net.minecraft.block.BlockEmptyDrops;
 import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityEnderCrystal;
+import net.minecraft.network.play.client.CPacketHeldItemChange;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.network.play.client.CPacketUseEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
@@ -63,23 +66,23 @@ public class CrystalAura extends Module {
 
 	@Override
 	public void onEvent(Event<?> e) {
-		
+
 		if (e instanceof EventUpdate) {
-			InventoryUtils.push();
-			
+
+
 			if (!TargetUtils.findTarget(range.value)) return;
 			Entity player = TargetUtils.currentTarget;
 			//BlockPos playerPos = new BlockPos(TargetUtils.currentTarget);
-			
+
 			int range = (int) this.range.value;
 			float maxdmg = 0;
 			BlockPos maxpos = null;
 
 			int crystal = InventoryUtils.pickItem(426, false);
-			
+
 			crys = new ArrayList<>();
 			BlockPos playerPos = new BlockPos(TargetUtils.currentTarget);
-			
+
 			for (int dx = -range; dx <= range; dx++) {
 				for (int dy = -range; dy <= range; dy++) {
 					for (int dz = -range; dz <= range; dz++) {
@@ -91,7 +94,7 @@ public class CrystalAura extends Module {
 						if (!TargetUtils.canAttack(mc.player.getPositionVector().add(0, mc.player.getEyeHeight(), 0), new Vec3d(pos).add(.5D, 1.7D, .5D))) continue;//1.7D
 						double damage = CrystalUtils.getDamage(new Vec3d(pos).add(.5D, 0.0D, .5D), TargetUtils.currentTarget);
 						double selfdmg = CrystalUtils.getDamage(new Vec3d(pos).add(.5D, 0.0D, .5D), null);
-						
+
 						if (damage < min.value) continue;
 						if (!mc.world.isAirBlock(pos.offset(EnumFacing.UP))) continue;
 						//if (!mc.world.checkNoEntityCollision(Block.FULL_BLOCK_AABB.offset(pos))) continue;
@@ -103,11 +106,11 @@ public class CrystalAura extends Module {
 							}
 						}
 						if (col) continue;
-						
+
 						if (damage > maxdmg && selfdmg < self.getValue()) {
 							crys.add(new Crystal(pos, damage, selfdmg));
 						}
-						
+
 						//ClientUtils.addChatMsg("Pos   : " + pos);
 						//ClientUtils.addChatMsg("MaxPos: " + maxpos);
 						//ClientUtils.addChatMsg("Player: " + playerPos);
@@ -120,44 +123,45 @@ public class CrystalAura extends Module {
 				public int compare(Crystal a, Crystal b) {
 					if (a == null && b == null)
 						return 0;
-					
+
 					if (a.damage-a.selfDamage>b.damage-b.selfDamage)
 						return -1;
-					
+
 					if (a.damage-a.selfDamage<b.damage-b.selfDamage)
 						return 1;
 					/*if (a.damage>b.damage)
 						return -1;
-					
+
 					if (a.damage<b.damage)
 						return 1;*/
-					
+
 					return 0;
 				}
 			});
-			
+
 
 			if (!crys.isEmpty())
 				maxpos = crys.get(0).pos;
 			if (maxpos != null) {
-				InventoryUtils.setSlot(crystal);
-				CrystalUtils.placeCrystal(maxpos);
+				mc.getConnection().sendPacket(new CPacketHeldItemChange(crystal));
+				mc.getConnection().sendPacket(new CPacketPlayerTryUseItemOnBlock(maxpos.offset(EnumFacing.DOWN), EnumFacing.UP, EnumHand.MAIN_HAND, 0, 0, 0));
+				mc.getConnection().sendPacket(new CPacketHeldItemChange(InventoryUtils.getSlot()));
 			}
 
 			for (Entity target : mc.world.loadedEntityList) {
 				if (player.getDistance(target) > range)
 					continue;
-                if (target instanceof EntityEnderCrystal) {
-        			if (!crys.isEmpty()) {
-        				Crystal c = crys.get(0);
-        				if (c.pos.equals(new BlockPos(target)))
-        					mc.getConnection().sendPacket(new CPacketUseEntity(target));
-        			}
-                }
-            }
-			
-			
-			InventoryUtils.pop();
+				if (target instanceof EntityEnderCrystal) {
+					if (!crys.isEmpty()) {
+						Crystal c = crys.get(0);
+						if (c.pos.equals(new BlockPos(target)))
+							mc.getConnection().sendPacket(new CPacketUseEntity(target));
+					}
+				}
+			}
+
+
+
 		}
 		if (e instanceof EventRenderWorld && e.isPost()) {
 			for (Crystal c : crys) {
