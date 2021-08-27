@@ -83,7 +83,10 @@ public class ModuleManager {
 		modules.add(new CrystalAura());
 		modules.add(new HoleESP());
 		modules.add(new AutoTotem());
-		modules.add(new FakePlayer());
+		modules.add(new FakePlayer());;
+		modules.add(new Burrow());
+		modules.add(new Anchor());
+		modules.add(new ForcePlace());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {
@@ -218,10 +221,7 @@ public class ModuleManager {
 					}
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-					SettingFile.delete();
-				} catch (ClassCastException e) {
+				} catch (IOException | ClassCastException | StringIndexOutOfBoundsException e) {
 					e.printStackTrace();
 					SettingFile.delete();
 				}
