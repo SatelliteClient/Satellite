@@ -1,6 +1,7 @@
 package com.github.satellite.features.module.movement;
 
 import com.github.satellite.event.Event;
+import com.github.satellite.event.listeners.EventJump;
 import com.github.satellite.event.listeners.EventMotion;
 import com.github.satellite.event.listeners.EventPlayerInput;
 import com.github.satellite.event.listeners.EventUpdate;
@@ -8,9 +9,14 @@ import com.github.satellite.features.module.Module;
 import com.github.satellite.mixin.client.AccessorEntityPlayer;
 import com.github.satellite.setting.BooleanSetting;
 import com.github.satellite.setting.ModeSetting;
+import com.github.satellite.setting.NumberSetting;
 import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MovementUtils;
+import com.google.common.base.Supplier;
+
 import net.minecraft.potion.Potion;
+import net.minecraft.util.math.BlockPos;
+
 import org.lwjgl.input.Keyboard;
 
 public class LongJump extends Module {
@@ -20,17 +26,21 @@ public class LongJump extends Module {
 	}
 
 	ModeSetting mode;
-
-	BooleanSetting useTimer;
+	NumberSetting speed, fallSpeed, jumpForce;
+	BooleanSetting useTimer, autoJump;
 
 	boolean inTimer;
 	int state;
 
 	@Override
 	public void init() {
-		this.mode = new ModeSetting("Mode", "Vanilla", new String[] {"Vanilla", "NCPLow", "NCPHigh", "AAC"});
-		this.useTimer = new BooleanSetting("UseTimer", true);
-		addSetting(mode, useTimer);
+		addSetting(this.mode = new ModeSetting("Mode", null, "Vanilla", new String[] {"Vanilla", "NCPLow", "NCPHigh", "AAC"}));
+		addSetting(this.speed = new NumberSetting("Speed", null, 1, 0, 10, .1));
+		Supplier<Boolean> suppilier = () -> mode.is("Vanilla");
+		addSetting(this.fallSpeed = new NumberSetting("FallSpeed", suppilier, .04, 0, 1, .01));
+		addSetting(this.jumpForce = new NumberSetting("JumpForce", suppilier, .42, 0, 5, .01));
+		addSetting(this.useTimer = new BooleanSetting("UseTimer", null, true));
+		addSetting(this.autoJump = new BooleanSetting("AutoJump", null, false));
 		super.init();
 	}
 
@@ -42,14 +52,32 @@ public class LongJump extends Module {
 
 		switch(mode.getMode()) {
 			case "Vanilla":
-				if(e instanceof EventUpdate && e.isPre()) {
-					MovementUtils.Strafe(1);
+				if(e instanceof EventMotion && e.isPre()) {
+					if (mc.player.onGround && autoJump.isEnable()) {
+						mc.player.jump();
+					}
+					MovementUtils.Strafe(speed.value);
+					if (MovementUtils.isMoving()) {
+//						if (Math.abs(mc.player.motionX) > Math.abs(mc.player.motionZ)) {
+//							mc.player.setPosition(mc.player.posX, mc.player.posY, (int)mc.player.posZ+.5D);
+//						}else {
+//							mc.player.setPosition((int)mc.player.posX+.5D, mc.player.posY, mc.player.posZ);
+//						}
+					}else {
+						double y = mc.player.posY;
+						MovementUtils.setPosition(new BlockPos(mc.player));
+						MovementUtils.yClip(y);
+					}
+					mc.player.motionY += (mc.player.capabilities.isFlying?0:.08)-fallSpeed.value;
+				}
+				if (e instanceof EventJump) {
+					mc.player.motionY = jumpForce.value;
 				}
 				break;
 
 			case "NCPLow":
 			{
-				if(e instanceof EventMotion && e.isPre()) {
+				if(e instanceof EventMotion && e.isPre()){
 					if(mc.player.posY == mc.player.lastTickPosY && mc.player.collidedVertically && mc.player.onGround && MovementUtils.isMoving()) {
 						MovementUtils.Strafe(0.1D);
 						mc.player.setPosition(mc.player.lastTickPosX+mc.player.motionX, mc.player.lastTickPosY, mc.player.lastTickPosZ+mc.player.motionZ);
@@ -62,9 +90,9 @@ public class LongJump extends Module {
 					}
 					if(mc.player.motionY == .33319999363422365 && MovementUtils.isMoving()) {
 						if (mc.player.isPotionActive(Potion.getPotionById(1))) {
-							MovementUtils.Strafe(1.34D);
+							MovementUtils.Strafe(speed.value*1.34D);
 						} else {
-							MovementUtils.Strafe(1.261D);
+							MovementUtils.Strafe(speed.value*1.261D);
 						}
 					}
 					MovementUtils.Strafe(MovementUtils.getSpeed());
@@ -100,7 +128,7 @@ public class LongJump extends Module {
 								progress=-1;
 							}
 
-							if(progress == 0) {
+							if(progress == 2) {
 								mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
 								for (double d : ncpp) {
 									MovementUtils.vClip2(d, false);
@@ -116,7 +144,7 @@ public class LongJump extends Module {
 
 							if(progress == 0) MovementUtils.Strafe(.29D);
 							if(progress == 1) {
-								MovementUtils.Strafe(.7D);
+								MovementUtils.Strafe(speed.value*.7D);
 							}
 							if(progress == 7) {
 								MovementUtils.Strafe(.26D);
@@ -135,8 +163,8 @@ public class LongJump extends Module {
 					if(mc.player.onGround) {
 						mc.player.motionY=0.42;
 					}
-					mc.player.motionX *= 1.08;
-					mc.player.motionZ *= 1.08;
+					mc.player.motionX *= speed.value*1.08;
+					mc.player.motionZ *= speed.value*1.08;
 					mc.player.motionY += 0.05999D;
 					mc.player.motionY += 0.01D;
 				}

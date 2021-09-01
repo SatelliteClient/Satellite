@@ -165,4 +165,13 @@ public class MovementUtils {
 	public static double nextSpeed(double d) {
 		return d*.9900000095367432D;
 	}
+
+	public static Vec3d getInputVec2d() {
+		int x = (mc.player.movementInput.rightKeyDown?1:0)-(mc.player.movementInput.leftKeyDown?1:0);
+		int z = (mc.player.movementInput.forwardKeyDown?1:0)-(mc.player.movementInput.backKeyDown?1:0);
+		double r = Math.atan2(z, x)-1.57079633-Math.toRadians(mc.player.rotationYaw);
+		double d = Math.sqrt(x*x+z*z);
+		boolean f = d == 0;
+		return new Vec3d(f?0:Math.sin(r), 0, f?0:Math.cos(r));
+	}
 }

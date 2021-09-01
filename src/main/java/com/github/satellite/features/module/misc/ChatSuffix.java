@@ -57,7 +57,7 @@ public class ChatSuffix extends Module{
 					String send = message + Sep2 + "\ua731\u1d00\u1d1b\u1d07\u029f\u029f\u026a\u1d1b\u1d07";
 					
 					if(send.length() > 255) return;
-					((AccessorCPacketChatMessage)((CPacketChatMessage) p)).message(send);
+					((AccessorCPacketChatMessage) p).message(send);
 				}
 			}
 		}

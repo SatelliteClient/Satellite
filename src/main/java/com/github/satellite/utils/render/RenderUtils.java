@@ -357,6 +357,8 @@ public final class RenderUtils {
 		double y=pos.getY();
 		double z=pos.getZ();
 
+		color = ColorUtils.alpha(color, color.getAlpha()-20);
+
 		x -= mc.getRenderManager().viewerPosX;
 		y -= mc.getRenderManager().viewerPosY;
 		z -= mc.getRenderManager().viewerPosZ;

@@ -3,9 +3,10 @@ package com.github.satellite.features.module.movement;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventMotion;
-import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.setting.ModeSetting;
+import com.github.satellite.setting.NumberSetting;
+import com.github.satellite.utils.ClientUtils;
 import com.github.satellite.utils.MovementUtils;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
@@ -15,118 +16,92 @@ public class Phase extends Module {
 	public Phase() {
 		super("Phase", Keyboard.KEY_H, Category.MOVEMENT);
 	}
-	
+
+	ModeSetting mode;
+	NumberSetting limit;
+
 	@Override
 	public void init() {
-		settings.add(new ModeSetting("Mode", "NCP", new String[] {"NCP", "AAC", "Matrix"}));
+		settings.add(mode = new ModeSetting("Mode", null, "NCP", new String[] {"Vanilla", "NCP", "AAC", "Matrix"}));
+		settings.add(limit = new NumberSetting("MaxDistance", () -> mode.is("Vanilla"), 2, 0, 5, .1));
 		super.init();
 	}
-	
+
 	@Override
 	public void onDisable() {
 		mc.player.capabilities.isFlying = false;
 		tickTimer=0;
 		teleportId=0;
 		clearLagTeleportId=0;
+		ClientUtils.setTimer(1.0F);
 		super.onDisable();
 	}
 
-	double lastTickSpeed=0;
 	double tickTimer=0;
-	int CansellingTeleport;
 	int clearLagTeleportId;
 	int teleportId;
-	int speed;
-	int reset;
 
 	@Override
 	public void onEvent(Event<?> e) {
-		switch(((ModeSetting)settings.get(1)).getMode()) {
-		
-		case "NCP":
-		{
-			if(e instanceof EventUpdate) {
-				if(mc.player.collidedVertically) {
-					double speed = 1;
-					double late = 60;
-					int tick = 50;
-					
-					late = 1 / late;
-					late = 1 - late;
-					MovementUtils.Strafe(speed - speed*Math.pow(late, tickTimer%tick));
+		switch(mode.getMode()) {
+			case "Vanilla":
+				if (e instanceof EventMotion && e.isPost()) {
+					boolean canClip = false;
 
-					if (tick - (tickTimer%tick) < 20) {
-						MovementUtils.Strafe(1.98f);
-						mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
+					Vec3d vec = MovementUtils.getInputVec2d();
+					double x, dx, dz;
+					dx = vec.x;
+					dz = vec.z;
+					for (x=1; x<limit.value*10; x++) {
+						if (!mc.world.collidesWithAnyBlock(mc.player.getEntityBoundingBox().offset(dx*x*.1, 0, dz*x*.1))) {
+							canClip = true;
+							break;
+						}
 					}
+					if (mc.player.collidedHorizontally && canClip) {
+						Vec3d m = MovementUtils.getMotionVector();
+						mc.player.setPosition(mc.player.posX+vec.x*0.0625D, mc.player.posY, mc.player.posZ+vec.z*0.0625D);
+						MovementUtils.vClip2(0, mc.player.onGround);
+						mc.player.setPosition(mc.player.posX+dx*x*.1, mc.player.posY, mc.player.posZ+dz*x*.1);
+						MovementUtils.setMotionVector(m);
+						tickTimer = 0;
+					}
+				}
+				break;
+			case "NCP":
 
-					mc.player.setPosition(mc.player.posX + mc.player.motionX, mc.player.posY, mc.player.posZ + mc.player.motionZ);
+			case "AAC": {
+				break;
+			}
+
+
+			case "Matrix":
+			{
+				if(e instanceof EventMotion && e.isPre()) {
+				/*EventMotion event = (EventMotion)e;
+				ClientUtils.setTimer(2.0F);
+				if (mc.player.fallDistance>.5F) {
+					MovementUtils.freeze();
+					mc.player.fallDistance = 0;
+					ClientUtils.setTimer(0.05F);
+					event.onGround = true;
+				}*/
+					EventMotion event = (EventMotion)e;
+
+					Vec3d lpos = mc.player.getPositionVector();
+					MovementUtils.Strafe(7);
+					mc.player.posX+=mc.player.motionX;
+					mc.player.posZ+=mc.player.motionZ;
 					MovementUtils.vClip2(0, true);
-					tickTimer++;
+					MovementUtils.vClip2(0, true);
+					mc.player.setPosition(lpos.x, lpos.y, lpos.z);
+					MovementUtils.freeze();
+
+					event.y -= 1E-10;
 				}
+				break;
 			}
-			/*if(e instanceof EventUpdate) {
-				mc.player.motionY=0.3;
-				if(mc.player.isCollidedVertically) {
-					PlayerUtils.vClip(1E-10);
-				}
-			}
-			if(e instanceof EventPlayerInput) {
-				EventPlayerInput event = (EventPlayerInput)e;
-				if(!mc.player.isCollidedVertically&&mc.player.motionY>0) {
-					event.setSneak(true);
-				}
-			}*/
-			/*if(e instanceof EventUpdate) {
-				PlayerUtils.Strafe(1);
-				mc.player.motionY = PlayerUtils.InputY();
-				mc.player.setPosition(mc.player.posX + mc.player.motionX, mc.player.posY + mc.player.motionY, mc.player.posZ + mc.player.motionZ);
-				PlayerUtils.freeze();
-			}
-			if(e instanceof EventHandleTeleport) {
-				EventHandleTeleport event = (EventHandleTeleport)e;
-				event.setCancellTeleporting(true);
-			}*/
-			break;
-		}
-		
-		
-		
-		case "AAC":
-		{
-			if(e instanceof EventMotion) {
-				EventMotion event = (EventMotion)e;
-				event.y -= 1E-10;
-				MovementUtils.vClip2(999, true);
-				mc.player.setPosition(mc.player.lastTickPosX, mc.player.lastTickPosY, mc.player.lastTickPosZ);
-				MovementUtils.vClip2(-1E-10, true);
-				MovementUtils.vClip(-1E-10);
-				toggle();
-			}
-			break;
-		}
-		
-		
-		
-		case "Matrix":
-		{
-			if(e instanceof EventMotion) {
-				EventMotion event = (EventMotion)e;
-				
-				Vec3d lpos = mc.player.getPositionVector();
-				MovementUtils.Strafe(7);
-				mc.player.posX+=mc.player.motionX;
-				mc.player.posZ+=mc.player.motionZ;
-				MovementUtils.vClip2(0, true);
-				MovementUtils.vClip2(0, true);
-				mc.player.setPosition(lpos.x, lpos.y, lpos.z);
-				MovementUtils.freeze();
-				
-				event.y -= 1E-10;
-			}
-			break;
-		}
-		
+
 		}
 		super.onEvent(e);
 	}

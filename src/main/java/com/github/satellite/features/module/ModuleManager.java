@@ -87,6 +87,7 @@ public class ModuleManager {
 		modules.add(new Burrow());
 		modules.add(new Anchor());
 		modules.add(new ForcePlace());
+		modules.add(new Nuker());
 	}
 
 	public static class ModuleComparator implements Comparator<Module> {
