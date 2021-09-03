@@ -2,16 +2,12 @@ package com.github.satellite.features.module.render;
 
 import com.github.satellite.event.Event;
 import com.github.satellite.event.listeners.EventRenderWorld;
-import com.github.satellite.event.listeners.EventUpdate;
 import com.github.satellite.features.module.Module;
 import com.github.satellite.utils.MovementUtils;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.GameType;
 
 import org.lwjgl.input.Keyboard;
 
